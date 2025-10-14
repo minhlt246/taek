@@ -1,0 +1,70 @@
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+} from 'typeorm';
+import { User } from '../../users/entities/user.entity';
+import { Coach } from '../../coaches/entities/coach.entity';
+import { Course } from '../../courses/entities/course.entity';
+import { Event } from '../../events/entities/event.entity';
+import { Notification } from '../../notifications/entities/notification.entity';
+import { TuitionPackage } from '../../tuition-packages/entities/tuition-package.entity';
+import { BeltTest } from '../../belt-tests/entities/belt-test.entity';
+
+@Entity('clubs')
+export class Club {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ length: 20, unique: true })
+  club_code: string;
+
+  @Column({ length: 100 })
+  name: string;
+
+  @Column({ length: 255, nullable: true })
+  address: string;
+
+  @Column({ length: 20, nullable: true })
+  phone: string;
+
+  @Column({ length: 100, nullable: true })
+  email: string;
+
+  @Column({ type: 'text', nullable: true })
+  description: string;
+
+  @Column({ length: 255, nullable: true })
+  logo_url: string;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
+
+  // Relations
+  @OneToMany(() => User, (user) => user.club)
+  users: User[];
+
+  @OneToMany(() => Coach, (coach) => coach.club)
+  coaches: Coach[];
+
+  @OneToMany(() => Course, (course) => course.club)
+  courses: Course[];
+
+  @OneToMany(() => Event, (event) => event.club)
+  events: Event[];
+
+  @OneToMany(() => Notification, (notification) => notification.club)
+  notifications: Notification[];
+
+  @OneToMany(() => TuitionPackage, (tuitionPackage) => tuitionPackage.club)
+  tuition_packages: TuitionPackage[];
+
+  @OneToMany(() => BeltTest, (test) => test.club)
+  belt_tests: BeltTest[];
+}

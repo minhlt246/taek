@@ -23,7 +23,11 @@ export const authApi = {
 
   async login(
     credentials: LoginRequest
-  ): Promise<{ token: string; user: any }> {
+  ): Promise<{
+    success: boolean;
+    message: string;
+    data: { user: any; token: string };
+  }> {
     const response = await http.post("/auth/login", credentials);
     return response.data;
   },

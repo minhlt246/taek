@@ -15,7 +15,7 @@ export default function Login() {
   const { setLoginSuccess, setAccount } = useAccountStore();
 
   const [showPassword, setShowPassword] = useState(false);
-  const [username, setUsername] = useState(
+  const [email, setEmail] = useState(
     process.env.NEXT_PUBLIC_MODE === "development" ? "customer@yopmail.com" : ""
   );
   const [password, setPassword] = useState(
@@ -26,20 +26,18 @@ export default function Login() {
 
   const router = useRouter();
   const { validateUsername } = useValidate();
-  const usernameResult = validateUsername(username);
+  const emailResult = validateUsername(email);
 
-  const isFormValid = usernameResult.valid && password.trim() !== "";
+  const isFormValid = emailResult.valid && password.trim() !== "";
 
   useEffect(() => {
-    const rememberedUsername = localStorage.getItem("rememberedUsername");
-    const rememberedPassword = localStorage.getItem("rememberedPassword");
-    if (rememberedUsername) {
-      setUsername(rememberedUsername);
+    const rememberedEmail = localStorage.getItem("rememberedEmail");
+    if (rememberedEmail) {
+      setEmail(rememberedEmail);
       setRememberMe(true);
     }
-    if (rememberedPassword) {
-      setPassword(rememberedPassword);
-    }
+    // Remove password from localStorage for security
+    localStorage.removeItem("rememberedPassword");
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -48,7 +46,7 @@ export default function Login() {
     setLoading(true);
 
     const res: any = await signIn("login-by-username-password", {
-      username,
+      email,
       password,
       redirect: false,
     });
@@ -56,16 +54,14 @@ export default function Login() {
       setLoginSuccess(false);
       useToast.error(t(res.error));
       if (res.error === "auth.accountInactive") {
-        router.push(`/otp?email=${username}&resend=1`);
+        router.push(`/otp?email=${email}&resend=1`);
       }
     } else {
-      // Login and Remember Me
+      // Login and Remember Me (only email, not password for security)
       if (rememberMe) {
-        localStorage.setItem("rememberedUsername", username);
-        localStorage.setItem("rememberedPassword", password);
+        localStorage.setItem("rememberedEmail", email);
       } else {
-        localStorage.removeItem("rememberedUsername");
-        localStorage.removeItem("rememberedPassword");
+        localStorage.removeItem("rememberedEmail");
       }
 
       const result: any = await getSession();
@@ -97,9 +93,9 @@ export default function Login() {
           setAccount(session.user);
           setLoginSuccess(true);
 
-          // Handle Remember Me cho Google login
+          // Handle Remember Me for Google login
           if (rememberMe && session.user.email) {
-            localStorage.setItem("rememberedUsername", session.user.email);
+            localStorage.setItem("rememberedEmail", session.user.email);
           }
 
           useToast.success("Google login successful!");
@@ -132,16 +128,16 @@ export default function Login() {
                 <input
                   className="form-control"
                   id="mus-account"
-                  type="text"
+                  type="email"
                   placeholder="Email"
                   required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
                 <div className="mb-3">
-                  {username && usernameResult.message && (
+                  {email && emailResult.message && (
                     <div style={{ color: "red", fontSize: 13 }}>
-                      {usernameResult.message}
+                      {emailResult.message}
                     </div>
                   )}
                 </div>

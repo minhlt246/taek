@@ -1,0 +1,23 @@
+import { Course } from '../entities/course.entity';
+
+export interface ICourseService {
+  create(createCourseDto: any): Promise<Course>;
+  findAll(): Promise<Course[]>;
+  findOne(id: number): Promise<Course>;
+  findByClub(club_id: number): Promise<Course[]>;
+  findByCoach(coach_id: number): Promise<Course[]>;
+  findByLevel(level: string): Promise<Course[]>;
+  update(id: number, updateCourseDto: any): Promise<Course>;
+  remove(id: number): Promise<void>;
+}
+
+export interface ICourseRepository {
+  create(course: Partial<Course>): Promise<Course>;
+  findAll(): Promise<Course[]>;
+  findOne(id: number): Promise<Course>;
+  findByClub(club_id: number): Promise<Course[]>;
+  findByCoach(coach_id: number): Promise<Course[]>;
+  findByLevel(level: string): Promise<Course[]>;
+  update(id: number, course: Partial<Course>): Promise<Course>;
+  remove(id: number): Promise<void>;
+}

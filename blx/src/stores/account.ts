@@ -5,9 +5,7 @@ interface User {
   id: string;
   email: string;
   name?: string;
-  avatar?: string;
-  isVerified?: boolean;
-  kycStatus?: "pending" | "approved" | "rejected";
+  role?: string;
 }
 
 interface Asset {
@@ -30,8 +28,6 @@ interface AccountState {
   isLoading: boolean;
   loginSuccess: boolean;
   account: User | null;
-  assets: Asset[];
-  referral: Referral | null;
 
   // User methods
   setUser: (user: User | null) => void;
@@ -39,8 +35,6 @@ interface AccountState {
   setLoading: (loading: boolean) => void;
   setLoginSuccess: (success: boolean) => void;
   setAccount: (account: User | null) => void;
-  setAssets: (assets: Asset[]) => void;
-  setReferral: (referral: Referral | null) => void;
 
   // Auth methods
   login: (user: User, token: string) => void;
@@ -60,8 +54,6 @@ export const useAccountStore = create<AccountState>()(
       isLoading: false,
       loginSuccess: false,
       account: null,
-      assets: [],
-      referral: null,
 
       // User methods
       setUser: (user) => set({ user, isAuthenticated: !!user }),
@@ -69,8 +61,6 @@ export const useAccountStore = create<AccountState>()(
       setLoading: (isLoading) => set({ isLoading }),
       setLoginSuccess: (loginSuccess) => set({ loginSuccess }),
       setAccount: (account) => set({ account }),
-      setAssets: (assets) => set({ assets }),
-      setReferral: (referral) => set({ referral }),
 
       // Auth methods
       login: (user, token) =>
@@ -91,8 +81,6 @@ export const useAccountStore = create<AccountState>()(
           isAuthenticated: false,
           loginSuccess: false,
           isLoading: false,
-          assets: [],
-          referral: null,
         }),
 
       reset: () =>
@@ -103,8 +91,6 @@ export const useAccountStore = create<AccountState>()(
           isAuthenticated: false,
           loginSuccess: false,
           isLoading: false,
-          assets: [],
-          referral: null,
         }),
 
       // Update methods
@@ -122,8 +108,6 @@ export const useAccountStore = create<AccountState>()(
         token: state.token,
         isAuthenticated: state.isAuthenticated,
         loginSuccess: state.loginSuccess,
-        assets: state.assets,
-        referral: state.referral,
       }),
     }
   )
