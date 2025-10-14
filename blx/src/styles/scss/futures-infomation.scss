@@ -1,0 +1,140 @@
+@use "./breakpoint.scss" as *;
+@use "./galaxy.scss" as galaxy;
+
+// SCSS for Liquidation Order UI
+.liquidation-order-wrapper {
+    background: #1b2945;
+   
+    
+    .liquidation-header {
+    background: #1b2945;
+    border-top: 1px solid #171c2c;
+    height: 82px;
+    padding-top: 47px;
+      color: #fff;
+     
+      display: flex;
+      align-items: center;
+      .liquidation-title {
+        font-weight: 600;
+        font-size: 1.1rem;
+        i {
+          margin-right: 8px;
+        }
+      }
+    }
+  
+    .liquidation-tabs {
+        .nav-link {
+          background: transparent;
+          border: none;
+          border-radius: 0;
+          color: #87a2cd;
+          display: inline-block;
+          font-size: 14px;
+          margin-left: 40px;
+          position: relative;
+         
+      
+          // Hover state
+          &:hover {
+            color: #fff;
+          }
+      
+          // Active tab with content shown
+          &[aria-selected="true"] {
+            color: #fff;
+            font-weight: 600;
+      
+            &::after {
+              content: "";
+              position: absolute;
+              bottom: 0;
+              left: 0;
+              width: 100%;
+              height: 2px;
+              background-color: #1a73e8;
+            }
+          }
+        }
+      }
+      
+  
+}
+.liquidation-table-container {
+  .card {
+    border: none;
+    border-radius: 10px;
+  }
+
+  .liquidation-filters {
+    .form-label {
+      font-size: 0.85rem;
+      color: #333;
+    }
+
+    .form-select,
+    .form-control {
+      font-size: 0.85rem;
+    }
+
+    .btn {
+      font-size: 0.85rem;
+    }
+  }
+
+  .liquidation-table {
+    thead th {
+      background-color: #f9fafc;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #6b7280;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    tbody td {
+      font-size: 0.9rem;
+      vertical-align: middle;
+      padding: 12px 8px;
+      border-bottom: 1px solid #eef0f3;
+    }
+
+    tbody td.text-end {
+      text-align: right;
+    }
+
+    .text-danger {
+      color: #e53935;
+      font-weight: 500;
+    }
+
+    .text-success {
+      color: #43a047;
+      font-weight: 500;
+    }
+  }
+
+  .liquidation-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+
+    .btn {
+      font-size: 0.8rem;
+      padding: 4px 8px;
+    }
+
+    input.form-control {
+      font-size: 0.8rem;
+      text-align: center;
+      width: 60px;
+    }
+
+    .page-info {
+      font-size: 0.75rem;
+      color: #888;
+    }
+  }
+}
+  

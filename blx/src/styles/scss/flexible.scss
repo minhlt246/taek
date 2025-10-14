@@ -1,0 +1,232 @@
+@use "./breakpoint.scss" as *;
+@use "./galaxy.scss" as galaxy;
+
+// Hero Section
+.earn-hero-section {
+  background-color: #0b0d13;
+
+  .earn-hero-section-title {
+    font-weight: 700;
+  }
+
+  .earn-hero-section-subtitle {
+    color: #bfc9da;
+  }
+
+  .earn-hero-section-login {
+    font-weight: 200;
+    padding: 10px 32px;
+    background-color: #0d6efd;
+    color: #fff;
+  }
+
+  .earn-hero-section-img {
+    width: 50%;
+    @media (max-width: 767.98px) {
+      display: none;
+    }
+  }
+
+  .earn-tabs-section-nav {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 12px;
+    padding-top: 20px;
+    padding-bottom: 4px;
+    scrollbar-width: none; // Firefox
+
+    &::-webkit-scrollbar {
+      display: none; // Chrome, Safari
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      position: relative;
+      cursor: pointer;
+      height: 52px;
+      line-height: 52px;
+      color: #fff;
+      font-weight: 500;
+      font-size: 20px;
+      padding: 0 24px;
+      .nav-link {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 400;
+        background-color: transparent;
+        border: none;
+        padding: 8px;
+        border-radius: 4px;
+        transition: all 0.2s ease-in-out;
+        z-index: 1;
+        white-space: nowrap; // không xuống dòng
+
+        &:hover {
+          color: #0aa7ff;
+          background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        &.active {
+          color: #000;
+          font-weight: 600;
+          background-color: #fff;
+          border-top-right-radius: 8px;
+          border-top-left-radius: 8px;
+          z-index: 2;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .bong {
+          background: #fe8731;
+          border-radius: 4px;
+          font-weight: 500;
+          font-size: 12px;
+          padding: 0 4px;
+          height: 18px;
+          line-height: 18px;
+          color: #fff;
+          margin-left: 4px;
+        }
+      }
+    }
+
+    // Optional: Responsive tweak
+    @media (max-width: 576px) {
+      gap: 8px;
+
+      .nav-link {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+      }
+    }
+  }
+}
+
+// Table Section
+.earn-table-section {
+  .earn-table-section-header {
+    flex-wrap: nowrap;
+  }
+
+  .earn-table-section-title {
+    font-weight: 700;
+    font-size: 18px;
+    color: #181c23;
+  }
+
+  .earn-table-section-search {
+    min-width: 220px;
+    max-width: 260px;
+    background-color: #f8f9fa;
+    border: 1px solid #e0e6ed;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  table {
+    thead {
+      th {
+        color: #bfc9da;
+        font-weight: 600;
+        font-size: 14px;
+        border-bottom: none;
+        padding: 12px 16px;
+      }
+    }
+
+    tbody {
+      tr {
+        background-color: #ffffff;
+        border-bottom: 1px solid #f0f2f5;
+        transition: background 0.2s ease;
+
+        &:hover {
+          background-color: #f9fbfd;
+        }
+
+        td {
+          vertical-align: middle;
+          font-size: 15px;
+          color: #181c23;
+          padding: 14px 16px;
+          border-top: none;
+        }
+      }
+    }
+  }
+
+  .earn-table-section-token-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #fff;
+    border: 1px solid #e5e8ef;
+  }
+
+  .earn-table-section-token-name {
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  .earn-table-section-apy,
+  .earn-table-section-term {
+    font-size: 15px;
+  }
+
+  .earn-table-section-action {
+    .dropdown-toggle {
+      font-weight: 500;
+      font-size: 15px;
+      color: #0d6efd;
+
+      border: none;
+      text-decoration: none;
+      padding: 0;
+
+      &:hover {
+        text-decoration: underline;
+      }
+
+      i {
+        font-size: 0.85em;
+        vertical-align: middle;
+      }
+    }
+
+    .dropdown-menu {
+      min-width: 180px;
+      font-size: 14px;
+      border-radius: 8px;
+      padding: 8px 0;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      background-color: #fff;
+      border: 1px solid #e6e8ec;
+      color: #000;
+      .dropdown-item {
+        padding: 10px 16px;
+        color: #000;
+        transition: all 0.15s ease-in-out;
+        background-color: #f6f8fb;
+        &:hover {
+          background-color: #f6f8fb;
+          color: #0d6efd;
+        }
+      }
+
+      .dropdown-divider {
+        height: 1px;
+        margin: 4px 0;
+        overflow: hidden;
+        background-color: #e9ecef;
+      }
+    }
+  }
+}

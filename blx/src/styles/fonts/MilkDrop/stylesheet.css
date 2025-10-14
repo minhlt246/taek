@@ -1,0 +1,13 @@
+@font-face {
+    font-family: 'Milk Drops';
+    src: url('MilkDropsBold.eot');
+    src: local('Milk Drops Bold'), local('MilkDropsBold'),
+        url('MilkDropsBold.eot?#iefix') format('embedded-opentype'),
+        url('MilkDropsBold.woff2') format('woff2'),
+        url('MilkDropsBold.woff') format('woff'),
+        url('MilkDropsBold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+

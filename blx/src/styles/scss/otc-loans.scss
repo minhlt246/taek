@@ -1,0 +1,294 @@
+@use "./breakpoint.scss" as *;
+@use "./galaxy.scss" as galaxy;
+
+
+// OTC Why Section
+.otc-why {
+ 
+  .otc-why-box {
+    border: 1px solid #ececec;
+    border-radius: 0;
+    background: #fff;
+    padding: 2rem;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    transition: box-shadow 0.2s;
+    box-shadow: 0 0 0 rgba(0,0,0,0);
+    &:hover {
+      box-shadow: 0 4px 24px rgba(41,121,255,0.08);
+    }
+    img {
+      margin-bottom: 1.25rem;
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+    }
+    h5 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    p {
+      color: #888;
+      font-size: 1rem;
+      margin-bottom: 0;
+    }
+  }
+  @media (max-width: 991.98px) {
+    h2 {
+      font-size: 2rem;
+    }
+    .otc-why-box {
+      padding: 1.25rem;
+      min-height: 180px;
+      h5 {
+        font-size: 1.1rem;
+      }
+      p {
+        font-size: 0.95rem;
+      }
+    }
+  }
+} 
+
+// OTC Steps Section
+.otc-steps {
+  background-color: #f8fdfd;
+
+  .otc-step {
+    text-align: center;
+    position: relative;
+
+    .otc-step-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto;
+      border-radius: 50%;
+      background-color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 6px rgba(0, 0, 0, 0.02);
+    }
+
+    h6 {
+      font-size: 14px;
+      color: #333;
+    }
+
+    p {
+      font-size: 14px;
+      color: #000;
+    }
+
+    // Dotted line between steps
+    .otc-step-line {
+      position: absolute;
+      top: 40px; // ngang giữa icon 80x80
+      left: 70%;
+      width: 200px;
+      height: 1px;
+      border-bottom: 1px dashed #ccc;
+      z-index: 0;
+      transform: translateX(0px); 
+    }
+
+    &:last-child .otc-step-line {
+      display: none;
+    }
+  }
+}
+
+
+// OTC Begin Section
+.otc-begin {
+  background: #111;
+  color: #fff;
+  .otc-loan-form {
+    .form-label {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    .form-control {
+      background: #181818;
+      color: #fff;
+      border: 1px solid #444;
+      border-radius: 8px;
+      font-size: 1rem;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.5rem;
+      &::placeholder {
+        color: #aaa;
+        opacity: 1;
+      }
+    }
+    .form-check-input {
+      background: #222;
+      border: 1px solid #444;
+      margin-right: 0.5rem;
+    }
+    .form-check-label {
+      color: #fff;
+      font-size: 1rem;
+      margin-right: 1.5rem;
+    }
+    
+  }
+  .text-white-50 {
+    color: #aaa !important;
+    font-size: 0.98rem;
+  }
+  @include sm  {
+    
+    .otc-loan-form {
+      .form-control {
+        font-size: 0.98rem;
+        padding: 0.6rem 0.8rem;
+      }
+      .btn-primary {
+        font-size: 1rem;
+      }
+    }
+  }
+} 
+.otc-faq-section {
+  background-color: #fff;
+  padding: 3rem 0;
+
+  
+
+  .otc-faq-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+  }
+
+  .otc-faq {
+    .accordion-item {
+      border: 1px solid #e6e6e6;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+
+    .accordion-button {
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 1rem 1.25rem;
+      background-color: #fff;
+      color: #000;
+      border: none;
+      box-shadow: none;
+
+      &::after {
+        content: "+";
+        font-size: 16px;
+        transform: none;
+        background: transparent !important;
+        margin-left: auto;
+        padding-left: 10px;
+        color: #000;
+      }
+
+      &:not(.collapsed)::after {
+        content: "–";
+      }
+
+      &:focus {
+        box-shadow: none;
+      }
+    }
+
+    .accordion-body {
+      font-size: 0.95rem;
+      color: #555;
+      padding: 1rem 1.25rem;
+      background: #f9f9f9;
+    }
+  }
+}
+
+
+.section-otc-hero {
+ 
+  min-height: 420px;
+  background: linear-gradient(180deg, #99ccff 0%, #fff 100%);
+  position: relative;
+  padding: 60px 80px 40px;
+  overflow: hidden;
+
+  .container-otc-hero {
+    
+    z-index: 2;
+    position: relative;
+
+    .otc-hero-subtitle {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: #222;
+    }
+
+    .otc-hero-title {
+      font-size: 3rem;
+      font-weight: 600;
+      margin-bottom: 2.5rem;
+      color: #111;
+      line-height: 1.15;
+
+      @include sm {
+        font-size: 2rem;
+      }
+    }
+
+    .btn-otc-apply {
+      display: inline-block;
+      background: #2574ea;
+      color: #fff;
+      font-size: 1.3rem;
+      font-weight: 500;
+      padding: 0.9rem 2.5rem;
+      border-radius: 0;
+      border: none;
+      text-decoration: none;
+      transition: background 0.2s;
+      box-shadow: 0 2px 8px rgba(37, 116, 234, 0.08);
+
+      &:hover {
+        background: #155bb5;
+      }
+    }
+  }
+
+  .otc-hero-illustration {
+    position: absolute;
+    right: 100px;
+    bottom: 0;
+    z-index: 1;
+
+    img {
+      max-width: 240px;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    @include md {
+      position: static;
+      margin-top: 32px;
+      display: flex;
+      justify-content: center;
+    }
+  }
+
+  @include md {
+    padding: 40px 16px;
+    text-align: center;
+  }
+}
+

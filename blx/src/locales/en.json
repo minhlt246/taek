@@ -1,0 +1,344 @@
+{
+  "account": {
+    "changePassword": {
+      "userNotFound": "User not found",
+      "wrongOldPassword": "Old password is incorrect",
+      "confirmMismatch": "New password confirmation does not match",
+      "sameAsOld": "New password cannot be the same as the old password",
+      "success": "Password changed successfully"
+    },
+    "errors": {},
+    "validation": {
+      "address": "Address must be a string",
+      "phoneFormat": "Invalid phone number format.",
+      "invalidReferralCode": "Invalid or non-existent referral code."
+    }
+  },
+  "auth": {
+    "accountInactive": "Account is not active",
+    "accountLocked": "Your account is temporarily locked due to too many failed login attempts. Please try again after few minutes.",
+    "register": {
+      "success": "Registration successful. Please check your email to verify your account.",
+      "error": "Unable to register",
+      "passwordMismatch": "Password confirmation does not match",
+      "usernameExists": "Username already exists",
+      "emailExists": "Email is already in use",
+      "phoneExists": "Phone number is already in use",
+      "defaultGroupNotFound": "Default user group not found",
+      "invalidReferralCode": "Invalid or non-existent referral code.",
+      "validation": {
+        "firstName": {
+          "required": "First name is required",
+          "string": "First name must be a string",
+          "minLength": "First name must be at least 2 characters"
+        },
+        "lastName": {
+          "required": "Last name is required",
+          "string": "Last name must be a string",
+          "minLength": "Last name must be at least 2 characters"
+        },
+        "username": {
+          "required": "Username is required",
+          "string": "Username must be a string",
+          "minLength": "Username must be at least 3 characters",
+          "format": "Username can only contain letters, numbers and underscores"
+        },
+        "email": {
+          "required": "Email is required",
+          "format": "Invalid email format"
+        },
+        "phoneNumber": {
+          "required": "Phone number is required",
+          "string": "Phone number must be a string",
+          "format": "Phone number must be 10 or 11 digits"
+        },
+        "password": {
+          "required": "Password is required",
+          "string": "Password must be a string",
+          "minLength": "Password must be at least 8 characters",
+          "format": "Password must contain at least one uppercase letter, one lowercase letter, one number and one special character"
+        },
+        "confirmPassword": {
+          "required": "Password confirmation is required",
+          "string": "Password confirmation must be a string"
+        },
+        "referralCode": {
+          "string": "Referral code must be a string"
+        }
+      }
+    },
+    "login": {
+      "requires2fa": "Two-factor authentication required",
+      "device": "Device verification required",
+      "maxDevices": "Maximum number of trusted devices reached",
+      "error": "Unable to login",
+      "wrongCredentials": "Wrong username or password",
+      "locked": "Your account is temporarily locked due to too many failed login attempts. Please try again in {minutes} minutes."
+    },
+    "verifyEmail": {
+      "success": "Email verified successfully. You can now login.",
+      "error": "Unable to verify email",
+      "invalidToken": "Please try again.",
+      "expiredToken": "Verification token has expired"
+    },
+    "resendVerification": {
+      "success": "Verification email has been resent. Please check your inbox.",
+      "error": "Unable to resend verification email",
+      "accountNotFound": "No account found with this email",
+      "alreadyVerified": "Email is already verified"
+    },
+    "forgotPassword": {
+      "success": "Password reset email has been sent. Please check your inbox.",
+      "error": "Unable to send reset password email",
+      "accountNotFound": "No account found with this email",
+      "emailNotVerified": "Email is not verified"
+    },
+    "resetPassword": {
+      "success": "Password reset successful. You can now login with your new password.",
+      "error": "Unable to reset password",
+      "passwordMismatch": "Password confirmation does not match",
+      "invalidToken": "Invalid reset code password",
+      "expiredToken": "Reset password token has expired",
+      "validation": {
+        "minLength": "At least 8 characters",
+        "uppercase": "At least 1 uppercase letter",
+        "specialChar": "At least 1 special character",
+        "valid": "Password is valid",
+        "requirementsNotMet": "Password does not meet requirements",
+        "confirmMismatch": "Passwords do not match"
+      }
+    },
+    "logout": {
+      "success": "Logged out successfully",
+      "error": "Unable to logout",
+      "tokenNotFound": "Token not found or expired",
+      "invalidToken": "Invalid token"
+    },
+    "refreshToken": {
+      "error": "Unable to refresh token",
+      "userNotFound": "User not found",
+      "accountInactive": "Account is not active"
+    },
+    "validateToken": {
+      "authorizationHeaderRequired": "Authorization header required",
+      "invalidToken": "Invalid token",
+      "userNotFound": "User does not exist or is not active"
+    },
+    "logoutAllDevices": {
+      "success": "Logged out all devices successfully",
+      "error": "Unable to logout all devices"
+    },
+    "getCurrentUser": {
+      "error": "Unable to get user information",
+      "userNotFound": "User not found"
+    },
+    "email": {
+      "verificationSubject": "Email Verification - MUS Exchange",
+      "resetPasswordSubject": "Reset Password - MUS Exchange",
+      "sendError": "Unable to send email"
+    },
+    "maxDevices": "You can only be logged in on up to 3 devices at the same time. Please log out from another device before logging in."
+  },
+  "p2pTrade": {
+    "paymentConfirmed": "Payment confirmed successfully!",
+    "list": {
+      "orders": "orders",
+      "completion": "completion"
+    },
+    "createOffer": {
+      "success": "P2P offer created successfully",
+      "error": "Unable to create P2P offer"
+    },
+    "errors": {
+      "maxActiveOffersReached": "You have reached the maximum number of active offers for this asset",
+      "offerOwnerInsufficientAvailableBalance": "Offer owner's available amount does not have enough to place this buy/sell order",
+      "offerOwnerInsufficientFundingBalance": "Offer owner's funding wallet does not have enough balance to place this buy/sell order",
+      "orderExpired": "Order expired",
+      "paymentMethodsNotFound": "Payment methods not found",
+      "insufficientBalanceForCancellation": "Insufficient balance to cancel this trade",
+      "offerOwnerFundingWalletNotFound": "Offer owner's funding wallet not found",
+      "offerNotFoundOrExpired": "Offer does not exist or has expired",
+      "cannotTradeOnOwnOffer": "Cannot trade on your own offer",
+      "insufficientAmount": "Insufficient amount to trade",
+      "amountOutOfRange": "Amount is out of allowed range",
+      "offerExpired": "Offer has expired",
+      "insufficientBalance": "Insufficient balance to perform the trade",
+      "tradeNotFound": "P2P trade not found",
+      "onlySellerCanConfirm": "Only the seller can confirm this trade",
+      "tradeNotPaid": "Trade has not been marked as paid",
+      "sellerFundingWalletNotFound": "Seller's funding wallet not found",
+      "insufficientBalanceForCompletion": "Insufficient balance to complete the trade",
+      "buyerFundingWalletNotFound": "Buyer's funding wallet not found",
+      "noPermissionToCancel": "You do not have permission to cancel this trade",
+      "tradeCompleted": "Trade is already completed and cannot be cancelled",
+      "tradeInDispute": "Trade is in dispute and cannot be cancelled",
+      "tradeBuyerConfirmed": "Trade has been marked as paid by the buyer and cannot be cancelled",
+      "tradeSellerConfirmed": "Trade has been confirmed by the seller and cannot be cancelled",
+      "tradeCancelled": "Trade has already been cancelled",
+      "tradeExpired": "Trade has expired and cannot be cancelled",
+      "noPermissionToDispute": "You do not have permission to dispute this trade",
+      "cannotDisputeCompletedOrCancelledTrade": "Cannot dispute a completed or cancelled trade",
+      "noPermissionToSendMessage": "You do not have permission to send messages in this trade",
+      "cannotSendMessageInTrade": "Cannot send messages in this trade",
+      "onlyBuyerCanMarkPaid": "Only the buyer can mark the trade as paid",
+      "tradeNotPending": "Trade is not in pending status",
+      "insufficientBalanceToCreateOffer": "Insufficient balance to create offer",
+      "offerNotFound": "Offer not found",
+      "offerCancelledOrExpired": "Offer has been cancelled or expired",
+      "cannotCancelOfferWithRelatedTrades": "Cannot cancel offer with related trades",
+      "noPermissionToViewMessages": "You do not have permission to view messages in this trade",
+      "tradeNotInDispute": "Trade is not in dispute status",
+      "p2pDisabled": "P2P feature is disabled, please contact admin",
+      "not_owner": "You do not own this asset",
+      "trade_inactive": "Trade is no longer active",
+      "invalid_status": "Trade is not in the correct status",
+      "cannot_buy_own": "Cannot buy your own trade",
+      "amount_exceeded": "Purchase amount exceeds available amount",
+      "min_amount": "Minimum amount is {{minAmount}}",
+      "max_amount": "Maximum amount is {{maxAmount}}",
+      "only_seller_confirm": "Only the seller can confirm completion",
+      "cannot_cancel": "You cannot cancel this trade",
+      "cannot_dispute": "You cannot dispute this trade",
+      "cannot_send_message": "You cannot send messages in this trade",
+      "assetSymbolNotSupported": "Asset symbol not supported"
+    },
+    "transaction": {
+      "lockTokenDescription": "Lock token for P2P trade {{assetSymbol}}",
+      "sellTokenDescription": "P2P trade sell token {{assetSymbol}}",
+      "buyTokenDescription": "P2P trade buy token {{assetSymbol}}",
+      "refundTokenDescription": "Refund token due to P2P trade cancellation {{assetSymbol}}",
+      "asset_locked": "Asset has been locked for trade",
+      "asset_unlocked": "Asset has been unlocked",
+      "tokens_transferred": "Tokens transferred successfully"
+    },
+    "message": {
+      "tradeCreated": "P2P trade created",
+      "tradePurchased": "User purchased {{amount}} tokens at {{price}} USDT each. Total: {{totalAmount}} USDT{{note}}",
+      "tradeCompleted": "Trade completed successfully!{{note}}",
+      "tradeCancelled": "Trade has been cancelled. Reason: {{reason}}",
+      "tradeInDispute": "Trade has been disputed. Reason: {{reason}}",
+      "created": "P2P trade created successfully",
+      "bought": "P2P trade purchased successfully",
+      "confirmed": "P2P trade confirmed successfully",
+      "cancelled": "P2P trade cancelled successfully",
+      "disputed": "P2P trade disputed successfully",
+      "messageSent": "Message sent successfully",
+      "sellerConfirmedPayment": "Seller has confirmed payment. Token will be released to buyer.",
+      "buyerConfirmedPayment": "Buyer has marked as paid. Waiting for seller confirmation.",
+      "disputeResolved": "Dispute resolved: {{resolution}}. {{note}}"
+    }
+  },
+  "ipSecurity": {
+    "newIpDetected": "New IP address detected. Please verify your login.",
+    "checkError": "IP security check failed",
+    "verificationSuccess": "IP address verified successfully",
+    "verificationError": "IP verification failed",
+    "rejectionSuccess": "IP address rejected successfully",
+    "rejectionError": "IP rejection failed",
+    "sessionExpired": "IP verification session expired",
+    "sessionError": "IP verification session error",
+    "userNotFound": "User not found",
+    "removeTrustedIpSuccess": "Trusted IP removed successfully",
+    "removeTrustedIpError": "Failed to remove trusted IP",
+    "email": {
+      "subject": "New Login Detected - Action Required"
+    }
+  },
+  "kyc": {
+    "notFound": "KYC information not found",
+    "alreadyApproved": "You already have an approved KYC",
+    "pendingKycExists": "You already have a pending KYC",
+    "cannotUpdate": "Cannot update this KYC",
+    "cannotVerify": "Cannot verify this KYC",
+    "cannotDelete": "Cannot delete this KYC",
+    "kycCreated": "KYC created successfully",
+    "kycUpdated": "KYC updated successfully",
+    "kycVerified": "KYC verified successfully",
+    "kycRejected": "KYC rejected",
+    "kycDeleted": "KYC deleted successfully",
+    "kycRequired": "KYC is required for this transaction",
+    "kycPending": "KYC is pending",
+    "kycUnderReview": "KYC is under review",
+    "kycApproved": "KYC is approved",
+    "kycExpired": "KYC has expired",
+    "kycSuspended": "KYC is suspended",
+    "missingImages": "Missing attached images. Please upload all 3 images: front ID, back ID and selfie"
+  },
+  "wallet": {
+    "createWalletFailed": "Failed to create wallet",
+    "fetch-data-failed": "Failed to fetch wallet data",
+    "withdraw": {
+      "processingWithdraw": "Your withdraw request is being processed",
+      "transactionNotFound": "Withdraw transaction not found",
+      "approveSuccess": "Withdraw request approved successfully",
+      "approveFailed": "Failed to approve withdraw request",
+      "rateLimit": "Withdraw rate limit exceeded",
+      "invalidChain": "Invalid chain ID",
+      "minAmountRequired": "Minimum amount is required",
+      "insufficientFunds": "Insufficient funds",
+      "assetRequired": "Asset is required for this withdrawal",
+      "userNotFound": "User not found",
+      "withdrawalDisabled": "Withdrawal is currently disabled",
+      "walletNotFound": "Wallet not found",
+      "assetNotFound": "Asset not found",
+      "insufficientBalance": "Insufficient balance",
+      "addressRequired": "Please Input Address Wallet",
+      "invalidAddress": "Wallet address is incorrect",
+      "amountRequired": "Please Input transfer amount",
+      "minAmount": "Minimum withdraw",
+      "maxAmount": "Maximum withdraw per transaction",
+      "dailyLimitExceeded": "Daily withdrawal limit exceeded",
+      "historyError": "Failed to get withdrawal history: {{error}}",
+      "limitsError": "Failed to get withdrawal limits: {{error}}",
+      "success": "Withdraw request created successfully",
+      "failed": "Withdraw request failed, please contact support"
+    },
+    "wrongFormatWallet": "The wallet address format is incorrect"
+  },
+  "common": {
+    "request-success": "Request completed successfully.",
+    "success": "Success",
+    "error": "Error",
+    "notFound": "Not found",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden",
+    "badRequest": "Bad request",
+    "internalServerError": "Internal server error",
+    "validationError": "Validation error",
+    "walletNotFound": "Wallet not found",
+    "assetNotFound": "Asset not found",
+    "invalidDepositAmount": "Invalid deposit amount",
+    "invalidWithdrawAmount": "Invalid withdraw amount",
+    "invalidTransferAmount": "Invalid transfer amount",
+    "insufficientBalance": "Insufficient balance",
+    "receiverNotFound": "Receiver not found",
+    "receiverWalletNotFound": "Receiver's wallet not found",
+    "cannotTransferToSelf": "Cannot transfer to yourself"
+  },
+  "trade": {
+    "priceRequired": "Please enter price",
+    "quantityRequired": "Please enter quantity",
+    "quantityGreaterThanZero": "Quantity must be greater than 0",
+    "priceGreaterThanZero": "Price must be greater than 0",
+    "insufficientBalance": "Insufficient balance to place order",
+    "stopPriceGreaterThanZero": "Stop price must be greater than 0",
+    "orderNotFound": "Order not found",
+    "cannotCancelOrder": "Cannot cancel this order",
+    "marketNotFound": "Market not found",
+    "marketNotActive": "Market is not active",
+    "orderCreated": "Order created successfully",
+    "orderCancelled": "Order cancelled successfully",
+    "marketNotOpen": "Market is not open for trading",
+    "noCounterpartyLiquidity": "No counterparty liquidity available to match this MARKET",
+    "quickTrade": {
+      "buy": "Buy",
+      "sell": "Sell",
+      "title": "Quick Trade",
+      "orderSuccess": "Order successfully",
+      "description": "Instantly execute buy or sell orders for cryptocurrencies at the current market rate.",
+      "estimatedReceive": " Estimated to receive",
+      "fee": " Fee",
+      "price": " Price"
+    }
+  }
+}

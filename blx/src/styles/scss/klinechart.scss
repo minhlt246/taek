@@ -1,0 +1,12 @@
+/*chart pro fix */
+.klinecharts-pro-button {
+  width: auto !important;
+}
+
+.klinecharts-pro-period-bar {
+  overflow-x: scroll;
+}
+
+.klinecharts-pro-period-bar > .symbol {
+  display: none;
+}

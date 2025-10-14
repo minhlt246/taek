@@ -1,0 +1,377 @@
+@use "./breakpoint.scss" as *;
+@use "./galaxy.scss" as galaxy;
+
+.ticket-support {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  
+  @include md {
+    padding: 30px 15px;
+  }
+  
+  @include sm {
+    padding: 20px 10px;
+    align-items: flex-start;
+  }
+  
+  .ticket-container {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    padding: 32px 24px 24px 24px;
+    max-width: 600px;
+    width: 100%;
+    box-sizing: border-box;
+    
+    @include md {
+      padding: 24px 20px;
+      border-radius: 12px;
+    }
+    
+    @include sm {
+      padding: 20px 16px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+  }
+
+  .ticket-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: #333;
+    text-align: center;
+    
+    @include md {
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+    }
+    
+    @include sm {
+      font-size: 1.2rem;
+      margin-bottom: 16px;
+    }
+  }
+
+  .ticket-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    
+    @include sm {
+      gap: 16px;
+    }
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    label {
+      font-size: 1rem;
+      font-weight: 500;
+      color: #444;
+      margin-bottom: 2px;
+      
+      @include sm {
+        font-size: 0.9rem;
+      }
+    }
+
+    input[type="text"],
+    select {
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-family: inherit;
+      background: #fafafa;
+      transition: border 0.2s;
+      outline: none;
+      
+      @include sm {
+        padding: 8px 10px;
+        font-size: 0.9rem;
+      }
+    }
+    input[type="text"]:focus,
+    select:focus {
+      border: 1.5px solid #0d6efd;
+      background: #fff;
+    }
+    input[type="file"] {
+      font-size: 1rem;
+      margin-top: 2px;
+      
+      @include sm {
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  .form-submit {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+  }
+}
+
+.my-tickets {
+  margin: 32px auto 0 auto;
+  max-width: 1100px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  padding: 24px 18px 18px 18px;
+  
+  @include md {
+    margin: 24px 15px 0 15px;
+    max-width: none;
+    padding: 20px 15px;
+    border-radius: 8px;
+  }
+  
+  @include sm {
+    margin: 16px 10px 0 10px;
+    padding: 16px 12px;
+    border-radius: 6px;
+  }
+
+  .d-flex {
+    @include sm {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 16px;
+    }
+  }
+
+  .tickets-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+    color: #333;
+    
+    @include md {
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+    }
+    
+    @include sm {
+      font-size: 1rem;
+      margin-bottom: 0;
+    }
+  }
+
+  .tickets-filter {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+    
+    @include sm {
+      justify-content: flex-start;
+      margin-bottom: 16px;
+      width: 100%;
+    }
+    
+    .tickets-filter-form {
+      display: flex;
+      gap: 18px;
+      align-items: flex-end;
+      
+      @include md {
+        gap: 12px;
+      }
+      
+      @include sm {
+        flex-direction: column;
+        width: 100%;
+        gap: 12px;
+        align-items: stretch;
+      }
+      
+      .filter-group {
+        display: flex;
+        flex-direction: column;
+        
+        @include sm {
+          width: 100%;
+        }
+        
+        label {
+          font-size: 0.95rem;
+          color: #444;
+          margin-bottom: 2px;
+          
+          @include sm {
+            font-size: 0.85rem;
+          }
+        }
+        select, input[type="date"] {
+          padding: 6px 10px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          font-size: 1rem;
+          background: #fafafa;
+          font-family: inherit;
+          
+          @include sm {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+          }
+        }
+      }
+    }
+  }
+
+  .tickets-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    
+    @include md {
+      font-size: 0.9rem;
+    }
+    
+    @include sm {
+      font-size: 0.8rem;
+      min-width: 600px; // Đảm bảo bảng có width tối thiểu để scroll
+    }
+    
+    thead, tbody, tr {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+    }
+    
+    th, td {
+      border: 1px solid #e0e0e0;
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 1rem;
+      font-family: inherit;
+      
+      @include md {
+        padding: 8px 10px;
+        font-size: 0.9rem;
+      }
+      
+      @include sm {
+        padding: 6px 8px;
+        font-size: 0.8rem;
+        white-space: nowrap; // Ngăn text wrap để table không bị vỡ layout
+      }
+    }
+    
+    th {
+      background: #f7f7f7;
+      font-weight: 600;
+      color: #222;
+    }
+    
+    tr {
+      &:nth-child(even) {
+        background: #fcfcfc;
+      }
+    }
+    
+    .tickets-view {
+      color: #2196f3;
+      text-decoration: underline;
+      font-weight: 500;
+      cursor: pointer;
+      
+      @include sm {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+        background: #2196f3;
+        color: white;
+        border-radius: 4px;
+        text-decoration: none;
+        display: inline-block;
+      }
+      
+      &:hover {
+        color: #1565c0;
+        
+        @include sm {
+          background: #1565c0;
+          color: white;
+        }
+      }
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 2px 12px;
+      border-radius: 6px;
+      font-size: 0.98rem;
+      font-weight: 500;
+      
+      @include md {
+        padding: 2px 8px;
+        font-size: 0.85rem;
+      }
+      
+      @include sm {
+        padding: 2px 6px;
+        font-size: 0.7rem;
+      }
+      
+      &.status-pending {
+        background: #ffe082;
+        color: #7c5a00;
+        border: 1px solid #ffe082;
+      }
+      &.status-replied {
+        background: #b2ebf2;
+        color: #006064;
+        border: 1px solid #b2ebf2;
+      }
+      &.status-closed {
+        background: #e0e0e0;
+        color: #444;
+        border: 1px solid #e0e0e0;
+      }
+    }
+  }
+  
+  // Table wrapper để scroll horizontal
+  .tickets-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    
+    @include md {
+      border-radius: 6px;
+    }
+    
+    @include sm {
+      border-radius: 4px;
+      
+      // Thêm scrollbar styling cho mobile
+      &::-webkit-scrollbar {
+        height: 6px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+        
+        &:hover {
+          background: #a8a8a8;
+        }
+      }
+    }
+  }
+}
+
+

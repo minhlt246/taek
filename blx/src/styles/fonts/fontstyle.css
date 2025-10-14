@@ -1,0 +1,137 @@
+/* @font-face {
+    font-family: "Montserrat";
+    src: url("Montserrat/Montserrat-SemiBold.ttf") format("truetype");
+}
+@font-face {
+    font-family: "Montserrat";
+    src: url("Montserrat/Montserrat-Bold.ttf") format("truetype");
+    font-weight: 700;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Mont-Regular";
+    src: url("Montserrat/Montserrat-Regular.ttf") format("truetype");
+}
+@font-face {
+    font-family: "Mont-Medium";
+    src: url("Montserrat/Montserrat-Medium.ttf") format("truetype");
+}
+@font-face {
+    font-family: "Mont-Black";
+    src: url("Montserrat/Montserrat-Black.ttf") format("truetype");
+} */
+
+/* @import url('https://fonts.googleapis.com/css2?family=Festive&family=Mountains+of+Christmas:wght@400;700&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Play:wght@400;700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Rubik:ital,wght@0,300..900;1,300..900&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+@font-face {
+    font-family: "Glyphicons Halflings";
+    src: url("glyphicons-halflings-regular.eot");
+    src: url("glyphicons-halflings-regular.eot?#iefix") format("embedded-opentype"),
+    url("glyphicons-halflings-regular.woff2") format("woff2"),
+    url("glyphicons-halflings-regular.woff") format("woff"),
+    url("glyphicons-halflings-regular.ttf") format("truetype"),
+    url("glyphicons-halflings-regular.svg#glyphicons_halflingsregular") format("svg");
+} */
+@font-face {
+  font-family: harmonyos-sans;
+  src: url("harmonyos-sans/HarmonyOS_Sans_Thin.ttf") format("truetype");
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: harmonyos-sans;
+  src: url("harmonyos-sans/HarmonyOS_Sans_Thin_Italic.ttf") format("truetype");
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: harmonyos-sans;
+  src: url("harmonyos-sans/HarmonyOS_Sans_Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: harmonyos-sans;
+  src: url("harmonyos-sans/HarmonyOS_Sans_Light_Italic.ttf") format("truetype");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: harmonyos-sans;
+  src: url("harmonyos-sans/HarmonyOS_Sans_Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: harmonyos-sans;
+  src: url("harmonyos-sans/HarmonyOS_Sans_Regular_Italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: harmonyos-sans;
+  src: url("harmonyos-sans/HarmonyOS_Sans_Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: harmonyos-sans;
+  src: url("harmonyos-sans/HarmonyOS_Sans_Medium_Italic.ttf") format("truetype");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: harmonyos-sans;
+  src: url("harmonyos-sans/HarmonyOS_Sans_Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: harmonyos-sans;
+  src: url("harmonyos-sans/HarmonyOS_Sans_Bold_Italic.ttf") format("truetype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: harmonyos-sans;
+  src: url("harmonyos-sans/HarmonyOS_Sans_Black.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: harmonyos-sans;
+  src: url("harmonyos-sans/HarmonyOS_Sans_Black_Italic.ttf") format("truetype");
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+html,
+body {
+  font-family: harmonyos-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+}
+
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0px;
+  font-family: harmonyos-sans, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+}

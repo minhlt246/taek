@@ -1,0 +1,460 @@
+@use "./breakpoint.scss" as *;
+@use "./galaxy.scss" as galaxy;
+.dual-investment-hero {
+  background: #19191c;
+  color: #fff;
+  padding: 60px 0;
+
+  .hero-title {
+    font-size: 2.8rem;
+    font-weight: 600;
+    margin-bottom: 32px;
+    line-height: 1.4;
+  }
+
+  .hero-actions {
+    margin-bottom: 40px;
+
+    .hero-about-btn {
+      display: inline-block;
+      padding: 10px 24px;
+      font-size: 1rem;
+      color: #fff;
+      border: 1px solid #fff;
+      border-radius: 24px;
+      text-decoration: none;
+      font-family: inherit;
+      background: none;
+      transition: all 0.2s ease-in-out;
+
+      &:hover {
+        background: #fff;
+        color: #19191c;
+      }
+    }
+  }
+
+  .hero-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+
+    .hero-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 24px 40px;
+      background: #232327;
+      color: #fff;
+      font-size: 1.2rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-family: inherit;
+      transition: background 0.2s ease-in-out;
+
+      i {
+        font-size: 2rem;
+      }
+
+      &:hover {
+        background: #2c2c31;
+      }
+    }
+  }
+
+  .hero-image {
+    display: flex;
+
+    align-items: center;
+
+    img {
+      width: 100%;
+
+      height: auto;
+      display: block;
+    }
+  }
+
+  @include sm {
+    .hero-buttons {
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .hero-image {
+      justify-content: center;
+      margin-top: 40px;
+    }
+
+    .hero-title {
+      font-size: 2rem;
+    }
+  }
+  @include md {
+    .hero-buttons {
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .hero-image {
+      justify-content: center;
+      margin-top: 40px;
+    }
+
+    .hero-title {
+      font-size: 2rem;
+    }
+  }
+}
+
+.dual-investment-products {
+  background: #fff;
+  padding: 32px 0 0 0;
+
+  .products-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: #19191c;
+  }
+
+  .products-list {
+    display: flex;
+    gap: 24px;
+    justify-content: space-between;
+    @include sm {
+      flex-direction: column;
+    }
+    @include md {
+      flex-direction: column;
+    }
+  }
+
+  .product-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 24px 32px;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(25, 25, 28, 0.03);
+
+    &.active {
+      border-color: #2196f3; // xanh dương
+      box-shadow: 0 2px 12px rgba(33, 150, 243, 0.08);
+    }
+
+    .product-icon {
+      width: 32px;
+      height: 32px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        border-radius: 50%;
+        background: #fff;
+      }
+    }
+
+    .product-info {
+      .product-name {
+        font-size: 18px;
+        font-weight: 400;
+        color: #19191c;
+        margin-bottom: 8px;
+      }
+      .product-rate {
+        font-size: 16px;
+        font-weight: 300;
+        color: #009966;
+      }
+    }
+  }
+  // Responsive
+}
+
+.dual-investment-filterbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  .filterbar-left {
+    flex: 1;
+
+    .filter-btn-group {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 16px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      .filter-btn {
+        border: none;
+        border-radius: 8px;
+        padding: 8px 20px;
+        font-size: 1rem;
+        color: #444;
+        background: transparent;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+        white-space: nowrap;
+
+        &.active {
+          background: #ededed;
+          color: #19191c;
+          font-weight: 600;
+        }
+
+        &:hover {
+          background: #f2f2f2;
+          color: #111;
+        }
+      }
+    }
+  }
+
+  .filterbar-right {
+    @include sm {
+      margin-top: 16px;
+    }
+    .btc-price {
+      
+      color: #444;
+
+      .btc-icon {
+        width: 24px;
+        height: 24px;
+        margin-right: 8px;
+        border-radius: 50%;
+        object-fit: contain;
+      }
+
+      span {
+        color: #444;
+        font-weight: 500;
+      }
+    }
+  }
+
+ 
+}
+
+
+
+.dual-investment-tabs {
+  .nav-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 12px;
+    padding: 6px 8px;
+    border: none;
+
+    .nav-link {
+      position: relative;
+      background: transparent;
+      border: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #757575;
+      padding: 10px 14px;
+      white-space: nowrap;
+      transition: all 0.2s ease-in-out;
+
+      &:hover {
+        color: #19191c;
+        font-weight: 600;
+      }
+
+      &.active {
+        color: #19191c;
+        font-weight: 700;
+
+        &::after {
+          content: "";
+          position: absolute;
+          left: 0;
+          bottom: -2px;
+          width: 100%;
+          height: 2px;
+          background-color: #1565c0;
+          border-radius: 1px;
+        }
+      }
+    }
+
+    // Optional: hide scrollbar in Webkit
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+  }
+
+  // Responsive (Mobile)
+  @include sm  {
+    .nav-tabs {
+      gap: 8px;
+      padding: 4px 6px;
+
+      .nav-link {
+        font-size: 0.85rem;
+        padding: 8px 10px;
+      }
+    }
+  }
+}
+
+.tab-content {
+  .dual-investment-table {
+    background: #fff;
+    border-radius: 12px;
+    padding-bottom: 32px;
+    margin-top: 16px;
+
+    .table {
+      width: 100%;
+      border: 1px solid #e5e7eb;
+      font-size: 1rem;
+      color: #19191c;
+      border-radius: 12px;
+    
+      thead {
+        tr {
+          th {
+            border-radius: 12px;
+            font-weight: 600;
+            color: #757575;
+            padding: 16px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 1rem;
+            text-align: left;
+          }
+        }
+      }
+    
+      td {
+        padding: 14px 12px;
+        vertical-align: middle;
+        border-radius: 12px;
+      }
+    
+      .term-row {
+        td {
+          border-radius: 12px;
+          font-weight: 600;
+          color: #1565c0;
+          font-size: 1rem;
+          padding-top: 24px;
+          padding-bottom: 8px;
+          border-bottom: none;
+        }
+      }
+    
+      .term-label {
+        font-size: 12px;
+        color: #999999;
+        font-weight: 400;
+      }
+    
+      .target-price {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #19191c;
+        display: inline-block;
+        margin-right: 6px;
+      }
+    
+      .target-diff {
+        font-size: 0.95rem;
+        color: #757575;
+        display: inline-block;
+      }
+    
+      .interest-rate {
+        color: #009966;
+        font-weight: 300;
+        font-size: 1rem;
+      }
+    
+      .subscribe-btn {
+        background: #1565c0;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 22px;
+        font-size: 1rem;
+        font-family: inherit;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+    
+        &:hover {
+          background: #0d47a1;
+        }
+      }
+    
+      // ===== Responsive for Mobile (≤480px) =====
+      @include sm  {
+        font-size: 0.85rem;
+        thead {
+          tr {
+            th {
+              padding: 0px 8px;
+              font-size: 12px;
+            }
+          }
+        }
+    
+        td {
+          padding: 10px 8px;
+          font-size: 0.85rem;
+        }
+    
+        .term-row {
+          td {
+            font-size: 0.9rem;
+            padding-top: 16px;
+            padding-bottom: 6px;
+          }
+        }
+    
+        .term-label {
+          font-size: 11px;
+        }
+    
+        .target-price {
+          font-size: 0.95rem;
+          margin-right: 4px;
+        }
+    
+        .target-diff {
+          font-size: 0.85rem;
+        }
+    
+        .interest-rate {
+          font-size: 0.9rem;
+        }
+    
+        .subscribe-btn {
+          font-size: 0.9rem;
+          padding: 6px 16px;
+        }
+      }
+    }
+    
+  }
+}

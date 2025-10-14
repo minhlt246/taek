@@ -1,0 +1,327 @@
+@use "./breakpoint.scss" as *;
+@use "./galaxy.scss" as galaxy;
+
+// Community Post Page - Withdraw Style Theme
+.community-post-page {
+  min-height: 100vh;
+  
+  .page-header {
+    margin-bottom: 2rem;
+    
+    h5 {
+      color: #1c1c1e;
+      font-weight: 600;
+      font-size: 1.5rem;
+      margin-bottom: 0;
+      
+      i {
+        color: #007bff;
+      }
+    }
+  }
+  
+  .post-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    
+    .card-body {
+      padding: 2rem;
+    }
+  }
+  
+  .step-header {
+    color: #007bff;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e9ecef;
+    position: relative;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 60px;
+      height: 2px;
+      background: #007bff;
+    }
+  }
+  
+  .post-form-card {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+    
+    .form-label {
+      color: #495057;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    .form-control {
+      border-radius: 6px;
+      border: 1px solid #ced4da;
+      padding: 0.75rem 1rem;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+      
+      &:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+      }
+      
+      &.content-textarea {
+        min-height: 200px;
+        resize: vertical;
+      }
+    }
+    
+    .form-text {
+      color: #6c757d;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+  }
+  
+  .upload-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+    
+    .upload-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      border: 2px dashed #007bff;
+      background: transparent;
+      color: #007bff;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      
+      &:hover:not(.disabled) {
+        background: #007bff;
+        color: white;
+        border-style: solid;
+      }
+      
+      &.disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+  
+  .attachments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-top: 0.5rem;
+    
+    .attachment-item {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid #e9ecef;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        border-color: #007bff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,123,255,0.15);
+      }
+      
+      .attachment-preview {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        display: block;
+      }
+      
+      .remove-btn {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        border: none;
+        background: #dc3545;
+        color: white;
+        z-index: 10;
+        transition: all 0.2s ease;
+        
+        &:hover {
+          background: #c82333;
+          transform: scale(1.1);
+        }
+      }
+    }
+  }
+  
+  .hashtags-preview {
+    .hashtag-badge {
+      font-size: 0.875rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-weight: 500;
+      background: #007bff !important;
+    }
+  }
+  
+  .post-summary-card {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    
+    .summary-title {
+      color: #495057;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+    
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #e9ecef;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      .label {
+        color: #6c757d;
+        font-weight: 500;
+      }
+      
+      .value {
+        color: #495057;
+        font-weight: 500;
+        max-width: 60%;
+        text-align: right;
+        word-break: break-word;
+      }
+    }
+  }
+  
+  .post-actions {
+    text-align: center;
+    
+    .submit-btn {
+      background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+      border: none;
+      border-radius: 25px;
+      padding: 0.75rem 2rem;
+      font-weight: 600;
+      font-size: 1rem;
+      color: white;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+      
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,123,255,0.4);
+      }
+      
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+    }
+  }
+  
+  // Alert styling
+  .alert {
+    border-radius: 8px;
+    border: none;
+    
+    &.alert-danger {
+      background: #f8d7da;
+      color: #721c24;
+      
+      i {
+        color: #dc3545;
+      }
+    }
+  }
+  
+  // Breadcrumb styling
+  .breadcrumb {
+    background: transparent;
+    padding: 0;
+    margin-bottom: 1rem;
+    
+    .breadcrumb-item {
+      font-size: 0.9rem;
+      
+      a {
+        color: #007bff;
+        text-decoration: none;
+        
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+      
+      &.active {
+        color: #6c757d;
+      }
+    }
+  }
+  
+  // Input group styling
+  .input-group {
+    .input-group-text {
+      background: #f8f9fa;
+      border-color: #ced4da;
+      color: #495057;
+    }
+  }
+  
+  // Responsive design
+  @include media(sm, md) {
+    .post-card .card-body {
+      padding: 1rem;
+    }
+    
+    .attachments-grid {
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+    
+    .post-summary-card .summary-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+      
+      .value {
+        max-width: 100%;
+        text-align: left;
+      }
+    }
+  }
+}
+
+

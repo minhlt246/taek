@@ -1,0 +1,34 @@
+@use "./breakpoint.scss" as *;
+@use "./galaxy.scss" as galaxy;
+.page-detail {
+  background: #fff;
+  color: #222;
+  font-family: 'Inter', Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.7;
+
+  .page-detail-header {
+    background: #23272f;
+    color: #fff;
+    padding: 3rem 0 2rem 0;
+    margin-bottom: 2rem;
+
+    .page-detail-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      margin-bottom: 0;
+    }
+  }
+
+
+  .page-detail-main {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px 0 rgba(0,0,0,0.06);
+    padding: 2.5rem 2rem 2rem 2rem;
+    margin-bottom: 2rem;
+
+   
+  }
+}
