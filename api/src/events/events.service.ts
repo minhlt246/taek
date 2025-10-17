@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ConflictException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Event } from './entities/event.entity';
@@ -13,6 +18,16 @@ export class EventsService implements IEventService {
   ) {}
 
   async create(createEventDto: CreateEventDto): Promise<Event> {
+    // Validate date logic
+    if (createEventDto.start_date && createEventDto.end_date) {
+      const startDate = new Date(createEventDto.start_date);
+      const endDate = new Date(createEventDto.end_date);
+
+      if (startDate >= endDate) {
+        throw new BadRequestException('End date must be after start date');
+      }
+    }
+
     const event = this.eventRepository.create(createEventDto);
     return await this.eventRepository.save(event);
   }
@@ -62,7 +77,20 @@ export class EventsService implements IEventService {
   }
 
   async update(id: number, updateEventDto: UpdateEventDto): Promise<Event> {
-    await this.findOne(id);
+    const existingEvent = await this.findOne(id);
+
+    // Validate date logic
+    const startDate = updateEventDto.start_date
+      ? new Date(updateEventDto.start_date)
+      : existingEvent.start_date;
+    const endDate = updateEventDto.end_date
+      ? new Date(updateEventDto.end_date)
+      : existingEvent.end_date;
+
+    if (startDate && endDate && startDate >= endDate) {
+      throw new BadRequestException('End date must be after start date');
+    }
+
     await this.eventRepository.update(id, updateEventDto);
     return await this.findOne(id);
   }

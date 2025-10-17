@@ -40,18 +40,6 @@ export class CreateEventDto {
   club_id?: number;
 
   @IsOptional()
-  @IsNumber()
-  registration_fee?: number;
-
-  @IsOptional()
-  @IsNumber()
-  max_participants?: number;
-
-  @IsOptional()
-  @IsNumber()
-  current_participants?: number;
-
-  @IsOptional()
   @IsEnum(['upcoming', 'ongoing', 'completed', 'cancelled'])
   status?: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
 }

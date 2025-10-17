@@ -24,6 +24,14 @@ export class CreateCourseDto {
   level?: 'beginner' | 'intermediate' | 'advanced';
 
   @IsOptional()
+  @IsEnum(['Q1', 'Q2', 'Q3', 'Q4'])
+  quarter?: 'Q1' | 'Q2' | 'Q3' | 'Q4';
+
+  @IsOptional()
+  @IsNumber()
+  year?: number;
+
+  @IsOptional()
   @IsNumber()
   coach_id?: number;
 
@@ -32,16 +40,16 @@ export class CreateCourseDto {
   club_id?: number;
 
   @IsOptional()
+  @IsNumber()
+  branch_id?: number;
+
+  @IsOptional()
   @IsDateString()
   start_date?: string;
 
   @IsOptional()
   @IsDateString()
   end_date?: string;
-
-  @IsOptional()
-  @IsNumber()
-  max_students?: number;
 
   @IsOptional()
   @IsNumber()

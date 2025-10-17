@@ -4,6 +4,7 @@ import {
   IsEmail,
   IsNumber,
   IsBoolean,
+  IsEnum,
   MinLength,
   MaxLength,
 } from 'class-validator';
@@ -35,6 +36,15 @@ export class CreateCoachDto {
   email?: string;
 
   @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  password?: string;
+
+  @IsOptional()
+  @IsEnum(['head_coach', 'main_manager', 'assistant_manager', 'assistant'])
+  role?: 'head_coach' | 'main_manager' | 'assistant_manager' | 'assistant';
+
+  @IsOptional()
   @IsNumber()
   belt_level_id?: number;
 
@@ -54,6 +64,10 @@ export class CreateCoachDto {
   @IsOptional()
   @IsNumber()
   club_id?: number;
+
+  @IsOptional()
+  @IsNumber()
+  branch_id?: number;
 
   @IsOptional()
   @IsBoolean()

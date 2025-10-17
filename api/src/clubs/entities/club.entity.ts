@@ -5,6 +5,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Coach } from '../../coaches/entities/coach.entity';
@@ -13,6 +15,7 @@ import { Event } from '../../events/entities/event.entity';
 import { Notification } from '../../notifications/entities/notification.entity';
 import { TuitionPackage } from '../../tuition-packages/entities/tuition-package.entity';
 import { BeltTest } from '../../belt-tests/entities/belt-test.entity';
+import { Branch } from '../../branches/entities/branch.entity';
 
 @Entity('clubs')
 export class Club {
@@ -34,6 +37,9 @@ export class Club {
   @Column({ length: 100, nullable: true })
   email: string;
 
+  @Column({ nullable: true })
+  head_coach_id: number;
+
   @Column({ type: 'text', nullable: true })
   description: string;
 
@@ -50,8 +56,15 @@ export class Club {
   @OneToMany(() => User, (user) => user.club)
   users: User[];
 
+  @OneToMany(() => Branch, (branch) => branch.club)
+  branches: Branch[];
+
   @OneToMany(() => Coach, (coach) => coach.club)
   coaches: Coach[];
+
+  @ManyToOne(() => Coach, (coach) => coach.id)
+  @JoinColumn({ name: 'head_coach_id' })
+  head_coach: Coach;
 
   @OneToMany(() => Course, (course) => course.club)
   courses: Course[];

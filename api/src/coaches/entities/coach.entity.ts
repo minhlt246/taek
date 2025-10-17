@@ -9,6 +9,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Club } from '../../clubs/entities/club.entity';
+import { Branch } from '../../branches/entities/branch.entity';
 import { BeltLevel } from '../../belt-levels/entities/belt-level.entity';
 import { Course } from '../../courses/entities/course.entity';
 import { BeltPromotion } from '../../belt-promotions/entities/belt-promotion.entity';
@@ -36,6 +37,16 @@ export class Coach {
   @Column({ length: 100, nullable: true })
   email: string;
 
+  @Column({ length: 255, nullable: true })
+  password: string;
+
+  @Column({
+    type: 'enum',
+    enum: ['head_coach', 'main_manager', 'assistant_manager', 'assistant'],
+    default: 'assistant',
+  })
+  role: 'head_coach' | 'main_manager' | 'assistant_manager' | 'assistant';
+
   @Column({ nullable: true })
   belt_level_id: number;
 
@@ -51,6 +62,9 @@ export class Coach {
   @Column({ nullable: true })
   club_id: number;
 
+  @Column({ nullable: true })
+  branch_id: number;
+
   @Column({ default: true })
   is_active: boolean;
 
@@ -64,6 +78,10 @@ export class Coach {
   @ManyToOne(() => Club, (club) => club.coaches)
   @JoinColumn({ name: 'club_id' })
   club: Club;
+
+  @ManyToOne(() => Branch, (branch) => branch.coaches)
+  @JoinColumn({ name: 'branch_id' })
+  branch: Branch;
 
   @ManyToOne(() => BeltLevel, (beltLevel) => beltLevel.coaches)
   @JoinColumn({ name: 'belt_level_id' })

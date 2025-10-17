@@ -6,10 +6,8 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
-  OneToMany,
 } from 'typeorm';
 import { Club } from '../../clubs/entities/club.entity';
-import { EventRegistration } from '../../event-registrations/entities/event-registration.entity';
 
 @Entity('events')
 export class Event {
@@ -41,15 +39,6 @@ export class Event {
   @Column({ nullable: true })
   club_id: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
-  registration_fee: number;
-
-  @Column({ nullable: true })
-  max_participants: number;
-
-  @Column({ default: 0 })
-  current_participants: number;
-
   @Column({
     type: 'enum',
     enum: ['upcoming', 'ongoing', 'completed', 'cancelled'],
@@ -67,7 +56,4 @@ export class Event {
   @ManyToOne(() => Club, (club) => club.events)
   @JoinColumn({ name: 'club_id' })
   club: Club;
-
-  @OneToMany(() => EventRegistration, (registration) => registration.event)
-  event_registrations: EventRegistration[];
 }

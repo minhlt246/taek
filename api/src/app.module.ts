@@ -4,6 +4,7 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ClubsModule } from './clubs/clubs.module';
+import { BranchesModule } from './branches/branches.module';
 import { BeltLevelsModule } from './belt-levels/belt-levels.module';
 import { CoachesModule } from './coaches/coaches.module';
 import { CoursesModule } from './courses/courses.module';
@@ -16,6 +17,17 @@ import { ContactMessagesModule } from './contact-messages/contact-messages.modul
 import { ParentsModule } from './parents/parents.module';
 import { StudentParentsModule } from './student-parents/student-parents.module';
 import { databaseConfig } from './config/database.config';
+import { AttendanceModule } from './attendance/attendance.module';
+import { BeltPromotionsModule } from './belt-promotions/belt-promotions.module';
+import { CertificatesModule } from './certificates/certificates.module';
+import { BeltTestsModule } from './belt-tests/belt-tests.module';
+import { FeedbacksModule } from './feedbacks/feedbacks.module';
+import { LearningProgressModule } from './learning-progress/learning-progress.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { PaymentDetailsModule } from './payment-details/payment-details.module';
+import { StudentEvaluationsModule } from './student-evaluations/student-evaluations.module';
+import { TestRegistrationsModule } from './test-registrations/test-registrations.module';
+import { TuitionPackagesModule } from './tuition-packages/tuition-packages.module';
 
 const createDatabaseConfig = (
   configService: ConfigService,
@@ -46,6 +58,7 @@ const createDatabaseConfig = (
     AuthModule,
     UsersModule,
     ClubsModule,
+    BranchesModule,
     BeltLevelsModule,
     CoachesModule,
     CoursesModule,
@@ -57,6 +70,17 @@ const createDatabaseConfig = (
     ContactMessagesModule,
     ParentsModule,
     StudentParentsModule,
+    AttendanceModule,
+    BeltPromotionsModule,
+    CertificatesModule,
+    BeltTestsModule,
+    FeedbacksModule,
+    LearningProgressModule,
+    NotificationsModule,
+    PaymentDetailsModule,
+    StudentEvaluationsModule,
+    TestRegistrationsModule,
+    TuitionPackagesModule,
   ],
   controllers: [],
   providers: [],

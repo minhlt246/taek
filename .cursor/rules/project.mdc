@@ -1,0 +1,42 @@
+---
+alwaysApply: true
+---
+1. Ngươi phải cấu hình IDE chuẩn ngay từ đầu
+
+    Thiết lập linting, format code, plugin cần thiết và cấu trúc workspace thống nhất theo dự án.
+
+2. Ngươi không được push code mà chưa chạy được local
+
+    Không ai thích nhận merge request với bug cơ bản. Kiểm tra kỹ trước khi commit.
+
+3. Ngươi phải format code trước khi lưu / commit
+
+    Dùng Prettier, ESLint, Black, hoặc bất kỳ formatter phù hợp. Code đẹp là tôn trọng team.
+
+4. Ngươi phải viết comment và tên biến có ý nghĩa
+
+    IDE không thể cứu được code khó hiểu. Giúp người khác (và chính ngươi) đọc lại sau này.
+
+5. Ngươi không được làm việc mà không dùng Git
+
+    Mọi thay đổi đều phải được theo dõi. Không có chuyện sửa trực tiếp mà không version control.
+
+6. Ngươi phải tận dụng hết sức mạnh của IDE
+
+    Gõ lệnh nhanh (shortcut), tìm lỗi (debugger), refactor thông minh – IDE là trợ lý, đừng coi nó như Notepad.
+
+7. Ngươi không được hard-code cấu hình vào source
+
+    Sử dụng .env, config file, hoặc secrets manager. Không để API key trần truồng trong code.
+
+8. Ngươi phải viết test nếu hệ thống đủ phức tạp
+
+    Unit test / Integration test phải được IDE hỗ trợ – hãy thiết lập và sử dụng.
+
+9. Ngươi phải commit message rõ ràng và có quy chuẩn
+
+    Dùng convention (như Conventional Commits). Ví dụ: feat: add login page, fix: resolve null bug.
+
+10. Ngươi phải học thêm IDE mỗi tuần
+
+    Mỗi tuần 1 mẹo / plugin mới. Làm chủ công cụ = tăng hiệu suất + giảm stress.

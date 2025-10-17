@@ -1,4 +1,13 @@
-import { IsEmail, IsString, IsOptional, IsEnum, IsDateString, IsBoolean, MinLength, MaxLength } from 'class-validator';
+import {
+  IsEmail,
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsDateString,
+  IsBoolean,
+  MinLength,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -16,8 +25,8 @@ export class CreateUserDto {
   password: string;
 
   @IsOptional()
-  @IsEnum(['admin', 'student', 'HLV'])
-  role?: 'admin' | 'student' | 'HLV';
+  @IsEnum(['admin', 'student'])
+  role?: 'admin' | 'student';
 
   @IsOptional()
   @IsString()

@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto, UpdateEventDto } from './dto';
@@ -24,7 +25,20 @@ export class EventsController {
   }
 
   @Get()
-  findAll() {
+  findAll(
+    @Query('type') type?: string,
+    @Query('status') status?: string,
+    @Query('club_id') club_id?: string,
+  ) {
+    if (type) {
+      return this.eventsService.findByType(type);
+    }
+    if (status) {
+      return this.eventsService.findByStatus(status);
+    }
+    if (club_id) {
+      return this.eventsService.findByClub(parseInt(club_id));
+    }
     return this.eventsService.findAll();
   }
 

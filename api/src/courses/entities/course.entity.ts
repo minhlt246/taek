@@ -9,6 +9,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Club } from '../../clubs/entities/club.entity';
+import { Branch } from '../../branches/entities/branch.entity';
 import { Coach } from '../../coaches/entities/coach.entity';
 import { Enrollment } from '../../enrollments/entities/enrollment.entity';
 import { Schedule } from '../../schedules/entities/schedule.entity';
@@ -35,20 +36,30 @@ export class Course {
   })
   level: 'beginner' | 'intermediate' | 'advanced';
 
+  @Column({
+    type: 'enum',
+    enum: ['Q1', 'Q2', 'Q3', 'Q4'],
+    nullable: true,
+  })
+  quarter: 'Q1' | 'Q2' | 'Q3' | 'Q4';
+
+  @Column({ nullable: true })
+  year: number;
+
   @Column({ nullable: true })
   coach_id: number;
 
   @Column({ nullable: true })
   club_id: number;
 
+  @Column({ nullable: true })
+  branch_id: number;
+
   @Column({ type: 'date', nullable: true })
   start_date: Date;
 
   @Column({ type: 'date', nullable: true })
   end_date: Date;
-
-  @Column({ default: 20 })
-  max_students: number;
 
   @Column({ default: 0 })
   current_students: number;
@@ -69,6 +80,10 @@ export class Course {
   @ManyToOne(() => Club, (club) => club.courses)
   @JoinColumn({ name: 'club_id' })
   club: Club;
+
+  @ManyToOne(() => Branch, (branch) => branch.courses)
+  @JoinColumn({ name: 'branch_id' })
+  branch: Branch;
 
   @ManyToOne(() => Coach, (coach) => coach.courses)
   @JoinColumn({ name: 'coach_id' })

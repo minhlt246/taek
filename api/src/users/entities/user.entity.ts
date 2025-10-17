@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Club } from '../../clubs/entities/club.entity';
 import { BeltLevel } from '../../belt-levels/entities/belt-level.entity';
+import { Branch } from '../../branches/entities/branch.entity';
 import { Enrollment } from '../../enrollments/entities/enrollment.entity';
 import { Payment } from '../../payments/entities/payment.entity';
 import { News } from '../../news/entities/news.entity';
@@ -20,7 +21,6 @@ import { StudentEvaluation } from '../../student-evaluations/entities/student-ev
 import { Feedback } from '../../feedbacks/entities/feedback.entity';
 import { Attendance } from '../../attendance/entities/attendance.entity';
 import { LearningProgress } from '../../learning-progress/entities/learning-progress.entity';
-import { EventRegistration } from '../../event-registrations/entities/event-registration.entity';
 import { StudentParent } from '../../student-parents/entities/student-parent.entity';
 
 @Entity('users')
@@ -39,10 +39,10 @@ export class User {
 
   @Column({
     type: 'enum',
-    enum: ['admin', 'student', 'HLV'],
+    enum: ['admin', 'student'],
     default: 'student',
   })
-  role: 'admin' | 'student' | 'HLV';
+  role: 'admin' | 'student';
 
   @Column({ length: 20, unique: true, nullable: true })
   student_code: string;
@@ -52,6 +52,9 @@ export class User {
 
   @Column({ nullable: true })
   club_id: number;
+
+  @Column({ nullable: true })
+  branch_id: number;
 
   @Column({ length: 15, nullable: true })
   phone: string;
@@ -87,6 +90,10 @@ export class User {
   @JoinColumn({ name: 'belt_level_id' })
   belt_level: BeltLevel;
 
+  @ManyToOne(() => Branch, (branch) => branch.users)
+  @JoinColumn({ name: 'branch_id' })
+  branch: Branch;
+
   @OneToMany(() => Enrollment, (enrollment) => enrollment.user)
   enrollments: Enrollment[];
 
@@ -116,9 +123,6 @@ export class User {
 
   @OneToMany(() => LearningProgress, (progress) => progress.user)
   learning_progress: LearningProgress[];
-
-  @OneToMany(() => EventRegistration, (registration) => registration.user)
-  event_registrations: EventRegistration[];
 
   @OneToMany(() => StudentParent, (studentParent) => studentParent.student)
   student_parents: StudentParent[];

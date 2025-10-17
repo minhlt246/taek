@@ -17,11 +17,12 @@ CREATE TABLE clubs (
     address VARCHAR(255),
     phone VARCHAR(20),
     email VARCHAR(100),
-    
+    head_coach_id INT,
     description TEXT,
     logo_url VARCHAR(255),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (head_coach_id) REFERENCES coaches(id)
 );
 
 -- Tạo bảng cấp đai
@@ -35,16 +36,57 @@ CREATE TABLE belt_levels (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- Tạo bảng chi nhánh
+CREATE TABLE branches (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    club_id INT NOT NULL,
+    branch_code VARCHAR(20) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    address VARCHAR(255),
+    phone VARCHAR(20),
+    email VARCHAR(100),
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (club_id) REFERENCES clubs(id)
+);
+
+-- Tạo bảng quản lý chi nhánh (1 thầy có thể quản lý nhiều chi nhánh)
+CREATE TABLE branch_managers (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    branch_id INT NOT NULL,
+    manager_id INT NOT NULL,
+    role ENUM('main_manager', 'assistant_manager') DEFAULT 'main_manager',
+    is_active BOOLEAN DEFAULT TRUE,
+    assigned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (branch_id) REFERENCES branches(id),
+    FOREIGN KEY (manager_id) REFERENCES coaches(id),
+    UNIQUE KEY unique_branch_manager (branch_id, manager_id)
+);
+
+-- Tạo bảng trợ giảng chi nhánh (mỗi chi nhánh có nhiều trợ giảng)
+CREATE TABLE branch_assistants (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    branch_id INT NOT NULL,
+    assistant_id INT NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    assigned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (branch_id) REFERENCES branches(id),
+    FOREIGN KEY (assistant_id) REFERENCES coaches(id),
+    UNIQUE KEY unique_branch_assistant (branch_id, assistant_id)
+);
+
 -- Tạo bảng người dùng (học viên, admin)
 CREATE TABLE users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    role ENUM('admin', 'student', 'HLV') DEFAULT 'student',
+    role ENUM('admin', 'student') DEFAULT 'student',
     student_code VARCHAR(20) UNIQUE,
     belt_level_id INT,
     club_id INT,
+    branch_id INT,
     phone VARCHAR(15),
     date_of_birth DATE,
     gender ENUM('male', 'female', 'other'),
@@ -57,7 +99,8 @@ CREATE TABLE users (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (belt_level_id) REFERENCES belt_levels(id),
-    FOREIGN KEY (club_id) REFERENCES clubs(id)
+    FOREIGN KEY (club_id) REFERENCES clubs(id),
+    FOREIGN KEY (branch_id) REFERENCES branches(id)
 );
 
 -- Tạo bảng huấn luyện viên (HLV)
@@ -68,16 +111,20 @@ CREATE TABLE coaches (
     photo_url VARCHAR(255),
     phone VARCHAR(15),
     email VARCHAR(100),
+    password VARCHAR(255),
+    role ENUM('head_coach', 'main_manager', 'assistant_manager', 'assistant') DEFAULT 'assistant',
     belt_level_id INT,
     experience_years INT,
     specialization VARCHAR(100),
     bio TEXT,
     club_id INT,
+    branch_id INT,
     is_active BOOLEAN DEFAULT TRUE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (belt_level_id) REFERENCES belt_levels(id),
-    FOREIGN KEY (club_id) REFERENCES clubs(id)
+    FOREIGN KEY (club_id) REFERENCES clubs(id),
+    FOREIGN KEY (branch_id) REFERENCES branches(id)
 );
 
 -- Tạo bảng khóa học / lớp học
@@ -86,18 +133,21 @@ CREATE TABLE courses (
     title VARCHAR(100) NOT NULL,
     description TEXT,
     level ENUM('beginner', 'intermediate', 'advanced'),
+    quarter ENUM('Q1', 'Q2', 'Q3', 'Q4'),
+    year INT,
     coach_id INT,
     club_id INT,
+    branch_id INT,
     start_date DATE,
     end_date DATE,
-    max_students INT DEFAULT 20,
     current_students INT DEFAULT 0,
     image_url VARCHAR(255),
     is_active BOOLEAN DEFAULT TRUE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (coach_id) REFERENCES coaches(id),
-    FOREIGN KEY (club_id) REFERENCES clubs(id)
+    FOREIGN KEY (club_id) REFERENCES clubs(id),
+    FOREIGN KEY (branch_id) REFERENCES branches(id)
 );
 
 -- Tạo bảng đăng ký học viên vào lớp
@@ -232,27 +282,12 @@ CREATE TABLE events (
     end_date DATETIME,
     location VARCHAR(255),
     club_id INT,
-    registration_fee DECIMAL(10,2) DEFAULT 0,
-    max_participants INT,
-    current_participants INT DEFAULT 0,
     status ENUM('upcoming', 'ongoing', 'completed', 'cancelled') DEFAULT 'upcoming',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (club_id) REFERENCES clubs(id)
 );
 
--- Tạo bảng đăng ký sự kiện
-CREATE TABLE event_registrations (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    event_id INT,
-    user_id INT,
-    registration_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    payment_status ENUM('paid', 'pending', 'free') DEFAULT 'pending',
-    notes TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (event_id) REFERENCES events(id),
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
 
 -- Tạo bảng thông báo
 CREATE TABLE notifications (
@@ -271,20 +306,6 @@ CREATE TABLE notifications (
 
 
 
--- Tạo bảng lịch sử hoạt động (Audit Log)
-CREATE TABLE audit_logs (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT,
-    action VARCHAR(100) NOT NULL,
-    table_name VARCHAR(50),
-    record_id INT,
-    old_values JSON,
-    new_values JSON,
-    ip_address VARCHAR(45),
-    user_agent TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
 
 -- Tạo bảng quản lý học phí và gói học
 CREATE TABLE tuition_packages (
@@ -432,13 +453,31 @@ CREATE TABLE feedbacks (
 -- Indexes for users table
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_club_id ON users(club_id);
+CREATE INDEX idx_users_branch_id ON users(branch_id);
 CREATE INDEX idx_users_belt_level_id ON users(belt_level_id);
 CREATE INDEX idx_users_active_status ON users(active_status);
 
+-- Indexes for branches table
+CREATE INDEX idx_branches_club_id ON branches(club_id);
+CREATE INDEX idx_branches_branch_code ON branches(branch_code);
+
+-- Indexes for branch_managers table
+CREATE INDEX idx_branch_managers_branch_id ON branch_managers(branch_id);
+CREATE INDEX idx_branch_managers_manager_id ON branch_managers(manager_id);
+CREATE INDEX idx_branch_managers_role ON branch_managers(role);
+
+-- Indexes for branch_assistants table
+CREATE INDEX idx_branch_assistants_branch_id ON branch_assistants(branch_id);
+CREATE INDEX idx_branch_assistants_assistant_id ON branch_assistants(assistant_id);
+
 -- Indexes for courses table
 CREATE INDEX idx_courses_club_id ON courses(club_id);
+CREATE INDEX idx_courses_branch_id ON courses(branch_id);
 CREATE INDEX idx_courses_coach_id ON courses(coach_id);
 CREATE INDEX idx_courses_start_date ON courses(start_date);
+CREATE INDEX idx_courses_quarter ON courses(quarter);
+CREATE INDEX idx_courses_year ON courses(year);
+CREATE INDEX idx_courses_quarter_year ON courses(quarter, year);
 
 -- Indexes for enrollments table
 CREATE INDEX idx_enrollments_user_id ON enrollments(user_id);
@@ -464,10 +503,6 @@ CREATE INDEX idx_events_status ON events(status);
 CREATE INDEX idx_notifications_club_id ON notifications(club_id);
 CREATE INDEX idx_notifications_published_at ON notifications(published_at);
 
--- Indexes for audit_logs table
-CREATE INDEX idx_audit_logs_user_id ON audit_logs(user_id);
-CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at);
-CREATE INDEX idx_audit_logs_table_name ON audit_logs(table_name);
 
 -- =====================================================
 -- SAMPLE DATA INSERTION
@@ -475,28 +510,69 @@ CREATE INDEX idx_audit_logs_table_name ON audit_logs(table_name);
 
 -- Insert sample belt levels
 INSERT INTO belt_levels (name, color, order_sequence, description) VALUES
-('White Belt', 'White', 1, 'Beginner level - 10th Gup'),
-('Yellow Belt', 'Yellow', 2, 'Beginner level - 9th Gup'),
-('Orange Belt', 'Orange', 3, 'Beginner level - 8th Gup'),
-('Green Belt', 'Green', 4, 'Intermediate level - 7th Gup'),
-('Blue Belt', 'Blue', 5, 'Intermediate level - 6th Gup'),
-('Brown Belt', 'Brown', 6, 'Intermediate level - 5th Gup'),
-('Red Belt', 'Red', 7, 'Advanced level - 4th Gup'),
-('Red-Black Belt', 'Red-Black', 8, 'Advanced level - 3rd Gup'),
-('Black Belt 1st Dan', 'Black', 9, 'Master level - 1st Dan'),
-('Black Belt 2nd Dan', 'Black', 10, 'Master level - 2nd Dan');
+('Cấp 8', 'White', 1, 'Đai trắng cấp 8'),
+('Cấp 7', 'Yellow', 2, 'Đai vàng cấp 7'),
+('Cấp 6', 'Green', 3, 'Đai xanh lá cấp 6'),
+('Cấp 5', 'Blue', 4, 'Đai xanh dương cấp 5'),
+('Cấp 4', 'Red', 5, 'Đai đỏ cấp 4'),
+('Cấp 3', 'Red', 6, 'Đai đỏ cấp 3'),
+('Cấp 2', 'Red', 7, 'Đai đỏ cấp 2'),
+('Cấp 1', 'Red', 8, 'Đai đỏ cấp 1'),
+('Nhất đẳng (1 Dan)', 'Black', 9, 'Đai đen 1 đẳng'),
+('Nhị đẳng (2 Dan)', 'Black', 10, 'Đai đen 2 đẳng'),
+('Tam đẳng (3 Dan)', 'Black', 11, 'Đai đen 3 đẳng'),
+('Tứ đẳng (4 Dan)', 'Black', 12, 'Đai đen 4 đẳng'),
+('Ngũ đẳng (5 Dan)', 'Black', 13, 'Đai đen 5 đẳng'),
+('Lục đẳng (6 Dan)', 'Black', 14, 'Đai đen 6 đẳng'),
+('Thất đẳng (7 Dan)', 'Black', 15, 'Đai đen 7 đẳng'),
+('Bát đẳng (8 Dan)', 'Black', 16, 'Đai đen 8 đẳng'),
+('Cửu đẳng (9 Dan)', 'Black', 17, 'Đai đen 9 đẳng'),
+('Thập đẳng (10 Dan)', 'Black', 18, 'Đai đen 10 đẳng');
 
--- Insert sample club
-INSERT INTO clubs (club_code, name, address, phone, email, description) VALUES
-('TK001', 'Taekwondo Master Club', '123 Main Street, District 1, Ho Chi Minh City', '0123456789', 'info@taekwondomaster.com', 'Professional Taekwondo training center');
+-- Insert sample club (CLB Đồng Phú)
+INSERT INTO clubs (club_code, name, address, phone, email, head_coach_id, description) VALUES
+('DP001', 'CLB Đồng Phú', 'Đồng Phú, Bình Phước', '0123456789', 'dongphu@taekwondo.com', 2, 'CLB Taekwondo Đồng Phú - Thầy Tiến HLV trưởng');
 
 -- Insert sample admin user
 INSERT INTO users (name, email, password, role, club_id, phone, active_status) VALUES
 ('Admin Master', 'admin@taekwondomaster.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 1, '0123456789', TRUE);
 
--- Insert sample HLV user
-INSERT INTO users (name, email, password, role, student_code, belt_level_id, club_id, phone, active_status) VALUES
-('Master Nguyen Van A', 'hlv@taekwondomaster.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'HLV', 'HLV001', 9, 1, '0987654321', TRUE);
+-- Insert sample HLV trưởng (Thầy Tiến)
+INSERT INTO coaches (coach_code, name, email, password, role, belt_level_id, club_id, phone, is_active) VALUES
+('HLV001', 'Thầy Tiến', 'thaytien@dongphu.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'head_coach', 12, 1, '0987654321', TRUE);
+
+-- Insert sample quản lý chi nhánh (Thầy Tân)
+INSERT INTO coaches (coach_code, name, email, password, role, belt_level_id, club_id, branch_id, phone, is_active) VALUES
+('HLV002', 'Thầy Tân', 'thaytan@dongphu.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'main_manager', 10, 1, 1, '0987654322', TRUE);
+
+-- Insert sample trợ giảng
+INSERT INTO coaches (coach_code, name, email, password, role, belt_level_id, club_id, branch_id, phone, is_active) VALUES
+('TG001', 'Thầy Minh', 'thayminh@dongphu.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'assistant', 8, 1, 1, '0987654323', TRUE),
+('TG002', 'Cô Lan', 'colan@dongphu.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'assistant', 7, 1, 1, '0987654324', TRUE);
+
+-- Update club head coach
+UPDATE clubs SET head_coach_id = 1 WHERE id = 1;
+
+-- Insert sample chi nhánh của CLB Đồng Phú
+INSERT INTO branches (club_id, branch_code, name, address, phone, email) VALUES
+(1, 'GXTN', 'CLB Giáo Xứ Tân Lập', 'Giáo Xứ Tân Lập, Đồng Phú', '0123456781', 'gxtn@dongphu.com'),
+(1, 'THTN', 'CLB Tiểu Học Tân Lập', 'Trường Tiểu Học Tân Lập, Đồng Phú', '0123456782', 'thtn@dongphu.com'),
+(1, 'THTT', 'CLB Tiểu Học Tân Tiến', 'Trường Tiểu Học Tân Tiến, Đồng Phú', '0123456783', 'thtt@dongphu.com'),
+(1, 'THDP', 'CLB Tiểu Học Đồng Phú', 'Trường Tiểu Học Đồng Phú', '0123456784', 'thdp@dongphu.com'),
+(1, 'THTP', 'CLB Tiểu Học Tân Phú', 'Trường Tiểu Học Tân Phú, Đồng Phú', '0123456785', 'thtp@dongphu.com'),
+(1, 'THTD', 'CLB Tiểu Học Tân Định', 'Trường Tiểu Học Tân Định, Đồng Phú', '0123456786', 'thtd@dongphu.com');
+
+-- Insert sample quản lý chi nhánh (Thầy Tân quản lý nhiều chi nhánh)
+INSERT INTO branch_managers (branch_id, manager_id, role) VALUES
+(1, 3, 'main_manager'),  -- Thầy Tân quản lý CLB Giáo Xứ Tân Lập
+(2, 3, 'main_manager'),  -- Thầy Tân quản lý CLB Tiểu Học Tân Lập
+(3, 3, 'main_manager');  -- Thầy Tân quản lý CLB Tiểu Học Tân Tiến
+
+-- Insert sample trợ giảng cho chi nhánh
+INSERT INTO branch_assistants (branch_id, assistant_id) VALUES
+(1, 4), (1, 5),  -- CLB Giáo Xứ Tân Lập có 2 trợ giảng: Thầy Minh, Cô Lan
+(2, 4), (2, 5),  -- CLB Tiểu Học Tân Lập có 2 trợ giảng: Thầy Minh, Cô Lan
+(3, 4), (3, 5);  -- CLB Tiểu Học Tân Tiến có 2 trợ giảng: Thầy Minh, Cô Lan
 
 -- Insert sample coach
 INSERT INTO coaches (coach_code, name, phone, email, belt_level_id, experience_years, specialization, club_id) VALUES
