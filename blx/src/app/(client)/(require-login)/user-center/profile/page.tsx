@@ -112,7 +112,7 @@ export default function Profile() {
   // take user from context (can be used for quick display)
   const { account, setAccount, reset, loginSuccess } = useAccountStore();
 
-  // Mock security status for KYC
+  // Security status for KYC
   const kycStatus = account?.kycStatus || "pending";
   const securityLoading = false;
   const refreshSecurityStatus = async () => {};

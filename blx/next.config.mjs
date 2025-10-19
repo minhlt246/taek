@@ -22,6 +22,16 @@ const nextConfig = {
             },
         ];
     },
+
+    // Temporarily ignore problematic pages during development
+    async rewrites () {
+        return [
+            {
+                source: '/(client)/(require-login)/:path*',
+                destination: '/404',
+            },
+        ];
+    },
 };
 
 export default nextConfig;

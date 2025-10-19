@@ -36,20 +36,9 @@ export class AuthService {
       }
 
       // TODO: Implement actual login logic with database
-      // For now, return optimized response structure
-      return {
-        success: true,
-        message: 'Login successful',
-        data: {
-          user: {
-            id: 1,
-            name: 'Test User',
-            email: email,
-            role: 'student',
-          },
-          token: 'mock-jwt-token',
-        },
-      };
+      throw new UnauthorizedException(
+        'Login functionality not implemented yet',
+      );
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;

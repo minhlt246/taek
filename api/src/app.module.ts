@@ -20,13 +20,11 @@ import { databaseConfig } from './config/database.config';
 import { AttendanceModule } from './attendance/attendance.module';
 import { BeltPromotionsModule } from './belt-promotions/belt-promotions.module';
 import { CertificatesModule } from './certificates/certificates.module';
-import { BeltTestsModule } from './belt-tests/belt-tests.module';
 import { FeedbacksModule } from './feedbacks/feedbacks.module';
 import { LearningProgressModule } from './learning-progress/learning-progress.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { PaymentDetailsModule } from './payment-details/payment-details.module';
 import { StudentEvaluationsModule } from './student-evaluations/student-evaluations.module';
-import { TestRegistrationsModule } from './test-registrations/test-registrations.module';
 import { TuitionPackagesModule } from './tuition-packages/tuition-packages.module';
 
 const createDatabaseConfig = (
@@ -73,13 +71,11 @@ const createDatabaseConfig = (
     AttendanceModule,
     BeltPromotionsModule,
     CertificatesModule,
-    BeltTestsModule,
     FeedbacksModule,
     LearningProgressModule,
     NotificationsModule,
     PaymentDetailsModule,
     StudentEvaluationsModule,
-    TestRegistrationsModule,
     TuitionPackagesModule,
   ],
   controllers: [],

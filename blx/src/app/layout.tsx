@@ -6,6 +6,7 @@ import { I18nProvider } from "@/components/providers/I18nProvider";
 import "@/styles/css/bootstrap.min.css";
 import "@/styles/css/all.min.css";
 import "react-toastify/dist/ReactToastify.css";
+import "@/styles/admin.scss";
 
 export default function RootLayout({
   children,
@@ -20,9 +21,9 @@ export default function RootLayout({
           name="viewport"
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
         />
-        <meta name="description" content="M.U.S" />
-        <meta name="keywords" content="M.U.S" />
-        <meta name="author" content="M.U.S" />
+        <meta name="description" content="T.D.P" />
+        <meta name="keywords" content="T.D.P" />
+        <meta name="author" content="T.D.P" />
         <meta name="robots" content="index, follow" />
         <meta name="googlebot" content="index, follow" />
         <meta name="google" content="notranslate" />
