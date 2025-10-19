@@ -118,9 +118,9 @@ export default function EventsPage() {
     e.preventDefault();
     try {
       if (editingEvent) {
-        // Update existing event
+        // Cập nhật sự kiện hiện có
         await eventsApi.update(editingEvent.id, formData);
-        // Update local state
+        // Cập nhật state local
         setEvents(
           events.map((event) =>
             event.id === editingEvent.id
@@ -129,9 +129,9 @@ export default function EventsPage() {
           )
         );
       } else {
-        // Create new event
+        // Tạo sự kiện mới
         const newEvent = await eventsApi.create(formData);
-        // Add to local state
+        // Thêm vào state local
         setEvents([
           ...events,
           {
@@ -174,11 +174,11 @@ export default function EventsPage() {
     if (confirm("Bạn có chắc chắn muốn xóa sự kiện này?")) {
       try {
         await eventsApi.delete(id);
-        // Remove from local state
+        // Xóa khỏi state local
         setEvents(events.filter((event) => event.id !== id));
         alert("Xóa sự kiện thành công!");
       } catch (error) {
-        console.error("Failed to delete event:", error);
+        console.error("Lỗi khi xóa sự kiện:", error);
         alert("Lỗi khi xóa sự kiện. Vui lòng thử lại.");
       }
     }
@@ -218,7 +218,7 @@ export default function EventsPage() {
   return (
     <div className="events-page">
       <div className="page-header">
-        <h2>Events Management</h2>
+        <h2>Quản lý sự kiện</h2>
         <button
           className="btn btn-primary"
           onClick={() => {
@@ -227,7 +227,7 @@ export default function EventsPage() {
           }}
         >
           <i className="fas fa-plus mr-2"></i>
-          Add New Event
+          Thêm sự kiện mới
         </button>
       </div>
 
@@ -238,14 +238,14 @@ export default function EventsPage() {
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Title</th>
-                  <th>Type</th>
-                  <th>Location</th>
-                  <th>Date & Time</th>
-                  <th>Participants</th>
-                  <th>Fee</th>
-                  <th>Status</th>
-                  <th>Actions</th>
+                  <th>Tiêu đề</th>
+                  <th>Loại</th>
+                  <th>Địa điểm</th>
+                  <th>Ngày & Giờ</th>
+                  <th>Người tham gia</th>
+                  <th>Phí</th>
+                  <th>Trạng thái</th>
+                  <th>Thao tác</th>
                 </tr>
               </thead>
               <tbody>
@@ -311,12 +311,14 @@ export default function EventsPage() {
                       <button
                         className="btn btn-sm btn-outline-primary me-2"
                         onClick={() => handleEdit(event)}
+                        title="Chỉnh sửa"
                       >
                         <i className="fas fa-edit"></i>
                       </button>
                       <button
                         className="btn btn-sm btn-outline-danger"
                         onClick={() => handleDelete(event.id)}
+                        title="Xóa"
                       >
                         <i className="fas fa-trash"></i>
                       </button>
@@ -329,7 +331,7 @@ export default function EventsPage() {
         </div>
       </div>
 
-      {/* Modal for Add/Edit Event */}
+      {/* Modal cho Thêm/Chỉnh sửa Sự kiện */}
       {showModal && (
         <div
           className="modal show d-block"
@@ -339,7 +341,7 @@ export default function EventsPage() {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">
-                  {editingEvent ? "Edit Event" : "Add New Event"}
+                  {editingEvent ? "Chỉnh sửa sự kiện" : "Thêm sự kiện mới"}
                 </h5>
                 <button
                   type="button"
@@ -355,7 +357,7 @@ export default function EventsPage() {
                   <div className="row">
                     <div className="col-md-8">
                       <div className="mb-3">
-                        <label className="form-label">Event Title</label>
+                        <label className="form-label">Tiêu đề sự kiện</label>
                         <input
                           type="text"
                           className="form-control"
@@ -369,7 +371,7 @@ export default function EventsPage() {
                     </div>
                     <div className="col-md-4">
                       <div className="mb-3">
-                        <label className="form-label">Event Type</label>
+                        <label className="form-label">Loại sự kiện</label>
                         <select
                           className="form-select"
                           value={formData.type}
@@ -386,17 +388,17 @@ export default function EventsPage() {
                           }
                           required
                         >
-                          <option value="tournament">Tournament</option>
-                          <option value="seminar">Seminar</option>
-                          <option value="graduation">Graduation</option>
-                          <option value="social">Social</option>
-                          <option value="other">Other</option>
+                          <option value="tournament">Giải đấu</option>
+                          <option value="seminar">Hội thảo</option>
+                          <option value="graduation">Lễ tốt nghiệp</option>
+                          <option value="social">Xã hội</option>
+                          <option value="other">Khác</option>
                         </select>
                       </div>
                     </div>
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Description</label>
+                    <label className="form-label">Mô tả</label>
                     <textarea
                       className="form-control"
                       rows={3}
@@ -411,7 +413,7 @@ export default function EventsPage() {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Location</label>
+                    <label className="form-label">Địa điểm</label>
                     <input
                       type="text"
                       className="form-control"
@@ -425,7 +427,7 @@ export default function EventsPage() {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Start Date</label>
+                        <label className="form-label">Ngày bắt đầu</label>
                         <input
                           type="date"
                           className="form-control"
@@ -442,7 +444,7 @@ export default function EventsPage() {
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">End Date</label>
+                        <label className="form-label">Ngày kết thúc</label>
                         <input
                           type="date"
                           className="form-control"
@@ -461,7 +463,7 @@ export default function EventsPage() {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Start Time</label>
+                        <label className="form-label">Giờ bắt đầu</label>
                         <input
                           type="time"
                           className="form-control"
@@ -478,7 +480,7 @@ export default function EventsPage() {
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">End Time</label>
+                        <label className="form-label">Giờ kết thúc</label>
                         <input
                           type="time"
                           className="form-control"
@@ -497,7 +499,9 @@ export default function EventsPage() {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Max Participants</label>
+                        <label className="form-label">
+                          Số người tham gia tối đa
+                        </label>
                         <input
                           type="number"
                           className="form-control"
@@ -515,9 +519,7 @@ export default function EventsPage() {
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">
-                          Registration Fee (VND)
-                        </label>
+                        <label className="form-label">Phí đăng ký (VND)</label>
                         <input
                           type="number"
                           className="form-control"
@@ -553,7 +555,7 @@ export default function EventsPage() {
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Status</label>
+                        <label className="form-label">Trạng thái</label>
                         <select
                           className="form-select"
                           value={formData.status}
@@ -568,10 +570,10 @@ export default function EventsPage() {
                             })
                           }
                         >
-                          <option value="upcoming">Upcoming</option>
-                          <option value="ongoing">Ongoing</option>
-                          <option value="completed">Completed</option>
-                          <option value="cancelled">Cancelled</option>
+                          <option value="upcoming">Sắp tới</option>
+                          <option value="ongoing">Đang diễn ra</option>
+                          <option value="completed">Đã hoàn thành</option>
+                          <option value="cancelled">Đã hủy</option>
                         </select>
                       </div>
                     </div>
@@ -586,10 +588,10 @@ export default function EventsPage() {
                       resetForm();
                     }}
                   >
-                    Cancel
+                    Hủy
                   </button>
                   <button type="submit" className="btn btn-primary">
-                    {editingEvent ? "Update" : "Create"}
+                    {editingEvent ? "Cập nhật" : "Tạo mới"}
                   </button>
                 </div>
               </form>

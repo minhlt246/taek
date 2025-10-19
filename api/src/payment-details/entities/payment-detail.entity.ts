@@ -9,7 +9,7 @@ import {
 import { Payment } from '../../payments/entities/payment.entity';
 import { TuitionPackage } from '../../tuition-packages/entities/tuition-package.entity';
 
-@Entity('payment_details')
+@Entity('chi_tiet_thanh_toan')
 export class PaymentDetail {
   @PrimaryGeneratedColumn()
   id: number;

@@ -9,7 +9,7 @@ import {
 import { User } from '../../users/entities/user.entity';
 import { Parent } from '../../parents/entities/parent.entity';
 
-@Entity('student_parents')
+@Entity('hoc_vien_phu_huynh')
 export class StudentParent {
   @PrimaryGeneratedColumn()
   id: number;

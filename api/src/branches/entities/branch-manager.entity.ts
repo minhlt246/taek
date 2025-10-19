@@ -10,7 +10,7 @@ import {
 import { Branch } from './branch.entity';
 import { Coach } from '../../coaches/entities/coach.entity';
 
-@Entity('branch_managers')
+@Entity('quan_ly_chi_nhanh')
 @Unique(['branch_id', 'manager_id'])
 export class BranchManager {
   @PrimaryGeneratedColumn()

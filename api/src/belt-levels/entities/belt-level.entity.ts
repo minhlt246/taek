@@ -9,10 +9,10 @@ import {
 import { User } from '../../users/entities/user.entity';
 import { Coach } from '../../coaches/entities/coach.entity';
 import { BeltPromotion } from '../../belt-promotions/entities/belt-promotion.entity';
-import { TestRegistration } from '../../test-registrations/entities/test-registration.entity';
+// import { TestRegistration } from '../../test-registrations/entities/test-registration.entity';
 import { Certificate } from '../../certificates/entities/certificate.entity';
 
-@Entity('belt_levels')
+@Entity('cap_dai')
 export class BeltLevel {
   @PrimaryGeneratedColumn()
   id: number;
@@ -48,14 +48,14 @@ export class BeltLevel {
   @OneToMany(() => BeltPromotion, (promotion) => promotion.to_belt)
   to_promotions: BeltPromotion[];
 
-  @OneToMany(
-    () => TestRegistration,
-    (registration) => registration.current_belt,
-  )
-  current_test_registrations: TestRegistration[];
+  // @OneToMany(
+  //   () => TestRegistration,
+  //   (registration) => registration.current_belt,
+  // )
+  // current_test_registrations: TestRegistration[];
 
-  @OneToMany(() => TestRegistration, (registration) => registration.target_belt)
-  target_test_registrations: TestRegistration[];
+  // @OneToMany(() => TestRegistration, (registration) => registration.target_belt)
+  // target_test_registrations: TestRegistration[];
 
   @OneToMany(() => Certificate, (certificate) => certificate.belt_level)
   certificates: Certificate[];

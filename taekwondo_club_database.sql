@@ -10,7 +10,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- =====================================================
 
 -- Tạo bảng câu lạc bộ (CLB)
-CREATE TABLE clubs (
+CREATE TABLE cau_lac_bo (
     id INT PRIMARY KEY AUTO_INCREMENT,
     club_code VARCHAR(20) UNIQUE NOT NULL,
     name VARCHAR(100) NOT NULL,
@@ -22,11 +22,11 @@ CREATE TABLE clubs (
     logo_url VARCHAR(255),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (head_coach_id) REFERENCES coaches(id)
+    FOREIGN KEY (head_coach_id) REFERENCES huan_luyen_vien(id)
 );
 
 -- Tạo bảng cấp đai
-CREATE TABLE belt_levels (
+CREATE TABLE cap_dai (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50) UNIQUE NOT NULL,
     color VARCHAR(20),
@@ -37,7 +37,7 @@ CREATE TABLE belt_levels (
 );
 
 -- Tạo bảng chi nhánh
-CREATE TABLE branches (
+CREATE TABLE chi_nhanh (
     id INT PRIMARY KEY AUTO_INCREMENT,
     club_id INT NOT NULL,
     branch_code VARCHAR(20) UNIQUE NOT NULL,
@@ -48,63 +48,72 @@ CREATE TABLE branches (
     is_active BOOLEAN DEFAULT TRUE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (club_id) REFERENCES clubs(id)
+    FOREIGN KEY (club_id) REFERENCES cau_lac_bo(id)
 );
 
 -- Tạo bảng quản lý chi nhánh (1 thầy có thể quản lý nhiều chi nhánh)
-CREATE TABLE branch_managers (
+CREATE TABLE quan_ly_chi_nhanh (
     id INT PRIMARY KEY AUTO_INCREMENT,
     branch_id INT NOT NULL,
     manager_id INT NOT NULL,
     role ENUM('main_manager', 'assistant_manager') DEFAULT 'main_manager',
     is_active BOOLEAN DEFAULT TRUE,
     assigned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (branch_id) REFERENCES branches(id),
-    FOREIGN KEY (manager_id) REFERENCES coaches(id),
+    FOREIGN KEY (branch_id) REFERENCES chi_nhanh(id),
+    FOREIGN KEY (manager_id) REFERENCES huan_luyen_vien(id),
     UNIQUE KEY unique_branch_manager (branch_id, manager_id)
 );
 
 -- Tạo bảng trợ giảng chi nhánh (mỗi chi nhánh có nhiều trợ giảng)
-CREATE TABLE branch_assistants (
+CREATE TABLE tro_giang_chi_nhanh (
     id INT PRIMARY KEY AUTO_INCREMENT,
     branch_id INT NOT NULL,
     assistant_id INT NOT NULL,
     is_active BOOLEAN DEFAULT TRUE,
     assigned_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (branch_id) REFERENCES branches(id),
-    FOREIGN KEY (assistant_id) REFERENCES coaches(id),
+    FOREIGN KEY (branch_id) REFERENCES chi_nhanh(id),
+    FOREIGN KEY (assistant_id) REFERENCES huan_luyen_vien(id),
     UNIQUE KEY unique_branch_assistant (branch_id, assistant_id)
 );
 
--- Tạo bảng người dùng (học viên, admin)
-CREATE TABLE users (
+-- Tạo bảng võ sinh
+CREATE TABLE vo_sinh (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    role ENUM('admin', 'student') DEFAULT 'student',
-    student_code VARCHAR(20) UNIQUE,
-    belt_level_id INT,
-    club_id INT,
-    branch_id INT,
+    ho_va_ten VARCHAR(100) NOT NULL COMMENT 'Họ và tên đầy đủ',
+    ngay_thang_nam_sinh DATE NOT NULL COMMENT 'Ngày tháng năm sinh',
+    ma_hoi_vien VARCHAR(50) UNIQUE NOT NULL COMMENT 'Mã hội viên',
+    ma_clb VARCHAR(20) NOT NULL COMMENT 'Mã câu lạc bộ',
+    ma_don_vi VARCHAR(20) NOT NULL COMMENT 'Mã đơn vị',
+    quyen_so INT NOT NULL COMMENT 'Quyền số',
+    cap_dai_id INT NOT NULL COMMENT 'Cấp đai hiện tại',
+    gioi_tinh ENUM('Nam', 'Nữ') NOT NULL COMMENT 'Giới tính',
+    email VARCHAR(100) UNIQUE,
     phone VARCHAR(15),
-    date_of_birth DATE,
-    gender ENUM('male', 'female', 'other'),
     address TEXT,
     emergency_contact_name VARCHAR(100),
     emergency_contact_phone VARCHAR(15),
     active_status BOOLEAN DEFAULT TRUE,
-    payment_status BOOLEAN DEFAULT FALSE,
     profile_image_url VARCHAR(255),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (belt_level_id) REFERENCES belt_levels(id),
-    FOREIGN KEY (club_id) REFERENCES clubs(id),
-    FOREIGN KEY (branch_id) REFERENCES branches(id)
+    FOREIGN KEY (cap_dai_id) REFERENCES cap_dai(id)
+);
+
+-- Tạo bảng admin (tách riêng khỏi võ sinh)
+CREATE TABLE admin (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('admin', 'super_admin') DEFAULT 'admin',
+    phone VARCHAR(15),
+    active_status BOOLEAN DEFAULT TRUE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- Tạo bảng huấn luyện viên (HLV)
-CREATE TABLE coaches (
+CREATE TABLE huan_luyen_vien (
     id INT PRIMARY KEY AUTO_INCREMENT,
     coach_code VARCHAR(20) UNIQUE NOT NULL,
     name VARCHAR(100) NOT NULL,
@@ -122,13 +131,13 @@ CREATE TABLE coaches (
     is_active BOOLEAN DEFAULT TRUE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (belt_level_id) REFERENCES belt_levels(id),
-    FOREIGN KEY (club_id) REFERENCES clubs(id),
-    FOREIGN KEY (branch_id) REFERENCES branches(id)
+    FOREIGN KEY (belt_level_id) REFERENCES cap_dai(id),
+    FOREIGN KEY (club_id) REFERENCES cau_lac_bo(id),
+    FOREIGN KEY (branch_id) REFERENCES chi_nhanh(id)
 );
 
 -- Tạo bảng khóa học / lớp học
-CREATE TABLE courses (
+CREATE TABLE khoa_hoc (
     id INT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(100) NOT NULL,
     description TEXT,
@@ -145,13 +154,13 @@ CREATE TABLE courses (
     is_active BOOLEAN DEFAULT TRUE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (coach_id) REFERENCES coaches(id),
-    FOREIGN KEY (club_id) REFERENCES clubs(id),
-    FOREIGN KEY (branch_id) REFERENCES branches(id)
+    FOREIGN KEY (coach_id) REFERENCES huan_luyen_vien(id),
+    FOREIGN KEY (club_id) REFERENCES cau_lac_bo(id),
+    FOREIGN KEY (branch_id) REFERENCES chi_nhanh(id)
 );
 
 -- Tạo bảng đăng ký học viên vào lớp
-CREATE TABLE enrollments (
+CREATE TABLE dang_ky_hoc (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT,
     course_id INT,
@@ -159,12 +168,12 @@ CREATE TABLE enrollments (
     enrolled_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     approved_at DATETIME,
     notes TEXT,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (course_id) REFERENCES courses(id)
+    FOREIGN KEY (user_id) REFERENCES vo_sinh(id),
+    FOREIGN KEY (course_id) REFERENCES khoa_hoc(id)
 );
 
 -- Tạo bảng lịch học
-CREATE TABLE schedules (
+CREATE TABLE lich_hoc (
     id INT PRIMARY KEY AUTO_INCREMENT,
     course_id INT,
     day_of_week ENUM('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'),
@@ -173,11 +182,11 @@ CREATE TABLE schedules (
     location VARCHAR(100),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (course_id) REFERENCES courses(id)
+    FOREIGN KEY (course_id) REFERENCES khoa_hoc(id)
 );
 
 -- Tạo bảng bài viết / tin tức
-CREATE TABLE news (
+CREATE TABLE tin_tuc (
     id INT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(200) NOT NULL,
     slug VARCHAR(200) UNIQUE NOT NULL,
@@ -189,11 +198,11 @@ CREATE TABLE news (
     published_at DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (author_id) REFERENCES users(id)
+    FOREIGN KEY (author_id) REFERENCES admin(id)
 );
 
 -- Tạo bảng liên hệ / phản hồi
-CREATE TABLE contact_messages (
+CREATE TABLE tin_nhan_lien_he (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
@@ -205,7 +214,7 @@ CREATE TABLE contact_messages (
 );
 
 -- Tạo bảng thanh toán học phí
-CREATE TABLE payments (
+CREATE TABLE thanh_toan (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT,
     amount DECIMAL(10, 2) NOT NULL,
@@ -216,7 +225,7 @@ CREATE TABLE payments (
     note TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES nguoi_dung(id)
 );
 
 -- =====================================================
@@ -224,7 +233,7 @@ CREATE TABLE payments (
 -- =====================================================
 
 -- Tạo bảng lịch sử thăng cấp đai
-CREATE TABLE belt_promotions (
+CREATE TABLE thang_cap_dai (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT,
     from_belt_id INT,
@@ -234,14 +243,14 @@ CREATE TABLE belt_promotions (
     test_score DECIMAL(5,2),
     notes TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (from_belt_id) REFERENCES belt_levels(id),
-    FOREIGN KEY (to_belt_id) REFERENCES belt_levels(id),
-    FOREIGN KEY (coach_id) REFERENCES coaches(id)
+    FOREIGN KEY (user_id) REFERENCES vo_sinh(id),
+    FOREIGN KEY (from_belt_id) REFERENCES cap_dai(id),
+    FOREIGN KEY (to_belt_id) REFERENCES cap_dai(id),
+    FOREIGN KEY (coach_id) REFERENCES huan_luyen_vien(id)
 );
 
 -- Tạo bảng điểm danh
-CREATE TABLE attendance (
+CREATE TABLE diem_danh (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT,
     course_id INT,
@@ -249,12 +258,12 @@ CREATE TABLE attendance (
     status ENUM('present', 'absent', 'late', 'excused') DEFAULT 'present',
     notes TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (course_id) REFERENCES courses(id)
+    FOREIGN KEY (user_id) REFERENCES vo_sinh(id),
+    FOREIGN KEY (course_id) REFERENCES khoa_hoc(id)
 );
 
 -- Tạo bảng đánh giá học viên
-CREATE TABLE student_evaluations (
+CREATE TABLE danh_gia_hoc_vien (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT,
     coach_id INT,
@@ -266,14 +275,14 @@ CREATE TABLE student_evaluations (
     overall_score DECIMAL(3,1),
     comments TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (coach_id) REFERENCES coaches(id),
-    FOREIGN KEY (course_id) REFERENCES courses(id)
+    FOREIGN KEY (user_id) REFERENCES vo_sinh(id),
+    FOREIGN KEY (coach_id) REFERENCES huan_luyen_vien(id),
+    FOREIGN KEY (course_id) REFERENCES khoa_hoc(id)
 );
 
 
 -- Tạo bảng sự kiện/giải đấu
-CREATE TABLE events (
+CREATE TABLE su_kien (
     id INT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(200) NOT NULL,
     description TEXT,
@@ -285,12 +294,12 @@ CREATE TABLE events (
     status ENUM('upcoming', 'ongoing', 'completed', 'cancelled') DEFAULT 'upcoming',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (club_id) REFERENCES clubs(id)
+    FOREIGN KEY (club_id) REFERENCES cau_lac_bo(id)
 );
 
 
 -- Tạo bảng thông báo
-CREATE TABLE notifications (
+CREATE TABLE thong_bao (
     id INT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(200) NOT NULL,
     content TEXT,
@@ -301,14 +310,14 @@ CREATE TABLE notifications (
     published_at DATETIME,
     expires_at DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (club_id) REFERENCES clubs(id)
+    FOREIGN KEY (club_id) REFERENCES cau_lac_bo(id)
 );
 
 
 
 
 -- Tạo bảng quản lý học phí và gói học
-CREATE TABLE tuition_packages (
+CREATE TABLE goi_hoc_phi (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
     description TEXT,
@@ -319,11 +328,11 @@ CREATE TABLE tuition_packages (
     is_active BOOLEAN DEFAULT TRUE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (club_id) REFERENCES clubs(id)
+    FOREIGN KEY (club_id) REFERENCES cau_lac_bo(id)
 );
 
 -- Tạo bảng chi tiết thanh toán
-CREATE TABLE payment_details (
+CREATE TABLE chi_tiet_thanh_toan (
     id INT PRIMARY KEY AUTO_INCREMENT,
     payment_id INT,
     tuition_package_id INT,
@@ -333,12 +342,12 @@ CREATE TABLE payment_details (
     payment_method ENUM('cash', 'bank_transfer', 'card', 'other'),
     transaction_id VARCHAR(100),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (payment_id) REFERENCES payments(id),
-    FOREIGN KEY (tuition_package_id) REFERENCES tuition_packages(id)
+    FOREIGN KEY (payment_id) REFERENCES thanh_toan(id),
+    FOREIGN KEY (tuition_package_id) REFERENCES goi_hoc_phi(id)
 );
 
 -- Tạo bảng lịch sử học tập
-CREATE TABLE learning_progress (
+CREATE TABLE tien_trinh_hoc_tap (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT,
     course_id INT,
@@ -348,12 +357,12 @@ CREATE TABLE learning_progress (
     homework TEXT,
     coach_notes TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (course_id) REFERENCES courses(id)
+    FOREIGN KEY (user_id) REFERENCES vo_sinh(id),
+    FOREIGN KEY (course_id) REFERENCES khoa_hoc(id)
 );
 
 -- Tạo bảng quản lý phụ huynh (cho học viên nhỏ tuổi)
-CREATE TABLE parents (
+CREATE TABLE phu_huynh (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100),
@@ -366,18 +375,18 @@ CREATE TABLE parents (
 );
 
 -- Tạo bảng liên kết học viên - phụ huynh
-CREATE TABLE student_parents (
+CREATE TABLE hoc_vien_phu_huynh (
     id INT PRIMARY KEY AUTO_INCREMENT,
     student_id INT,
     parent_id INT,
     is_primary BOOLEAN DEFAULT FALSE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (student_id) REFERENCES users(id),
-    FOREIGN KEY (parent_id) REFERENCES parents(id)
+    FOREIGN KEY (parent_id) REFERENCES phu_huynh(id)
 );
 
 -- Tạo bảng quản lý kỳ thi thăng cấp
-CREATE TABLE belt_tests (
+CREATE TABLE ky_thi_thang_cap (
     id INT PRIMARY KEY AUTO_INCREMENT,
     test_name VARCHAR(100) NOT NULL,
     test_date DATE,
@@ -391,11 +400,11 @@ CREATE TABLE belt_tests (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (examiner_id) REFERENCES coaches(id),
-    FOREIGN KEY (club_id) REFERENCES clubs(id)
+    FOREIGN KEY (club_id) REFERENCES cau_lac_bo(id)
 );
 
 -- Tạo bảng đăng ký thi thăng cấp
-CREATE TABLE test_registrations (
+CREATE TABLE dang_ky_thi (
     id INT PRIMARY KEY AUTO_INCREMENT,
     test_id INT,
     user_id INT,
@@ -407,14 +416,14 @@ CREATE TABLE test_registrations (
     score DECIMAL(5,2),
     examiner_notes TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (test_id) REFERENCES belt_tests(id),
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (current_belt_id) REFERENCES belt_levels(id),
-    FOREIGN KEY (target_belt_id) REFERENCES belt_levels(id)
+    FOREIGN KEY (test_id) REFERENCES ky_thi_thang_cap(id),
+    FOREIGN KEY (user_id) REFERENCES vo_sinh(id),
+    FOREIGN KEY (current_belt_id) REFERENCES cap_dai(id),
+    FOREIGN KEY (target_belt_id) REFERENCES cap_dai(id)
 );
 
 -- Tạo bảng quản lý chứng chỉ
-CREATE TABLE certificates (
+CREATE TABLE chung_chi (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT,
     belt_level_id INT,
@@ -425,13 +434,13 @@ CREATE TABLE certificates (
     certificate_image_url VARCHAR(255),
     is_valid BOOLEAN DEFAULT TRUE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (belt_level_id) REFERENCES belt_levels(id)
+    FOREIGN KEY (user_id) REFERENCES vo_sinh(id),
+    FOREIGN KEY (belt_level_id) REFERENCES cap_dai(id)
 );
 
 
 -- Tạo bảng quản lý feedback/đánh giá
-CREATE TABLE feedbacks (
+CREATE TABLE danh_gia_phan_hoi (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT,
     course_id INT,
@@ -441,67 +450,73 @@ CREATE TABLE feedbacks (
     feedback_type ENUM('course', 'coach', 'facility', 'general'),
     is_anonymous BOOLEAN DEFAULT FALSE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (course_id) REFERENCES courses(id),
-    FOREIGN KEY (coach_id) REFERENCES coaches(id)
+    FOREIGN KEY (user_id) REFERENCES vo_sinh(id),
+    FOREIGN KEY (course_id) REFERENCES khoa_hoc(id),
+    FOREIGN KEY (coach_id) REFERENCES huan_luyen_vien(id)
 );
 
 -- =====================================================
 -- INDEXES FOR PERFORMANCE
 -- =====================================================
 
--- Indexes for users table
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_club_id ON users(club_id);
-CREATE INDEX idx_users_branch_id ON users(branch_id);
-CREATE INDEX idx_users_belt_level_id ON users(belt_level_id);
-CREATE INDEX idx_users_active_status ON users(active_status);
+-- Indexes for vo_sinh table
+CREATE INDEX idx_vo_sinh_email ON vo_sinh(email);
+CREATE INDEX idx_vo_sinh_ma_hoi_vien ON vo_sinh(ma_hoi_vien);
+CREATE INDEX idx_vo_sinh_ma_clb ON vo_sinh(ma_clb);
+CREATE INDEX idx_vo_sinh_cap_dai_id ON vo_sinh(cap_dai_id);
+CREATE INDEX idx_vo_sinh_active_status ON vo_sinh(active_status);
+CREATE INDEX idx_vo_sinh_gioi_tinh ON vo_sinh(gioi_tinh);
 
--- Indexes for branches table
-CREATE INDEX idx_branches_club_id ON branches(club_id);
-CREATE INDEX idx_branches_branch_code ON branches(branch_code);
+-- Indexes for admin table
+CREATE INDEX idx_admin_email ON admin(email);
+CREATE INDEX idx_admin_role ON admin(role);
+CREATE INDEX idx_admin_active_status ON admin(active_status);
 
--- Indexes for branch_managers table
-CREATE INDEX idx_branch_managers_branch_id ON branch_managers(branch_id);
-CREATE INDEX idx_branch_managers_manager_id ON branch_managers(manager_id);
-CREATE INDEX idx_branch_managers_role ON branch_managers(role);
+-- Indexes for chi_nhanh table
+CREATE INDEX idx_chi_nhanh_club_id ON chi_nhanh(club_id);
+CREATE INDEX idx_chi_nhanh_branch_code ON chi_nhanh(branch_code);
 
--- Indexes for branch_assistants table
-CREATE INDEX idx_branch_assistants_branch_id ON branch_assistants(branch_id);
-CREATE INDEX idx_branch_assistants_assistant_id ON branch_assistants(assistant_id);
+-- Indexes for quan_ly_chi_nhanh table
+CREATE INDEX idx_quan_ly_chi_nhanh_branch_id ON quan_ly_chi_nhanh(branch_id);
+CREATE INDEX idx_quan_ly_chi_nhanh_manager_id ON quan_ly_chi_nhanh(manager_id);
+CREATE INDEX idx_quan_ly_chi_nhanh_role ON quan_ly_chi_nhanh(role);
 
--- Indexes for courses table
-CREATE INDEX idx_courses_club_id ON courses(club_id);
-CREATE INDEX idx_courses_branch_id ON courses(branch_id);
-CREATE INDEX idx_courses_coach_id ON courses(coach_id);
-CREATE INDEX idx_courses_start_date ON courses(start_date);
-CREATE INDEX idx_courses_quarter ON courses(quarter);
-CREATE INDEX idx_courses_year ON courses(year);
-CREATE INDEX idx_courses_quarter_year ON courses(quarter, year);
+-- Indexes for tro_giang_chi_nhanh table
+CREATE INDEX idx_tro_giang_chi_nhanh_branch_id ON tro_giang_chi_nhanh(branch_id);
+CREATE INDEX idx_tro_giang_chi_nhanh_assistant_id ON tro_giang_chi_nhanh(assistant_id);
 
--- Indexes for enrollments table
-CREATE INDEX idx_enrollments_user_id ON enrollments(user_id);
-CREATE INDEX idx_enrollments_course_id ON enrollments(course_id);
-CREATE INDEX idx_enrollments_status ON enrollments(status);
+-- Indexes for khoa_hoc table
+CREATE INDEX idx_khoa_hoc_club_id ON khoa_hoc(club_id);
+CREATE INDEX idx_khoa_hoc_branch_id ON khoa_hoc(branch_id);
+CREATE INDEX idx_khoa_hoc_coach_id ON khoa_hoc(coach_id);
+CREATE INDEX idx_khoa_hoc_start_date ON khoa_hoc(start_date);
+CREATE INDEX idx_khoa_hoc_quarter ON khoa_hoc(quarter);
+CREATE INDEX idx_khoa_hoc_year ON khoa_hoc(year);
+CREATE INDEX idx_khoa_hoc_quarter_year ON khoa_hoc(quarter, year);
 
--- Indexes for attendance table
-CREATE INDEX idx_attendance_user_id ON attendance(user_id);
-CREATE INDEX idx_attendance_course_id ON attendance(course_id);
-CREATE INDEX idx_attendance_date ON attendance(attendance_date);
+-- Indexes for dang_ky_hoc table
+CREATE INDEX idx_dang_ky_hoc_user_id ON dang_ky_hoc(user_id);
+CREATE INDEX idx_dang_ky_hoc_course_id ON dang_ky_hoc(course_id);
+CREATE INDEX idx_dang_ky_hoc_status ON dang_ky_hoc(status);
 
--- Indexes for payments table
-CREATE INDEX idx_payments_user_id ON payments(user_id);
-CREATE INDEX idx_payments_date ON payments(payment_date);
-CREATE INDEX idx_payments_status ON payments(status);
+-- Indexes for diem_danh table
+CREATE INDEX idx_diem_danh_user_id ON diem_danh(user_id);
+CREATE INDEX idx_diem_danh_course_id ON diem_danh(course_id);
+CREATE INDEX idx_diem_danh_date ON diem_danh(attendance_date);
 
--- Indexes for events table
-CREATE INDEX idx_events_club_id ON events(club_id);
-CREATE INDEX idx_events_start_date ON events(start_date);
-CREATE INDEX idx_events_status ON events(status);
+-- Indexes for thanh_toan table
+CREATE INDEX idx_thanh_toan_user_id ON thanh_toan(user_id);
+CREATE INDEX idx_thanh_toan_date ON thanh_toan(payment_date);
+CREATE INDEX idx_thanh_toan_status ON thanh_toan(status);
 
--- Indexes for notifications table
-CREATE INDEX idx_notifications_club_id ON notifications(club_id);
-CREATE INDEX idx_notifications_published_at ON notifications(published_at);
+-- Indexes for su_kien table
+CREATE INDEX idx_su_kien_club_id ON su_kien(club_id);
+CREATE INDEX idx_su_kien_start_date ON su_kien(start_date);
+CREATE INDEX idx_su_kien_status ON su_kien(status);
+
+-- Indexes for thong_bao table
+CREATE INDEX idx_thong_bao_club_id ON thong_bao(club_id);
+CREATE INDEX idx_thong_bao_published_at ON thong_bao(published_at);
 
 
 -- =====================================================
@@ -509,7 +524,7 @@ CREATE INDEX idx_notifications_published_at ON notifications(published_at);
 -- =====================================================
 
 -- Insert sample belt levels
-INSERT INTO belt_levels (name, color, order_sequence, description) VALUES
+INSERT INTO cap_dai (name, color, order_sequence, description) VALUES
 ('Cấp 8', 'White', 1, 'Đai trắng cấp 8'),
 ('Cấp 7', 'Yellow', 2, 'Đai vàng cấp 7'),
 ('Cấp 6', 'Green', 3, 'Đai xanh lá cấp 6'),
@@ -530,31 +545,39 @@ INSERT INTO belt_levels (name, color, order_sequence, description) VALUES
 ('Thập đẳng (10 Dan)', 'Black', 18, 'Đai đen 10 đẳng');
 
 -- Insert sample club (CLB Đồng Phú)
-INSERT INTO clubs (club_code, name, address, phone, email, head_coach_id, description) VALUES
-('DP001', 'CLB Đồng Phú', 'Đồng Phú, Bình Phước', '0123456789', 'dongphu@taekwondo.com', 2, 'CLB Taekwondo Đồng Phú - Thầy Tiến HLV trưởng');
+INSERT INTO cau_lac_bo (club_code, name, address, phone, email, head_coach_id, description) VALUES
+('_00468', 'CLB Đồng Phú', 'Đồng Phú, Bình Phước', '0123456789', 'dongphu@taekwondo.com', 2, 'CLB Taekwondo Đồng Phú - Thầy Tiến HLV trưởng');
 
 -- Insert sample admin user
-INSERT INTO users (name, email, password, role, club_id, phone, active_status) VALUES
-('Admin Master', 'admin@taekwondomaster.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 1, '0123456789', TRUE);
+INSERT INTO admin (name, email, password, role, phone, active_status) VALUES
+('Admin Master', 'admin@taekwondomaster.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', '0123456789', TRUE);
+
+-- Insert sample võ sinh data
+INSERT INTO vo_sinh (ho_va_ten, ngay_thang_nam_sinh, ma_hoi_vien, ma_clb, ma_don_vi, quyen_so, cap_dai_id, gioi_tinh, email, phone) VALUES
+('Hoàng Phạm Bảo Anh', '2016-02-28', 'HV_anhhpb_280216', 'CLB_00468', 'DNAI', 7, 1, 'Nữ', 'anhhpb@example.com', '0123456789'),
+('Nguyễn Thị Minh Châu', '2015-07-03', 'HV_chauntm_030715', 'CLB_00468', 'DNAI', 7, 1, 'Nữ', 'chauntm@example.com', '0123456790'),
+('Lục Minh Châu', '2010-05-10', 'HV_chaulm_100510', 'CLB_00468', 'DNAI', 7, 1, 'Nữ', 'chaulm@example.com', '0123456791'),
+('Nguyễn Minh Châu', '2014-08-15', 'HV_chaunm_150814', 'CLB_00468', 'DNAI', 7, 1, 'Nữ', 'chaunm@example.com', '0123456792'),
+('Phạm Minh Châu', '2011-12-20', 'HV_chauphm_201211', 'CLB_00468', 'DNAI', 7, 1, 'Nữ', 'chauphm@example.com', '0123456793');
 
 -- Insert sample HLV trưởng (Thầy Tiến)
-INSERT INTO coaches (coach_code, name, email, password, role, belt_level_id, club_id, phone, is_active) VALUES
+INSERT INTO huan_luyen_vien (coach_code, name, email, password, role, belt_level_id, club_id, phone, is_active) VALUES
 ('HLV001', 'Thầy Tiến', 'thaytien@dongphu.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'head_coach', 12, 1, '0987654321', TRUE);
 
 -- Insert sample quản lý chi nhánh (Thầy Tân)
-INSERT INTO coaches (coach_code, name, email, password, role, belt_level_id, club_id, branch_id, phone, is_active) VALUES
+INSERT INTO huan_luyen_vien (coach_code, name, email, password, role, belt_level_id, club_id, branch_id, phone, is_active) VALUES
 ('HLV002', 'Thầy Tân', 'thaytan@dongphu.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'main_manager', 10, 1, 1, '0987654322', TRUE);
 
 -- Insert sample trợ giảng
-INSERT INTO coaches (coach_code, name, email, password, role, belt_level_id, club_id, branch_id, phone, is_active) VALUES
+INSERT INTO huan_luyen_vien (coach_code, name, email, password, role, belt_level_id, club_id, branch_id, phone, is_active) VALUES
 ('TG001', 'Thầy Minh', 'thayminh@dongphu.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'assistant', 8, 1, 1, '0987654323', TRUE),
 ('TG002', 'Cô Lan', 'colan@dongphu.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'assistant', 7, 1, 1, '0987654324', TRUE);
 
 -- Update club head coach
-UPDATE clubs SET head_coach_id = 1 WHERE id = 1;
+UPDATE cau_lac_bo SET head_coach_id = 1 WHERE id = 1;
 
 -- Insert sample chi nhánh của CLB Đồng Phú
-INSERT INTO branches (club_id, branch_code, name, address, phone, email) VALUES
+INSERT INTO chi_nhanh (club_id, branch_code, name, address, phone, email) VALUES
 (1, 'GXTN', 'CLB Giáo Xứ Tân Lập', 'Giáo Xứ Tân Lập, Đồng Phú', '0123456781', 'gxtn@dongphu.com'),
 (1, 'THTN', 'CLB Tiểu Học Tân Lập', 'Trường Tiểu Học Tân Lập, Đồng Phú', '0123456782', 'thtn@dongphu.com'),
 (1, 'THTT', 'CLB Tiểu Học Tân Tiến', 'Trường Tiểu Học Tân Tiến, Đồng Phú', '0123456783', 'thtt@dongphu.com'),
@@ -563,19 +586,19 @@ INSERT INTO branches (club_id, branch_code, name, address, phone, email) VALUES
 (1, 'THTD', 'CLB Tiểu Học Tân Định', 'Trường Tiểu Học Tân Định, Đồng Phú', '0123456786', 'thtd@dongphu.com');
 
 -- Insert sample quản lý chi nhánh (Thầy Tân quản lý nhiều chi nhánh)
-INSERT INTO branch_managers (branch_id, manager_id, role) VALUES
+INSERT INTO quan_ly_chi_nhanh (branch_id, manager_id, role) VALUES
 (1, 3, 'main_manager'),  -- Thầy Tân quản lý CLB Giáo Xứ Tân Lập
 (2, 3, 'main_manager'),  -- Thầy Tân quản lý CLB Tiểu Học Tân Lập
 (3, 3, 'main_manager');  -- Thầy Tân quản lý CLB Tiểu Học Tân Tiến
 
 -- Insert sample trợ giảng cho chi nhánh
-INSERT INTO branch_assistants (branch_id, assistant_id) VALUES
+INSERT INTO tro_giang_chi_nhanh (branch_id, assistant_id) VALUES
 (1, 4), (1, 5),  -- CLB Giáo Xứ Tân Lập có 2 trợ giảng: Thầy Minh, Cô Lan
 (2, 4), (2, 5),  -- CLB Tiểu Học Tân Lập có 2 trợ giảng: Thầy Minh, Cô Lan
 (3, 4), (3, 5);  -- CLB Tiểu Học Tân Tiến có 2 trợ giảng: Thầy Minh, Cô Lan
 
 -- Insert sample coach
-INSERT INTO coaches (coach_code, name, phone, email, belt_level_id, experience_years, specialization, club_id) VALUES
+INSERT INTO huan_luyen_vien (coach_code, name, phone, email, belt_level_id, experience_years, specialization, club_id) VALUES
 ('COACH001', 'Master Nguyen Van A', '0987654321', 'hlv@taekwondomaster.com', 9, 10, 'Sparring and Forms', 1);
 
 

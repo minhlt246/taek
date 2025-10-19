@@ -15,7 +15,7 @@ import { Course } from '../../courses/entities/course.entity';
 import { BranchManager } from './branch-manager.entity';
 import { BranchAssistant } from './branch-assistant.entity';
 
-@Entity('branches')
+@Entity('chi_nhanh')
 export class Branch {
   @PrimaryGeneratedColumn()
   id: number;

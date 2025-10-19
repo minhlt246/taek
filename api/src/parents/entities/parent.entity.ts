@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { StudentParent } from '../../student-parents/entities/student-parent.entity';
 
-@Entity('parents')
+@Entity('phu_huynh')
 export class Parent {
   @PrimaryGeneratedColumn()
   id: number;

@@ -14,10 +14,10 @@ import { Course } from '../../courses/entities/course.entity';
 import { Event } from '../../events/entities/event.entity';
 import { Notification } from '../../notifications/entities/notification.entity';
 import { TuitionPackage } from '../../tuition-packages/entities/tuition-package.entity';
-import { BeltTest } from '../../belt-tests/entities/belt-test.entity';
+// import { BeltTest } from '../../belt-tests/entities/belt-test.entity';
 import { Branch } from '../../branches/entities/branch.entity';
 
-@Entity('clubs')
+@Entity('cau_lac_bo')
 export class Club {
   @PrimaryGeneratedColumn()
   id: number;
@@ -78,6 +78,6 @@ export class Club {
   @OneToMany(() => TuitionPackage, (tuitionPackage) => tuitionPackage.club)
   tuition_packages: TuitionPackage[];
 
-  @OneToMany(() => BeltTest, (test) => test.club)
-  belt_tests: BeltTest[];
+  // @OneToMany(() => BeltTest, (test) => test.club)
+  // belt_tests: BeltTest[];
 }

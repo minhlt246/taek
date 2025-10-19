@@ -1,6 +1,6 @@
 // Admin API service for CRUD operations
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
 
 // Generic API request function
 const apiRequest = async (endpoint: string, options: RequestInit = {}) => {

@@ -5,7 +5,7 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 
-@Entity('contact_messages')
+@Entity('tin_nhan_lien_he')
 export class ContactMessage {
   @PrimaryGeneratedColumn()
   id: number;

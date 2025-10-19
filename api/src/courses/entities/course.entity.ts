@@ -18,7 +18,7 @@ import { StudentEvaluation } from '../../student-evaluations/entities/student-ev
 import { Feedback } from '../../feedbacks/entities/feedback.entity';
 import { LearningProgress } from '../../learning-progress/entities/learning-progress.entity';
 
-@Entity('courses')
+@Entity('khoa_hoc')
 export class Course {
   @PrimaryGeneratedColumn()
   id: number;

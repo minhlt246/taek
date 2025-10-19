@@ -254,7 +254,7 @@ export default function PaymentsPage() {
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Người dùng</th>
+                  <th>Võ sinh</th>
                   <th>Số tiền</th>
                   <th>Phương thức</th>
                   <th>Trạng thái</th>

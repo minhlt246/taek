@@ -9,7 +9,7 @@ import {
 import { User } from '../../users/entities/user.entity';
 import { BeltLevel } from '../../belt-levels/entities/belt-level.entity';
 
-@Entity('certificates')
+@Entity('chung_chi')
 export class Certificate {
   @PrimaryGeneratedColumn()
   id: number;

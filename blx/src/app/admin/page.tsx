@@ -60,7 +60,7 @@ export default function AdminDashboard() {
 
   const statCards = [
     {
-      title: "Tổng người dùng",
+      title: "Tổng võ sinh",
       value: stats.totalUsers,
       icon: "fas fa-users",
       color: "primary",

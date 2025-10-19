@@ -10,7 +10,7 @@ import { User } from '../../users/entities/user.entity';
 import { Coach } from '../../coaches/entities/coach.entity';
 import { Course } from '../../courses/entities/course.entity';
 
-@Entity('feedbacks')
+@Entity('phan_hoi')
 export class Feedback {
   @PrimaryGeneratedColumn()
   id: number;

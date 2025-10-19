@@ -15,9 +15,9 @@ import { Course } from '../../courses/entities/course.entity';
 import { BeltPromotion } from '../../belt-promotions/entities/belt-promotion.entity';
 import { StudentEvaluation } from '../../student-evaluations/entities/student-evaluation.entity';
 import { Feedback } from '../../feedbacks/entities/feedback.entity';
-import { BeltTest } from '../../belt-tests/entities/belt-test.entity';
+// import { BeltTest } from '../../belt-tests/entities/belt-test.entity';
 
-@Entity('coaches')
+@Entity('huan_luyen_vien')
 export class Coach {
   @PrimaryGeneratedColumn()
   id: number;
@@ -99,6 +99,6 @@ export class Coach {
   @OneToMany(() => Feedback, (feedback) => feedback.coach)
   feedbacks: Feedback[];
 
-  @OneToMany(() => BeltTest, (test) => test.examiner)
-  belt_tests: BeltTest[];
+  // @OneToMany(() => BeltTest, (test) => test.examiner)
+  // belt_tests: BeltTest[];
 }

@@ -16,7 +16,7 @@ const AdminSidebar = () => {
       active: pathname === "/admin",
     },
     {
-      title: "Người dùng",
+      title: "Võ sinh",
       icon: "fas fa-users",
       href: "/admin/users",
       active: pathname.startsWith("/admin/users"),
@@ -32,12 +32,6 @@ const AdminSidebar = () => {
       icon: "fas fa-building",
       href: "/admin/clubs",
       active: pathname.startsWith("/admin/clubs"),
-    },
-    {
-      title: "Chi nhánh",
-      icon: "fas fa-map-marker-alt",
-      href: "/admin/branches",
-      active: pathname.startsWith("/admin/branches"),
     },
     {
       title: "Khóa học",

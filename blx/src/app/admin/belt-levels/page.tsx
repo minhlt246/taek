@@ -7,15 +7,10 @@ interface BeltLevel {
   id: number;
   name: string;
   color: string;
+  order_sequence: number;
   description: string;
-  requirements: string;
-  minimumAge: number;
-  trainingHours: number;
-  testFee: number;
-  order: number;
-  status: "active" | "inactive";
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export default function BeltLevelsPage() {
@@ -29,25 +24,185 @@ export default function BeltLevelsPage() {
     name: "",
     color: "",
     description: "",
-    requirements: "",
-    minimumAge: 6,
-    trainingHours: 0,
-    testFee: 0,
-    order: 1,
-    status: "active" as "active" | "inactive",
+    order_sequence: 1,
   });
 
   useEffect(() => {
-    // Lấy danh sách cấp đai từ API
     const fetchBeltLevels = async () => {
       setLoading(true);
       try {
-        // TODO: Thay thế bằng API call thực tế
-        // const response = await api.get('/belt-levels');
-        // setBeltLevels(response.data);
-        setBeltLevels([]);
+        console.log("Đang tải danh sách cấp đai...");
+        const data = await beltLevelsApi.getAll();
+        console.log("Dữ liệu cấp đai từ API:", data);
+        setBeltLevels(data);
       } catch (error) {
         console.error("Lỗi khi tải danh sách cấp đai:", error);
+        // Tạm thời sử dụng dữ liệu mẫu khi API không hoạt động
+        const sampleData = [
+          {
+            id: 1,
+            name: "Cấp 8",
+            color: "White",
+            description: "Đai trắng cấp 8",
+            order_sequence: 1,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          {
+            id: 2,
+            name: "Cấp 7",
+            color: "Yellow",
+            description: "Đai vàng cấp 7",
+            order_sequence: 2,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          {
+            id: 3,
+            name: "Cấp 6",
+            color: "Green",
+            description: "Đai xanh lá cấp 6",
+            order_sequence: 3,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          {
+            id: 4,
+            name: "Cấp 5",
+            color: "Blue",
+            description: "Đai xanh dương cấp 5",
+            order_sequence: 4,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          {
+            id: 5,
+            name: "Cấp 4",
+            color: "Red",
+            description: "Đai đỏ cấp 4",
+            order_sequence: 5,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          {
+            id: 6,
+            name: "Cấp 3",
+            color: "Red",
+            description: "Đai đỏ cấp 3",
+            order_sequence: 6,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          {
+            id: 7,
+            name: "Cấp 2",
+            color: "Red",
+            description: "Đai đỏ cấp 2",
+            order_sequence: 7,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          {
+            id: 8,
+            name: "Cấp 1",
+            color: "Red",
+            description: "Đai đỏ cấp 1",
+            order_sequence: 8,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          {
+            id: 9,
+            name: "Nhất đẳng (1 Dan)",
+            color: "Black",
+            description: "Đai đen 1 đẳng",
+            order_sequence: 9,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          {
+            id: 10,
+            name: "Nhị đẳng (2 Dan)",
+            color: "Black",
+            description: "Đai đen 2 đẳng",
+            order_sequence: 10,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          {
+            id: 11,
+            name: "Tam đẳng (3 Dan)",
+            color: "Black",
+            description: "Đai đen 3 đẳng",
+            order_sequence: 11,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          {
+            id: 12,
+            name: "Tứ đẳng (4 Dan)",
+            color: "Black",
+            description: "Đai đen 4 đẳng",
+            order_sequence: 12,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          {
+            id: 13,
+            name: "Ngũ đẳng (5 Dan)",
+            color: "Black",
+            description: "Đai đen 5 đẳng",
+            order_sequence: 13,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          {
+            id: 14,
+            name: "Lục đẳng (6 Dan)",
+            color: "Black",
+            description: "Đai đen 6 đẳng",
+            order_sequence: 14,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          {
+            id: 15,
+            name: "Thất đẳng (7 Dan)",
+            color: "Black",
+            description: "Đai đen 7 đẳng",
+            order_sequence: 15,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          {
+            id: 16,
+            name: "Bát đẳng (8 Dan)",
+            color: "Black",
+            description: "Đai đen 8 đẳng",
+            order_sequence: 16,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          {
+            id: 17,
+            name: "Cửu đẳng (9 Dan)",
+            color: "Black",
+            description: "Đai đen 9 đẳng",
+            order_sequence: 17,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          {
+            id: 18,
+            name: "Thập đẳng (10 Dan)",
+            color: "Black",
+            description: "Đai đen 10 đẳng",
+            order_sequence: 18,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        ];
+        setBeltLevels(sampleData);
       } finally {
         setLoading(false);
       }
@@ -56,43 +211,26 @@ export default function BeltLevelsPage() {
     fetchBeltLevels();
   }, []);
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(amount);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       if (editingBeltLevel) {
-        // Update existing belt level
-        await beltLevelsApi.update(editingBeltLevel.id, formData);
-        // Update local state
+        // Cập nhật cấp đai hiện có
+        const updatedBeltLevel = await beltLevelsApi.update(
+          editingBeltLevel.id,
+          formData
+        );
+        // Cập nhật state local
         setBeltLevels(
           beltLevels.map((beltLevel) =>
-            beltLevel.id === editingBeltLevel.id
-              ? {
-                  ...beltLevel,
-                  ...formData,
-                  updatedAt: new Date().toISOString(),
-                }
-              : beltLevel
+            beltLevel.id === editingBeltLevel.id ? updatedBeltLevel : beltLevel
           )
         );
       } else {
-        // Create new belt level
+        // Tạo cấp đai mới
         const newBeltLevel = await beltLevelsApi.create(formData);
-        // Add to local state
-        setBeltLevels([
-          ...beltLevels,
-          {
-            ...newBeltLevel,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-        ]);
+        // Thêm vào state local
+        setBeltLevels([...beltLevels, newBeltLevel]);
       }
 
       setShowModal(false);
@@ -110,12 +248,7 @@ export default function BeltLevelsPage() {
       name: beltLevel.name,
       color: beltLevel.color,
       description: beltLevel.description,
-      requirements: beltLevel.requirements,
-      minimumAge: beltLevel.minimumAge,
-      trainingHours: beltLevel.trainingHours,
-      testFee: beltLevel.testFee,
-      order: beltLevel.order,
-      status: beltLevel.status,
+      order_sequence: beltLevel.order_sequence,
     });
     setShowModal(true);
   };
@@ -124,11 +257,11 @@ export default function BeltLevelsPage() {
     if (confirm("Bạn có chắc chắn muốn xóa cấp đai này?")) {
       try {
         await beltLevelsApi.delete(id);
-        // Remove from local state
+        // Xóa khỏi state local
         setBeltLevels(beltLevels.filter((beltLevel) => beltLevel.id !== id));
         alert("Xóa cấp đai thành công!");
       } catch (error) {
-        console.error("Failed to delete belt level:", error);
+        console.error("Lỗi khi xóa cấp đai:", error);
         alert("Lỗi khi xóa cấp đai. Vui lòng thử lại.");
       }
     }
@@ -139,12 +272,7 @@ export default function BeltLevelsPage() {
       name: "",
       color: "",
       description: "",
-      requirements: "",
-      minimumAge: 6,
-      trainingHours: 0,
-      testFee: 0,
-      order: 1,
-      status: "active",
+      order_sequence: 1,
     });
     setEditingBeltLevel(null);
   };
@@ -165,7 +293,7 @@ export default function BeltLevelsPage() {
   return (
     <div className="belt-levels-page">
       <div className="page-header">
-        <h2>Belt Levels Management</h2>
+        <h2>Quản lý cấp đai</h2>
         <button
           className="btn btn-primary"
           onClick={() => {
@@ -174,7 +302,7 @@ export default function BeltLevelsPage() {
           }}
         >
           <i className="fas fa-plus mr-2"></i>
-          Add New Belt Level
+          Thêm cấp đai mới
         </button>
       </div>
 
@@ -184,25 +312,27 @@ export default function BeltLevelsPage() {
             <table className="table table-bordered">
               <thead>
                 <tr>
-                  <th>Order</th>
-                  <th>Belt</th>
-                  <th>Name</th>
-                  <th>Min Age</th>
-                  <th>Training Hours</th>
-                  <th>Test Fee</th>
-                  <th>Status</th>
-                  <th>Actions</th>
+                  <th>Thứ tự</th>
+                  <th>Tên cấp đai</th>
+                  <th>Màu sắc</th>
+                  <th>Mô tả</th>
+                  <th>Ngày tạo</th>
+                  <th>Ngày cập nhật</th>
+                  <th>Thao tác</th>
                 </tr>
               </thead>
               <tbody>
                 {beltLevels
-                  .sort((a, b) => a.order - b.order)
+                  .sort((a, b) => a.order_sequence - b.order_sequence)
                   .map((beltLevel) => (
                     <tr key={beltLevel.id}>
                       <td>
                         <span className="badge bg-secondary">
-                          {beltLevel.order}
+                          {beltLevel.order_sequence}
                         </span>
+                      </td>
+                      <td>
+                        <strong>{beltLevel.name}</strong>
                       </td>
                       <td>
                         <div
@@ -213,46 +343,41 @@ export default function BeltLevelsPage() {
                             backgroundColor: beltLevel.color,
                             border: "1px solid #ccc",
                             borderRadius: "4px",
+                            display: "inline-block",
                           }}
                         ></div>
+                        <span className="ms-2">{beltLevel.color}</span>
                       </td>
                       <td>
-                        <div>
-                          <strong>{beltLevel.name}</strong>
-                          <br />
-                          <small className="text-muted">
-                            {beltLevel.description}
-                          </small>
+                        <div
+                          className="text-wrap"
+                          style={{ maxWidth: "300px" }}
+                        >
+                          {beltLevel.description}
                         </div>
                       </td>
-                      <td>{beltLevel.minimumAge} years</td>
-                      <td>{beltLevel.trainingHours} hours</td>
                       <td>
-                        {beltLevel.testFee > 0
-                          ? formatCurrency(beltLevel.testFee)
-                          : "Free"}
+                        {new Date(beltLevel.created_at).toLocaleDateString(
+                          "vi-VN"
+                        )}
                       </td>
                       <td>
-                        <span
-                          className={`badge ${
-                            beltLevel.status === "active"
-                              ? "bg-success"
-                              : "bg-secondary"
-                          }`}
-                        >
-                          {beltLevel.status}
-                        </span>
+                        {new Date(beltLevel.updated_at).toLocaleDateString(
+                          "vi-VN"
+                        )}
                       </td>
                       <td>
                         <button
                           className="btn btn-sm btn-outline-primary me-2"
                           onClick={() => handleEdit(beltLevel)}
+                          title="Chỉnh sửa"
                         >
                           <i className="fas fa-edit"></i>
                         </button>
                         <button
                           className="btn btn-sm btn-outline-danger"
                           onClick={() => handleDelete(beltLevel.id)}
+                          title="Xóa"
                         >
                           <i className="fas fa-trash"></i>
                         </button>
@@ -261,11 +386,21 @@ export default function BeltLevelsPage() {
                   ))}
               </tbody>
             </table>
+
+            {/* Hiển thị khi không có dữ liệu */}
+            {beltLevels.length === 0 && !loading && (
+              <div className="text-center py-4">
+                <i className="fas fa-medal fa-3x text-muted mb-3"></i>
+                <p className="text-muted">
+                  Chưa có cấp đai nào. Hãy thêm cấp đai đầu tiên!
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Modal for Add/Edit Belt Level */}
+      {/* Modal cho Thêm/Chỉnh sửa Cấp đai */}
       {showModal && (
         <div
           className="modal show d-block"
@@ -275,7 +410,7 @@ export default function BeltLevelsPage() {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">
-                  {editingBeltLevel ? "Edit Belt Level" : "Add New Belt Level"}
+                  {editingBeltLevel ? "Chỉnh sửa cấp đai" : "Thêm cấp đai mới"}
                 </h5>
                 <button
                   type="button"
@@ -291,7 +426,7 @@ export default function BeltLevelsPage() {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Belt Name</label>
+                        <label className="form-label">Tên cấp đai</label>
                         <input
                           type="text"
                           className="form-control"
@@ -305,7 +440,7 @@ export default function BeltLevelsPage() {
                     </div>
                     <div className="col-md-3">
                       <div className="mb-3">
-                        <label className="form-label">Color</label>
+                        <label className="form-label">Màu sắc</label>
                         <input
                           type="color"
                           className="form-control form-control-color"
@@ -319,15 +454,15 @@ export default function BeltLevelsPage() {
                     </div>
                     <div className="col-md-3">
                       <div className="mb-3">
-                        <label className="form-label">Order</label>
+                        <label className="form-label">Thứ tự</label>
                         <input
                           type="number"
                           className="form-control"
-                          value={formData.order}
+                          value={formData.order_sequence}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              order: parseInt(e.target.value),
+                              order_sequence: parseInt(e.target.value),
                             })
                           }
                           min="1"
@@ -337,10 +472,10 @@ export default function BeltLevelsPage() {
                     </div>
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Description</label>
+                    <label className="form-label">Mô tả</label>
                     <textarea
                       className="form-control"
-                      rows={2}
+                      rows={4}
                       value={formData.description}
                       onChange={(e) =>
                         setFormData({
@@ -348,96 +483,8 @@ export default function BeltLevelsPage() {
                           description: e.target.value,
                         })
                       }
-                      required
+                      placeholder="Mô tả về cấp đai này..."
                     />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">Requirements</label>
-                    <textarea
-                      className="form-control"
-                      rows={3}
-                      value={formData.requirements}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          requirements: e.target.value,
-                        })
-                      }
-                      placeholder="List the techniques and skills required for this belt level..."
-                      required
-                    />
-                  </div>
-                  <div className="row">
-                    <div className="col-md-4">
-                      <div className="mb-3">
-                        <label className="form-label">Minimum Age</label>
-                        <input
-                          type="number"
-                          className="form-control"
-                          value={formData.minimumAge}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              minimumAge: parseInt(e.target.value),
-                            })
-                          }
-                          min="1"
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="col-md-4">
-                      <div className="mb-3">
-                        <label className="form-label">Training Hours</label>
-                        <input
-                          type="number"
-                          className="form-control"
-                          value={formData.trainingHours}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              trainingHours: parseInt(e.target.value),
-                            })
-                          }
-                          min="0"
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="col-md-4">
-                      <div className="mb-3">
-                        <label className="form-label">Test Fee (VND)</label>
-                        <input
-                          type="number"
-                          className="form-control"
-                          value={formData.testFee}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              testFee: parseInt(e.target.value),
-                            })
-                          }
-                          min="0"
-                          required
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">Status</label>
-                    <select
-                      className="form-select"
-                      value={formData.status}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          status: e.target.value as "active" | "inactive",
-                        })
-                      }
-                    >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                    </select>
                   </div>
                 </div>
                 <div className="modal-footer">
@@ -449,10 +496,10 @@ export default function BeltLevelsPage() {
                       resetForm();
                     }}
                   >
-                    Cancel
+                    Hủy
                   </button>
                   <button type="submit" className="btn btn-primary">
-                    {editingBeltLevel ? "Update" : "Create"}
+                    {editingBeltLevel ? "Cập nhật" : "Tạo mới"}
                   </button>
                 </div>
               </form>

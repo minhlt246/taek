@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAccountStore } from "@/stores/account";
+import { coachesApi, clubsApi } from "@/services/adminApi";
 
 interface Coach {
   id: number;
@@ -14,6 +15,8 @@ interface Coach {
   specialization?: string;
   is_active: boolean;
   created_at: string;
+  club_id?: number;
+  club_name?: string;
 }
 
 export default function CoachesPage() {
@@ -21,11 +24,9 @@ export default function CoachesPage() {
   const [coaches, setCoaches] = useState<Coach[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterRole, setFilterRole] = useState<
-    "all" | "head_coach" | "main_manager" | "assistant_manager" | "assistant"
-  >("all");
   const [showModal, setShowModal] = useState(false);
   const [editingCoach, setEditingCoach] = useState<Coach | null>(null);
+  const [clubs, setClubs] = useState<{ id: number; name: string }[]>([]);
   const [formData, setFormData] = useState({
     coach_code: "",
     name: "",
@@ -37,27 +38,33 @@ export default function CoachesPage() {
       | "assistant_manager"
       | "assistant",
     experience_years: 0,
-    specialization: "",
+    specialization: "Taekwondo",
     is_active: true,
+    club_id: 0,
   });
 
   useEffect(() => {
-    // Lấy danh sách huấn luyện viên từ API
-    const fetchCoaches = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        // TODO: Thay thế bằng API call thực tế
-        // const response = await api.get('/coaches');
-        // setCoaches(response.data);
+        // Tạm thời chỉ load clubs vì coaches endpoint chưa có
+        const clubsData = await clubsApi.getAll();
+        setClubs(clubsData);
+
+        // TODO: Khi có coaches endpoint, uncomment dòng dưới
+        // const coachesData = await coachesApi.getAll();
+        // setCoaches(coachesData);
         setCoaches([]);
       } catch (error) {
-        console.error("Lỗi khi tải danh sách huấn luyện viên:", error);
+        console.error("Lỗi khi tải dữ liệu:", error);
+        setCoaches([]);
+        setClubs([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCoaches();
+    fetchData();
   }, []);
 
   const filteredCoaches = coaches.filter((coach) => {
@@ -65,9 +72,10 @@ export default function CoachesPage() {
       coach.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       coach.coach_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (coach.email &&
-        coach.email.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesRole = filterRole === "all" || coach.role === filterRole;
-    return matchesSearch && matchesRole;
+        coach.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (coach.club_name &&
+        coach.club_name.toLowerCase().includes(searchTerm.toLowerCase()));
+    return matchesSearch;
   });
 
   const getRoleBadgeClass = (role: string) => {
@@ -111,6 +119,7 @@ export default function CoachesPage() {
       experience_years: coach.experience_years || 0,
       specialization: coach.specialization || "",
       is_active: coach.is_active,
+      club_id: coach.club_id || 0,
     });
     setShowModal(true);
   };
@@ -119,22 +128,15 @@ export default function CoachesPage() {
     e.preventDefault();
     try {
       if (editingCoach) {
-        // Update existing coach
-        setCoaches(
-          coaches.map((coach) =>
-            coach.id === editingCoach.id
-              ? { ...coach, ...formData, updated_at: new Date().toISOString() }
-              : coach
-          )
-        );
+        await coachesApi.update(editingCoach.id, formData);
+        const updatedCoaches = await coachesApi.getAll();
+        setCoaches(updatedCoaches);
+        alert("Cập nhật huấn luyện viên thành công!");
       } else {
-        // Create new coach
-        const newCoach = {
-          id: Math.max(...coaches.map((c) => c.id)) + 1,
-          ...formData,
-          created_at: new Date().toISOString(),
-        };
-        setCoaches([...coaches, newCoach]);
+        await coachesApi.create(formData);
+        const updatedCoaches = await coachesApi.getAll();
+        setCoaches(updatedCoaches);
+        alert("Tạo huấn luyện viên mới thành công!");
       }
       setShowModal(false);
       setEditingCoach(null);
@@ -153,8 +155,9 @@ export default function CoachesPage() {
       phone: "",
       role: "assistant",
       experience_years: 0,
-      specialization: "",
+      specialization: "Taekwondo",
       is_active: true,
+      club_id: 0,
     });
     setEditingCoach(null);
   };
@@ -212,33 +215,11 @@ export default function CoachesPage() {
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Tìm kiếm huấn luyện viên..."
+                  placeholder="Tìm kiếm HLV hoặc CLB..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-            </div>
-            <div className="col-md-3">
-              <select
-                className="form-select"
-                value={filterRole}
-                onChange={(e) =>
-                  setFilterRole(
-                    e.target.value as
-                      | "all"
-                      | "head_coach"
-                      | "main_manager"
-                      | "assistant_manager"
-                      | "assistant"
-                  )
-                }
-              >
-                <option value="all">Tất cả vai trò</option>
-                <option value="head_coach">Huấn luyện viên trưởng</option>
-                <option value="main_manager">Quản lý chính</option>
-                <option value="assistant_manager">Quản lý phụ</option>
-                <option value="assistant">Trợ giảng</option>
-              </select>
             </div>
           </div>
 
@@ -252,6 +233,7 @@ export default function CoachesPage() {
                   <th>Tên</th>
                   <th>Email</th>
                   <th>Số điện thoại</th>
+                  <th>CLB</th>
                   <th>Vai trò</th>
                   <th>Kinh nghiệm</th>
                   <th>Chuyên môn</th>
@@ -267,6 +249,11 @@ export default function CoachesPage() {
                     <td>{coach.name}</td>
                     <td>{coach.email || "-"}</td>
                     <td>{coach.phone || "-"}</td>
+                    <td>
+                      <span className="badge bg-info">
+                        {coach.club_name || "Chưa phân công"}
+                      </span>
+                    </td>
                     <td>
                       <span
                         className={`badge ${getRoleBadgeClass(coach.role)}`}
@@ -453,14 +440,30 @@ export default function CoachesPage() {
                     <input
                       type="text"
                       className="form-control"
-                      value={formData.specialization}
+                      value="Taekwondo"
+                      disabled
+                      style={{ backgroundColor: "#f8f9fa" }}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">Câu lạc bộ</label>
+                    <select
+                      className="form-select"
+                      value={formData.club_id}
                       onChange={(e) =>
                         setFormData({
                           ...formData,
-                          specialization: e.target.value,
+                          club_id: parseInt(e.target.value),
                         })
                       }
-                    />
+                    >
+                      <option value={0}>Chọn CLB</option>
+                      {clubs.map((club) => (
+                        <option key={club.id} value={club.id}>
+                          {club.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div className="mb-3">
                     <div className="form-check">

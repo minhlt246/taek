@@ -11,7 +11,7 @@ import {
 import { Club } from '../../clubs/entities/club.entity';
 import { PaymentDetail } from '../../payment-details/entities/payment-detail.entity';
 
-@Entity('tuition_packages')
+@Entity('goi_hoc_phi')
 export class TuitionPackage {
   @PrimaryGeneratedColumn()
   id: number;

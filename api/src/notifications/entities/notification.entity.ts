@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { Club } from '../../clubs/entities/club.entity';
 
-@Entity('notifications')
+@Entity('thong_bao')
 export class Notification {
   @PrimaryGeneratedColumn()
   id: number;

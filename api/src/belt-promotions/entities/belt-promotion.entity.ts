@@ -10,7 +10,7 @@ import { User } from '../../users/entities/user.entity';
 import { BeltLevel } from '../../belt-levels/entities/belt-level.entity';
 import { Coach } from '../../coaches/entities/coach.entity';
 
-@Entity('belt_promotions')
+@Entity('thang_cap_dai')
 export class BeltPromotion {
   @PrimaryGeneratedColumn()
   id: number;

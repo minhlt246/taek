@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { Course } from '../../courses/entities/course.entity';
 
-@Entity('schedules')
+@Entity('lich_hoc')
 export class Schedule {
   @PrimaryGeneratedColumn()
   id: number;
