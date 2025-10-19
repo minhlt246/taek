@@ -48,87 +48,19 @@ export default function EventsPage() {
   });
 
   useEffect(() => {
-    // Simulate API call to fetch events
+    // Lấy danh sách sự kiện từ API
     const fetchEvents = async () => {
       setLoading(true);
-      // TODO: Replace with actual API call
-      setTimeout(() => {
-        setEvents([
-          {
-            id: 1,
-            title: "Spring Taekwondo Tournament 2024",
-            description: "Annual spring tournament for all belt levels",
-            type: "tournament",
-            location: "Main Branch - District 1",
-            startDate: "2024-03-15",
-            endDate: "2024-03-15",
-            startTime: "08:00",
-            endTime: "18:00",
-            maxParticipants: 100,
-            currentParticipants: 75,
-            registrationFee: 500000,
-            status: "upcoming",
-            organizer: "Master Nguyen Van A",
-            createdAt: "2024-01-15",
-            updatedAt: "2024-01-15",
-          },
-          {
-            id: 2,
-            title: "Belt Promotion Ceremony",
-            description: "Monthly belt promotion ceremony for students",
-            type: "graduation",
-            location: "Branch - District 3",
-            startDate: "2024-02-28",
-            endDate: "2024-02-28",
-            startTime: "14:00",
-            endTime: "16:00",
-            maxParticipants: 50,
-            currentParticipants: 32,
-            registrationFee: 0,
-            status: "upcoming",
-            organizer: "Master Tran Thi B",
-            createdAt: "2024-02-01",
-            updatedAt: "2024-02-01",
-          },
-          {
-            id: 3,
-            title: "Self-Defense Workshop",
-            description: "Special workshop on self-defense techniques",
-            type: "seminar",
-            location: "Main Branch - District 1",
-            startDate: "2024-02-20",
-            endDate: "2024-02-20",
-            startTime: "09:00",
-            endTime: "12:00",
-            maxParticipants: 30,
-            currentParticipants: 28,
-            registrationFee: 200000,
-            status: "upcoming",
-            organizer: "Grand Master Le Van C",
-            createdAt: "2024-02-05",
-            updatedAt: "2024-02-05",
-          },
-          {
-            id: 4,
-            title: "Club Anniversary Celebration",
-            description: "Celebrating 10 years of our Taekwondo club",
-            type: "social",
-            location: "Main Branch - District 1",
-            startDate: "2024-01-30",
-            endDate: "2024-01-30",
-            startTime: "18:00",
-            endTime: "22:00",
-            maxParticipants: 200,
-            currentParticipants: 150,
-            registrationFee: 100000,
-            status: "completed",
-            organizer: "Club Management",
-            createdAt: "2024-01-10",
-            updatedAt: "2024-01-10",
-          },
-        ]);
+      try {
+        // TODO: Thay thế bằng API call thực tế
+        // const response = await api.get('/events');
+        // setEvents(response.data);
+        setEvents([]);
+      } catch (error) {
+        console.error("Lỗi khi tải danh sách sự kiện:", error);
+      } finally {
         setLoading(false);
-      }, 1000);
+      }
     };
 
     fetchEvents();
@@ -214,8 +146,8 @@ export default function EventsPage() {
       setEditingEvent(null);
       resetForm();
     } catch (error) {
-      console.error("Failed to save event:", error);
-      alert("Failed to save event. Please try again.");
+      console.error("Lỗi khi lưu sự kiện:", error);
+      alert("Lỗi khi lưu sự kiện. Vui lòng thử lại.");
     }
   };
 
@@ -239,15 +171,15 @@ export default function EventsPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (confirm("Are you sure you want to delete this event?")) {
+    if (confirm("Bạn có chắc chắn muốn xóa sự kiện này?")) {
       try {
         await eventsApi.delete(id);
         // Remove from local state
         setEvents(events.filter((event) => event.id !== id));
-        alert("Event deleted successfully!");
+        alert("Xóa sự kiện thành công!");
       } catch (error) {
         console.error("Failed to delete event:", error);
-        alert("Failed to delete event. Please try again.");
+        alert("Lỗi khi xóa sự kiện. Vui lòng thử lại.");
       }
     }
   };
@@ -277,7 +209,7 @@ export default function EventsPage() {
         style={{ height: "400px" }}
       >
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">Đang tải...</span>
         </div>
       </div>
     );

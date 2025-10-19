@@ -42,97 +42,20 @@ export default function NewsPage() {
   });
 
   useEffect(() => {
-    // Simulate API call to fetch news
+    // Lấy danh sách tin tức từ API
     const fetchNews = async () => {
       setLoading(true);
-      // TODO: Replace with actual API call
-      setTimeout(() => {
-        setNews([
-          {
-            id: 1,
-            title: "Spring Tournament 2024 Registration Now Open",
-            content:
-              "We are excited to announce that registration for our annual Spring Tournament 2024 is now open. This tournament will feature competitions across all belt levels and age groups...",
-            summary:
-              "Registration for Spring Tournament 2024 is now open for all students.",
-            author: "Master Nguyen Van A",
-            category: "announcement",
-            status: "published",
-            featured: true,
-            imageUrl: "/images/tournament-2024.jpg",
-            tags: ["tournament", "competition", "registration"],
-            publishedAt: "2024-02-15",
-            createdAt: "2024-02-10",
-            updatedAt: "2024-02-15",
-          },
-          {
-            id: 2,
-            title: "New Black Belt Achievements",
-            content:
-              "Congratulations to our students who have successfully achieved their black belt this month. Their dedication and hard work have paid off...",
-            summary:
-              "Several students have achieved their black belt this month.",
-            author: "Master Tran Thi B",
-            category: "achievement",
-            status: "published",
-            featured: false,
-            imageUrl: "/images/black-belt-ceremony.jpg",
-            tags: ["black belt", "achievement", "graduation"],
-            publishedAt: "2024-02-10",
-            createdAt: "2024-02-08",
-            updatedAt: "2024-02-10",
-          },
-          {
-            id: 3,
-            title: "Self-Defense Workshop This Weekend",
-            content:
-              "Join us this weekend for a special self-defense workshop conducted by Grand Master Le Van C. Learn essential techniques for personal safety...",
-            summary:
-              "Special self-defense workshop this weekend with Grand Master Le Van C.",
-            author: "Club Management",
-            category: "event",
-            status: "published",
-            featured: false,
-            imageUrl: "/images/self-defense-workshop.jpg",
-            tags: ["workshop", "self-defense", "safety"],
-            publishedAt: "2024-02-12",
-            createdAt: "2024-02-05",
-            updatedAt: "2024-02-12",
-          },
-          {
-            id: 4,
-            title: "Club Anniversary Celebration Success",
-            content:
-              "Our 10th anniversary celebration was a huge success! Thank you to all students, parents, and instructors who made this event memorable...",
-            summary:
-              "Successful 10th anniversary celebration with great participation.",
-            author: "Club Management",
-            category: "general",
-            status: "published",
-            featured: true,
-            imageUrl: "/images/anniversary-celebration.jpg",
-            tags: ["anniversary", "celebration", "success"],
-            publishedAt: "2024-02-01",
-            createdAt: "2024-01-30",
-            updatedAt: "2024-02-01",
-          },
-          {
-            id: 5,
-            title: "New Training Schedule for March",
-            content:
-              "We are updating our training schedule for March to better accommodate our growing student base. Please check the new schedule...",
-            summary: "Updated training schedule for March is now available.",
-            author: "Master Pham Thi D",
-            category: "announcement",
-            status: "draft",
-            featured: false,
-            tags: ["schedule", "training", "march"],
-            createdAt: "2024-02-14",
-            updatedAt: "2024-02-14",
-          },
-        ]);
+      try {
+        // TODO: Thay thế bằng API call thực tế
+        // const response = await api.get('/news');
+        // setNews(response.data);
+        setNews([]);
+      } catch (error) {
+        console.error("Lỗi khi tải danh sách tin tức:", error);
+        setNews([]);
+      } finally {
         setLoading(false);
-      }, 1000);
+      }
     };
 
     fetchNews();
@@ -155,6 +78,23 @@ export default function NewsPage() {
     }
   };
 
+  const getCategoryDisplayName = (category: string) => {
+    switch (category) {
+      case "announcement":
+        return "Thông báo";
+      case "event":
+        return "Sự kiện";
+      case "achievement":
+        return "Thành tích";
+      case "general":
+        return "Chung";
+      case "sports":
+        return "Thể thao";
+      default:
+        return category;
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "published":
@@ -168,32 +108,60 @@ export default function NewsPage() {
     }
   };
 
+  const getStatusDisplayName = (status: string) => {
+    switch (status) {
+      case "published":
+        return "Đã xuất bản";
+      case "draft":
+        return "Bản nháp";
+      case "archived":
+        return "Đã lưu trữ";
+      default:
+        return status;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       if (editingNews) {
-        // Update existing news
+        // Cập nhật tin tức hiện có
         await newsApi.update(editingNews.id, formData);
-        // Update local state
+        // Cập nhật state local
         setNews(
           news.map((newsItem) =>
             newsItem.id === editingNews.id
               ? {
                   ...newsItem,
-                  ...formData,
+                  title: formData.title,
+                  content: formData.content,
+                  summary: formData.summary,
+                  author: formData.author,
+                  category: formData.category,
+                  status: formData.status,
+                  featured: formData.featured,
+                  imageUrl: formData.imageUrl,
+                  tags: formData.tags
+                    .split(",")
+                    .map((tag) => tag.trim())
+                    .filter((tag) => tag),
                   updatedAt: new Date().toISOString(),
                 }
               : newsItem
           )
         );
       } else {
-        // Create new news
+        // Tạo tin tức mới
         const newNews = await newsApi.create(formData);
-        // Add to local state
+        // Thêm vào state local
         setNews([
           ...news,
           {
             ...newNews,
+            tags: formData.tags
+              .split(",")
+              .map((tag) => tag.trim())
+              .filter((tag) => tag),
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           },
@@ -204,8 +172,8 @@ export default function NewsPage() {
       setEditingNews(null);
       resetForm();
     } catch (error) {
-      console.error("Failed to save news:", error);
-      alert("Failed to save news. Please try again.");
+      console.error("Lỗi khi lưu tin tức:", error);
+      alert("Lỗi khi lưu tin tức. Vui lòng thử lại.");
     }
   };
 
@@ -226,39 +194,40 @@ export default function NewsPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (confirm("Are you sure you want to delete this news article?")) {
+    if (confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
       try {
         await newsApi.delete(id);
-        // Remove from local state
+        // Xóa khỏi state local
         setNews(news.filter((newsItem) => newsItem.id !== id));
-        alert("News article deleted successfully!");
+        alert("Xóa bài viết thành công!");
       } catch (error) {
-        console.error("Failed to delete news:", error);
-        alert("Failed to delete news. Please try again.");
+        console.error("Lỗi khi xóa tin tức:", error);
+        alert("Lỗi khi xóa tin tức. Vui lòng thử lại.");
       }
     }
   };
 
   const handlePublish = async (id: number) => {
-    if (confirm("Are you sure you want to publish this article?")) {
+    if (confirm("Bạn có chắc chắn muốn xuất bản bài viết này?")) {
       try {
         await newsApi.publish(id);
-        // Update local state
+        // Cập nhật state local
         setNews(
           news.map((newsItem) =>
             newsItem.id === id
               ? {
                   ...newsItem,
-                  status: "published",
+                  status: "published" as const,
                   publishedAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
                 }
               : newsItem
           )
         );
-        alert("Article published successfully!");
+        alert("Xuất bản bài viết thành công!");
       } catch (error) {
-        console.error("Failed to publish news:", error);
-        alert("Failed to publish article. Please try again.");
+        console.error("Lỗi khi xuất bản tin tức:", error);
+        alert("Lỗi khi xuất bản bài viết. Vui lòng thử lại.");
       }
     }
   };
@@ -269,8 +238,8 @@ export default function NewsPage() {
       content: "",
       summary: "",
       author: "",
-      category: "general",
-      status: "draft",
+      category: "general" as const,
+      status: "draft" as const,
       featured: false,
       imageUrl: "",
       tags: "",
@@ -285,7 +254,7 @@ export default function NewsPage() {
         style={{ height: "400px" }}
       >
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">Đang tải...</span>
         </div>
       </div>
     );
@@ -294,7 +263,7 @@ export default function NewsPage() {
   return (
     <div className="news-page">
       <div className="page-header">
-        <h2>News Management</h2>
+        <h2>Quản lý tin tức</h2>
         <button
           className="btn btn-primary"
           onClick={() => {
@@ -303,7 +272,7 @@ export default function NewsPage() {
           }}
         >
           <i className="fas fa-plus mr-2"></i>
-          Add New Article
+          Thêm bài viết mới
         </button>
       </div>
 
@@ -314,13 +283,13 @@ export default function NewsPage() {
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Title</th>
-                  <th>Category</th>
-                  <th>Author</th>
-                  <th>Status</th>
-                  <th>Featured</th>
-                  <th>Published</th>
-                  <th>Actions</th>
+                  <th>Tiêu đề</th>
+                  <th>Danh mục</th>
+                  <th>Tác giả</th>
+                  <th>Trạng thái</th>
+                  <th>Nổi bật</th>
+                  <th>Ngày xuất bản</th>
+                  <th>Thao tác</th>
                 </tr>
               </thead>
               <tbody>
@@ -340,7 +309,7 @@ export default function NewsPage() {
                           newsItem.category
                         )}`}
                       >
-                        {newsItem.category}
+                        {getCategoryDisplayName(newsItem.category)}
                       </span>
                     </td>
                     <td>{newsItem.author}</td>
@@ -348,7 +317,7 @@ export default function NewsPage() {
                       <span
                         className={`badge ${getStatusColor(newsItem.status)}`}
                       >
-                        {newsItem.status}
+                        {getStatusDisplayName(newsItem.status)}
                       </span>
                     </td>
                     <td>
@@ -370,7 +339,7 @@ export default function NewsPage() {
                         <button
                           className="btn btn-sm btn-outline-primary"
                           onClick={() => handleEdit(newsItem)}
-                          title="Edit"
+                          title="Chỉnh sửa"
                         >
                           <i className="fas fa-edit"></i>
                         </button>
@@ -378,7 +347,7 @@ export default function NewsPage() {
                           <button
                             className="btn btn-sm btn-outline-success"
                             onClick={() => handlePublish(newsItem.id)}
-                            title="Publish"
+                            title="Xuất bản"
                           >
                             <i className="fas fa-paper-plane"></i>
                           </button>
@@ -386,7 +355,7 @@ export default function NewsPage() {
                         <button
                           className="btn btn-sm btn-outline-danger"
                           onClick={() => handleDelete(newsItem.id)}
-                          title="Delete"
+                          title="Xóa"
                         >
                           <i className="fas fa-trash"></i>
                         </button>
@@ -400,7 +369,7 @@ export default function NewsPage() {
         </div>
       </div>
 
-      {/* Modal for Add/Edit News */}
+      {/* Modal cho Thêm/Chỉnh sửa Tin tức */}
       {showModal && (
         <div
           className="modal show d-block"
@@ -410,7 +379,7 @@ export default function NewsPage() {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">
-                  {editingNews ? "Edit News Article" : "Add New News Article"}
+                  {editingNews ? "Chỉnh sửa bài viết" : "Thêm bài viết mới"}
                 </h5>
                 <button
                   type="button"
@@ -426,7 +395,7 @@ export default function NewsPage() {
                   <div className="row">
                     <div className="col-md-8">
                       <div className="mb-3">
-                        <label className="form-label">Title</label>
+                        <label className="form-label">Tiêu đề</label>
                         <input
                           type="text"
                           className="form-control"
@@ -440,7 +409,7 @@ export default function NewsPage() {
                     </div>
                     <div className="col-md-4">
                       <div className="mb-3">
-                        <label className="form-label">Category</label>
+                        <label className="form-label">Danh mục</label>
                         <select
                           className="form-select"
                           value={formData.category}
@@ -457,17 +426,17 @@ export default function NewsPage() {
                           }
                           required
                         >
-                          <option value="general">General</option>
-                          <option value="announcement">Announcement</option>
-                          <option value="event">Event</option>
-                          <option value="achievement">Achievement</option>
-                          <option value="sports">Sports</option>
+                          <option value="general">Chung</option>
+                          <option value="announcement">Thông báo</option>
+                          <option value="event">Sự kiện</option>
+                          <option value="achievement">Thành tích</option>
+                          <option value="sports">Thể thao</option>
                         </select>
                       </div>
                     </div>
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Summary</label>
+                    <label className="form-label">Tóm tắt</label>
                     <textarea
                       className="form-control"
                       rows={2}
@@ -475,12 +444,12 @@ export default function NewsPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, summary: e.target.value })
                       }
-                      placeholder="Brief summary of the article..."
+                      placeholder="Tóm tắt ngắn gọn về bài viết..."
                       required
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Content</label>
+                    <label className="form-label">Nội dung</label>
                     <textarea
                       className="form-control"
                       rows={8}
@@ -488,14 +457,14 @@ export default function NewsPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, content: e.target.value })
                       }
-                      placeholder="Full article content..."
+                      placeholder="Nội dung đầy đủ của bài viết..."
                       required
                     />
                   </div>
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Author</label>
+                        <label className="form-label">Tác giả</label>
                         <input
                           type="text"
                           className="form-control"
@@ -510,7 +479,7 @@ export default function NewsPage() {
                     <div className="col-md-6">
                       <div className="mb-3">
                         <label className="form-label">
-                          Image URL (optional)
+                          URL hình ảnh (tùy chọn)
                         </label>
                         <input
                           type="url"
@@ -530,7 +499,7 @@ export default function NewsPage() {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Tags</label>
+                        <label className="form-label">Thẻ</label>
                         <input
                           type="text"
                           className="form-control"
@@ -538,16 +507,16 @@ export default function NewsPage() {
                           onChange={(e) =>
                             setFormData({ ...formData, tags: e.target.value })
                           }
-                          placeholder="tag1, tag2, tag3"
+                          placeholder="thẻ1, thẻ2, thẻ3"
                         />
                         <div className="form-text">
-                          Separate tags with commas
+                          Phân cách các thẻ bằng dấu phẩy
                         </div>
                       </div>
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Status</label>
+                        <label className="form-label">Trạng thái</label>
                         <select
                           className="form-select"
                           value={formData.status}
@@ -561,9 +530,9 @@ export default function NewsPage() {
                             })
                           }
                         >
-                          <option value="draft">Draft</option>
-                          <option value="published">Published</option>
-                          <option value="archived">Archived</option>
+                          <option value="draft">Bản nháp</option>
+                          <option value="published">Đã xuất bản</option>
+                          <option value="archived">Đã lưu trữ</option>
                         </select>
                       </div>
                     </div>
@@ -583,7 +552,7 @@ export default function NewsPage() {
                         }
                       />
                       <label className="form-check-label" htmlFor="featured">
-                        Featured Article
+                        Bài viết nổi bật
                       </label>
                     </div>
                   </div>
@@ -597,10 +566,10 @@ export default function NewsPage() {
                       resetForm();
                     }}
                   >
-                    Cancel
+                    Hủy
                   </button>
                   <button type="submit" className="btn btn-primary">
-                    {editingNews ? "Update" : "Create"}
+                    {editingNews ? "Cập nhật" : "Tạo mới"}
                   </button>
                 </div>
               </form>

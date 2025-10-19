@@ -38,132 +38,19 @@ export default function BeltLevelsPage() {
   });
 
   useEffect(() => {
-    // Simulate API call to fetch belt levels
+    // Lấy danh sách cấp đai từ API
     const fetchBeltLevels = async () => {
       setLoading(true);
-      // TODO: Replace with actual API call
-      setTimeout(() => {
-        setBeltLevels([
-          {
-            id: 1,
-            name: "White Belt",
-            color: "#FFFFFF",
-            description: "Beginning level - no previous experience required",
-            requirements: "Basic stance, basic kicks, basic blocks",
-            minimumAge: 6,
-            trainingHours: 0,
-            testFee: 0,
-            order: 1,
-            status: "active",
-            createdAt: "2024-01-01",
-            updatedAt: "2024-01-01",
-          },
-          {
-            id: 2,
-            name: "Yellow Belt",
-            color: "#FFFF00",
-            description: "First colored belt - basic techniques mastered",
-            requirements:
-              "All white belt techniques, front kick, roundhouse kick",
-            minimumAge: 6,
-            trainingHours: 20,
-            testFee: 200000,
-            order: 2,
-            status: "active",
-            createdAt: "2024-01-01",
-            updatedAt: "2024-01-01",
-          },
-          {
-            id: 3,
-            name: "Orange Belt",
-            color: "#FFA500",
-            description: "Intermediate level - developing power and speed",
-            requirements: "All yellow belt techniques, side kick, back kick",
-            minimumAge: 7,
-            trainingHours: 40,
-            testFee: 250000,
-            order: 3,
-            status: "active",
-            createdAt: "2024-01-01",
-            updatedAt: "2024-01-01",
-          },
-          {
-            id: 4,
-            name: "Green Belt",
-            color: "#008000",
-            description: "Advanced intermediate - technique refinement",
-            requirements:
-              "All orange belt techniques, spinning kicks, combinations",
-            minimumAge: 8,
-            trainingHours: 60,
-            testFee: 300000,
-            order: 4,
-            status: "active",
-            createdAt: "2024-01-01",
-            updatedAt: "2024-01-01",
-          },
-          {
-            id: 5,
-            name: "Blue Belt",
-            color: "#0000FF",
-            description: "Senior intermediate - advanced techniques",
-            requirements: "All green belt techniques, jumping kicks, sparring",
-            minimumAge: 9,
-            trainingHours: 80,
-            testFee: 350000,
-            order: 5,
-            status: "active",
-            createdAt: "2024-01-01",
-            updatedAt: "2024-01-01",
-          },
-          {
-            id: 6,
-            name: "Brown Belt",
-            color: "#8B4513",
-            description: "Pre-black belt level - mastery preparation",
-            requirements:
-              "All blue belt techniques, advanced forms, leadership",
-            minimumAge: 10,
-            trainingHours: 100,
-            testFee: 400000,
-            order: 6,
-            status: "active",
-            createdAt: "2024-01-01",
-            updatedAt: "2024-01-01",
-          },
-          {
-            id: 7,
-            name: "Red Belt",
-            color: "#FF0000",
-            description: "High level - near black belt mastery",
-            requirements:
-              "All brown belt techniques, teaching skills, philosophy",
-            minimumAge: 12,
-            trainingHours: 120,
-            testFee: 500000,
-            order: 7,
-            status: "active",
-            createdAt: "2024-01-01",
-            updatedAt: "2024-01-01",
-          },
-          {
-            id: 8,
-            name: "Black Belt",
-            color: "#000000",
-            description: "Master level - beginning of true learning",
-            requirements:
-              "All previous techniques, mastery of forms, teaching ability",
-            minimumAge: 14,
-            trainingHours: 200,
-            testFee: 1000000,
-            order: 8,
-            status: "active",
-            createdAt: "2024-01-01",
-            updatedAt: "2024-01-01",
-          },
-        ]);
+      try {
+        // TODO: Thay thế bằng API call thực tế
+        // const response = await api.get('/belt-levels');
+        // setBeltLevels(response.data);
+        setBeltLevels([]);
+      } catch (error) {
+        console.error("Lỗi khi tải danh sách cấp đai:", error);
+      } finally {
         setLoading(false);
-      }, 1000);
+      }
     };
 
     fetchBeltLevels();
@@ -212,8 +99,8 @@ export default function BeltLevelsPage() {
       setEditingBeltLevel(null);
       resetForm();
     } catch (error) {
-      console.error("Failed to save belt level:", error);
-      alert("Failed to save belt level. Please try again.");
+      console.error("Lỗi khi lưu cấp đai:", error);
+      alert("Lỗi khi lưu cấp đai. Vui lòng thử lại.");
     }
   };
 
@@ -234,15 +121,15 @@ export default function BeltLevelsPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (confirm("Are you sure you want to delete this belt level?")) {
+    if (confirm("Bạn có chắc chắn muốn xóa cấp đai này?")) {
       try {
         await beltLevelsApi.delete(id);
         // Remove from local state
         setBeltLevels(beltLevels.filter((beltLevel) => beltLevel.id !== id));
-        alert("Belt level deleted successfully!");
+        alert("Xóa cấp đai thành công!");
       } catch (error) {
         console.error("Failed to delete belt level:", error);
-        alert("Failed to delete belt level. Please try again.");
+        alert("Lỗi khi xóa cấp đai. Vui lòng thử lại.");
       }
     }
   };
@@ -269,7 +156,7 @@ export default function BeltLevelsPage() {
         style={{ height: "400px" }}
       >
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">Đang tải...</span>
         </div>
       </div>
     );

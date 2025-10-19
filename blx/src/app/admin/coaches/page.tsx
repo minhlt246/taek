@@ -42,51 +42,19 @@ export default function CoachesPage() {
   });
 
   useEffect(() => {
-    // Simulate API call to fetch coaches
+    // Lấy danh sách huấn luyện viên từ API
     const fetchCoaches = async () => {
       setLoading(true);
-      // TODO: Replace with actual API calls
-      setTimeout(() => {
-        setCoaches([
-          {
-            id: 1,
-            coach_code: "COACH001",
-            name: "Master Nguyễn Văn A",
-            email: "master.nguyen@example.com",
-            phone: "0123456789",
-            role: "head_coach",
-            experience_years: 15,
-            specialization: "Taekwondo, Self Defense",
-            is_active: true,
-            created_at: "2024-01-01",
-          },
-          {
-            id: 2,
-            coach_code: "COACH002",
-            name: "Coach Trần Thị B",
-            email: "coach.tran@example.com",
-            phone: "0987654321",
-            role: "main_manager",
-            experience_years: 8,
-            specialization: "Taekwondo",
-            is_active: true,
-            created_at: "2024-01-10",
-          },
-          {
-            id: 3,
-            coach_code: "COACH003",
-            name: "Assistant Lê Văn C",
-            email: "assistant.le@example.com",
-            phone: "0369258147",
-            role: "assistant",
-            experience_years: 3,
-            specialization: "Taekwondo",
-            is_active: true,
-            created_at: "2024-01-15",
-          },
-        ]);
+      try {
+        // TODO: Thay thế bằng API call thực tế
+        // const response = await api.get('/coaches');
+        // setCoaches(response.data);
+        setCoaches([]);
+      } catch (error) {
+        console.error("Lỗi khi tải danh sách huấn luyện viên:", error);
+      } finally {
         setLoading(false);
-      }, 1000);
+      }
     };
 
     fetchCoaches();
@@ -120,13 +88,13 @@ export default function CoachesPage() {
   const getRoleDisplayName = (role: string) => {
     switch (role) {
       case "head_coach":
-        return "Head Coach";
+        return "Huấn luyện viên trưởng";
       case "main_manager":
-        return "Main Manager";
+        return "Quản lý chính";
       case "assistant_manager":
-        return "Assistant Manager";
+        return "Quản lý phụ";
       case "assistant":
-        return "Assistant";
+        return "Trợ giảng";
       default:
         return role;
     }
@@ -172,8 +140,8 @@ export default function CoachesPage() {
       setEditingCoach(null);
       resetForm();
     } catch (error) {
-      console.error("Failed to save coach:", error);
-      alert("Failed to save coach. Please try again.");
+      console.error("Lỗi khi lưu huấn luyện viên:", error);
+      alert("Lỗi khi lưu huấn luyện viên. Vui lòng thử lại.");
     }
   };
 
@@ -198,7 +166,7 @@ export default function CoachesPage() {
         style={{ height: "400px" }}
       >
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">Đang tải...</span>
         </div>
       </div>
     );
@@ -207,8 +175,8 @@ export default function CoachesPage() {
   return (
     <div className="admin-page">
       <div className="page-header">
-        <h2>Coach Management</h2>
-        <p>Manage all coaches and instructors</p>
+        <h2>Quản lý huấn luyện viên</h2>
+        <p>Quản lý tất cả huấn luyện viên và giảng viên</p>
       </div>
 
       {/* Filters and Actions */}
@@ -216,7 +184,9 @@ export default function CoachesPage() {
         <div className="card-header py-3">
           <div className="row align-items-center">
             <div className="col">
-              <h6 className="m-0 font-weight-bold text-primary">Coaches</h6>
+              <h6 className="m-0 font-weight-bold text-primary">
+                Danh sách huấn luyện viên
+              </h6>
             </div>
             <div className="col-auto">
               <button
@@ -227,7 +197,7 @@ export default function CoachesPage() {
                 }}
               >
                 <i className="fas fa-plus mr-2"></i>
-                Add New Coach
+                Thêm huấn luyện viên mới
               </button>
             </div>
           </div>
@@ -242,7 +212,7 @@ export default function CoachesPage() {
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Search coaches..."
+                  placeholder="Tìm kiếm huấn luyện viên..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -263,11 +233,11 @@ export default function CoachesPage() {
                   )
                 }
               >
-                <option value="all">All Roles</option>
-                <option value="head_coach">Head Coach</option>
-                <option value="main_manager">Main Manager</option>
-                <option value="assistant_manager">Assistant Manager</option>
-                <option value="assistant">Assistant</option>
+                <option value="all">Tất cả vai trò</option>
+                <option value="head_coach">Huấn luyện viên trưởng</option>
+                <option value="main_manager">Quản lý chính</option>
+                <option value="assistant_manager">Quản lý phụ</option>
+                <option value="assistant">Trợ giảng</option>
               </select>
             </div>
           </div>
@@ -278,15 +248,15 @@ export default function CoachesPage() {
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Code</th>
-                  <th>Name</th>
+                  <th>Mã</th>
+                  <th>Tên</th>
                   <th>Email</th>
-                  <th>Phone</th>
-                  <th>Role</th>
-                  <th>Experience</th>
-                  <th>Specialization</th>
-                  <th>Status</th>
-                  <th>Actions</th>
+                  <th>Số điện thoại</th>
+                  <th>Vai trò</th>
+                  <th>Kinh nghiệm</th>
+                  <th>Chuyên môn</th>
+                  <th>Trạng thái</th>
+                  <th>Thao tác</th>
                 </tr>
               </thead>
               <tbody>
@@ -306,7 +276,7 @@ export default function CoachesPage() {
                     </td>
                     <td>
                       {coach.experience_years
-                        ? `${coach.experience_years} years`
+                        ? `${coach.experience_years} năm`
                         : "-"}
                     </td>
                     <td>{coach.specialization || "-"}</td>
@@ -316,7 +286,7 @@ export default function CoachesPage() {
                           coach.is_active ? "bg-success" : "bg-secondary"
                         }`}
                       >
-                        {coach.is_active ? "Active" : "Inactive"}
+                        {coach.is_active ? "Hoạt động" : "Không hoạt động"}
                       </span>
                     </td>
                     <td>
@@ -342,7 +312,8 @@ export default function CoachesPage() {
             <div className="text-center py-4">
               <i className="fas fa-user-tie fa-3x text-muted mb-3"></i>
               <p className="text-muted">
-                No coaches found matching your criteria.
+                Không tìm thấy huấn luyện viên nào phù hợp với tiêu chí tìm
+                kiếm.
               </p>
             </div>
           )}
@@ -359,7 +330,9 @@ export default function CoachesPage() {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">
-                  {editingCoach ? "Edit Coach" : "Add New Coach"}
+                  {editingCoach
+                    ? "Chỉnh sửa huấn luyện viên"
+                    : "Thêm huấn luyện viên mới"}
                 </h5>
                 <button
                   type="button"
@@ -375,7 +348,7 @@ export default function CoachesPage() {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Coach Code</label>
+                        <label className="form-label">Mã huấn luyện viên</label>
                         <input
                           type="text"
                           className="form-control"
@@ -392,7 +365,7 @@ export default function CoachesPage() {
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Name</label>
+                        <label className="form-label">Tên</label>
                         <input
                           type="text"
                           className="form-control"
@@ -436,7 +409,7 @@ export default function CoachesPage() {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Role</label>
+                        <label className="form-label">Vai trò</label>
                         <select
                           className="form-select"
                           value={formData.role}
@@ -448,18 +421,18 @@ export default function CoachesPage() {
                           }
                           required
                         >
-                          <option value="assistant">Assistant</option>
-                          <option value="assistant_manager">
-                            Assistant Manager
+                          <option value="assistant">Trợ giảng</option>
+                          <option value="assistant_manager">Quản lý phụ</option>
+                          <option value="main_manager">Quản lý chính</option>
+                          <option value="head_coach">
+                            Huấn luyện viên trưởng
                           </option>
-                          <option value="main_manager">Main Manager</option>
-                          <option value="head_coach">Head Coach</option>
                         </select>
                       </div>
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Experience (years)</label>
+                        <label className="form-label">Kinh nghiệm (năm)</label>
                         <input
                           type="number"
                           className="form-control"
@@ -476,7 +449,7 @@ export default function CoachesPage() {
                     </div>
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Specialization</label>
+                    <label className="form-label">Chuyên môn</label>
                     <input
                       type="text"
                       className="form-control"
@@ -502,7 +475,7 @@ export default function CoachesPage() {
                           })
                         }
                       />
-                      <label className="form-check-label">Active</label>
+                      <label className="form-check-label">Hoạt động</label>
                     </div>
                   </div>
                 </div>
@@ -515,10 +488,10 @@ export default function CoachesPage() {
                       resetForm();
                     }}
                   >
-                    Cancel
+                    Hủy
                   </button>
                   <button type="submit" className="btn btn-primary">
-                    {editingCoach ? "Update" : "Create"}
+                    {editingCoach ? "Cập nhật" : "Tạo mới"}
                   </button>
                 </div>
               </form>

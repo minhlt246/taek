@@ -31,45 +31,19 @@ export default function ClubsPage() {
   });
 
   useEffect(() => {
-    // Simulate API call to fetch clubs
+    // Lấy danh sách câu lạc bộ từ API
     const fetchClubs = async () => {
       setLoading(true);
-      // TODO: Replace with actual API calls
-      setTimeout(() => {
-        setClubs([
-          {
-            id: 1,
-            name: "Taekwondo Club Hà Nội",
-            address: "123 Đường Láng, Đống Đa, Hà Nội",
-            phone: "024-1234-5678",
-            email: "hanoi@taekwondo.vn",
-            description: "Câu lạc bộ Taekwondo hàng đầu tại Hà Nội",
-            is_active: true,
-            created_at: "2024-01-01",
-          },
-          {
-            id: 2,
-            name: "Taekwondo Club TP.HCM",
-            address: "456 Nguyễn Huệ, Quận 1, TP.HCM",
-            phone: "028-8765-4321",
-            email: "hcm@taekwondo.vn",
-            description: "Trung tâm đào tạo Taekwondo tại TP.HCM",
-            is_active: true,
-            created_at: "2024-01-05",
-          },
-          {
-            id: 3,
-            name: "Taekwondo Club Đà Nẵng",
-            address: "789 Lê Duẩn, Hải Châu, Đà Nẵng",
-            phone: "0236-1111-2222",
-            email: "danang@taekwondo.vn",
-            description: "Câu lạc bộ Taekwondo tại Đà Nẵng",
-            is_active: true,
-            created_at: "2024-01-10",
-          },
-        ]);
+      try {
+        // TODO: Thay thế bằng API call thực tế
+        // const response = await api.get('/clubs');
+        // setClubs(response.data);
+        setClubs([]);
+      } catch (error) {
+        console.error("Lỗi khi tải danh sách câu lạc bộ:", error);
+      } finally {
         setLoading(false);
-      }, 1000);
+      }
     };
 
     fetchClubs();
@@ -120,8 +94,8 @@ export default function ClubsPage() {
       setEditingClub(null);
       resetForm();
     } catch (error) {
-      console.error("Failed to save club:", error);
-      alert("Failed to save club. Please try again.");
+      console.error("Lỗi khi lưu câu lạc bộ:", error);
+      alert("Lỗi khi lưu câu lạc bộ. Vui lòng thử lại.");
     }
   };
 
@@ -144,7 +118,7 @@ export default function ClubsPage() {
         style={{ height: "400px" }}
       >
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">Đang tải...</span>
         </div>
       </div>
     );
@@ -153,8 +127,8 @@ export default function ClubsPage() {
   return (
     <div className="admin-page">
       <div className="page-header">
-        <h2>Club Management</h2>
-        <p>Manage all Taekwondo clubs</p>
+        <h2>Quản lý câu lạc bộ</h2>
+        <p>Quản lý tất cả câu lạc bộ Taekwondo</p>
       </div>
 
       {/* Filters and Actions */}
@@ -162,7 +136,9 @@ export default function ClubsPage() {
         <div className="card-header py-3">
           <div className="row align-items-center">
             <div className="col">
-              <h6 className="m-0 font-weight-bold text-primary">Clubs</h6>
+              <h6 className="m-0 font-weight-bold text-primary">
+                Danh sách câu lạc bộ
+              </h6>
             </div>
             <div className="col-auto">
               <button
@@ -173,7 +149,7 @@ export default function ClubsPage() {
                 }}
               >
                 <i className="fas fa-plus mr-2"></i>
-                Add New Club
+                Thêm câu lạc bộ mới
               </button>
             </div>
           </div>
@@ -188,7 +164,7 @@ export default function ClubsPage() {
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Search clubs..."
+                  placeholder="Tìm kiếm câu lạc bộ..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -209,7 +185,7 @@ export default function ClubsPage() {
                           club.is_active ? "bg-success" : "bg-secondary"
                         }`}
                       >
-                        {club.is_active ? "Active" : "Inactive"}
+                        {club.is_active ? "Hoạt động" : "Không hoạt động"}
                       </span>
                     </div>
 
@@ -237,8 +213,7 @@ export default function ClubsPage() {
                   <div className="card-footer bg-transparent">
                     <div className="d-flex justify-content-between align-items-center">
                       <small className="text-muted">
-                        Created:{" "}
-                        {new Date(club.created_at).toLocaleDateString()}
+                        Tạo: {new Date(club.created_at).toLocaleDateString()}
                       </small>
                       <div className="btn-group" role="group">
                         <button
@@ -262,7 +237,7 @@ export default function ClubsPage() {
             <div className="text-center py-4">
               <i className="fas fa-building fa-3x text-muted mb-3"></i>
               <p className="text-muted">
-                No clubs found matching your criteria.
+                Không tìm thấy câu lạc bộ nào phù hợp với tiêu chí tìm kiếm.
               </p>
             </div>
           )}
@@ -279,7 +254,7 @@ export default function ClubsPage() {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">
-                  {editingClub ? "Edit Club" : "Add New Club"}
+                  {editingClub ? "Chỉnh sửa câu lạc bộ" : "Thêm câu lạc bộ mới"}
                 </h5>
                 <button
                   type="button"
@@ -293,7 +268,7 @@ export default function ClubsPage() {
               <form onSubmit={handleSubmit}>
                 <div className="modal-body">
                   <div className="mb-3">
-                    <label className="form-label">Club Name</label>
+                    <label className="form-label">Tên câu lạc bộ</label>
                     <input
                       type="text"
                       className="form-control"
@@ -305,7 +280,7 @@ export default function ClubsPage() {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Address</label>
+                    <label className="form-label">Địa chỉ</label>
                     <input
                       type="text"
                       className="form-control"
@@ -319,7 +294,7 @@ export default function ClubsPage() {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Phone</label>
+                        <label className="form-label">Số điện thoại</label>
                         <input
                           type="tel"
                           className="form-control"
@@ -347,7 +322,7 @@ export default function ClubsPage() {
                     </div>
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Description</label>
+                    <label className="form-label">Mô tả</label>
                     <textarea
                       className="form-control"
                       rows={3}
@@ -373,7 +348,7 @@ export default function ClubsPage() {
                           })
                         }
                       />
-                      <label className="form-check-label">Active</label>
+                      <label className="form-check-label">Hoạt động</label>
                     </div>
                   </div>
                 </div>
@@ -386,10 +361,10 @@ export default function ClubsPage() {
                       resetForm();
                     }}
                   >
-                    Cancel
+                    Hủy
                   </button>
                   <button type="submit" className="btn btn-primary">
-                    {editingClub ? "Update" : "Create"}
+                    {editingClub ? "Cập nhật" : "Tạo mới"}
                   </button>
                 </div>
               </form>

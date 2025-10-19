@@ -73,13 +73,18 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("general");
 
   useEffect(() => {
-    // Simulate API call to fetch settings
+    // Lấy cài đặt hệ thống từ API
     const fetchSettings = async () => {
       setLoading(true);
-      // TODO: Replace with actual API call
-      setTimeout(() => {
+      try {
+        // TODO: Thay thế bằng API call thực tế
+        // const response = await api.get('/settings');
+        // setSettings(response.data);
+      } catch (error) {
+        console.error("Lỗi khi tải cài đặt hệ thống:", error);
+      } finally {
         setLoading(false);
-      }, 1000);
+      }
     };
 
     fetchSettings();
@@ -89,26 +94,26 @@ export default function SettingsPage() {
     setSaving(true);
     try {
       await settingsApi.update(settings);
-      alert("Settings saved successfully!");
+      alert("Lưu cài đặt thành công!");
     } catch (error) {
-      console.error("Failed to save settings:", error);
-      alert("Failed to save settings. Please try again.");
+      console.error("Lỗi khi lưu cài đặt:", error);
+      alert("Lỗi khi lưu cài đặt. Vui lòng thử lại.");
     } finally {
       setSaving(false);
     }
   };
 
   const handleReset = async () => {
-    if (confirm("Are you sure you want to reset all settings to default?")) {
+    if (confirm("Bạn có chắc chắn muốn reset tất cả cài đặt về mặc định?")) {
       try {
         await settingsApi.reset();
         // Reload settings from API
         const defaultSettings = await settingsApi.getAll();
         setSettings(defaultSettings);
-        alert("Settings reset to default values!");
+        alert("Reset cài đặt về giá trị mặc định thành công!");
       } catch (error) {
-        console.error("Failed to reset settings:", error);
-        alert("Failed to reset settings. Please try again.");
+        console.error("Lỗi khi reset cài đặt:", error);
+        alert("Lỗi khi reset cài đặt. Vui lòng thử lại.");
       }
     }
   };
@@ -160,7 +165,7 @@ export default function SettingsPage() {
         style={{ height: "400px" }}
       >
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">Đang tải...</span>
         </div>
       </div>
     );
@@ -169,7 +174,7 @@ export default function SettingsPage() {
   return (
     <div className="settings-page">
       <div className="page-header">
-        <h2>System Settings</h2>
+        <h2>Cài đặt hệ thống</h2>
         <div className="btn-group">
           <button
             className="btn btn-primary"
@@ -183,18 +188,18 @@ export default function SettingsPage() {
                   role="status"
                   aria-hidden="true"
                 ></span>
-                Saving...
+                Đang lưu...
               </>
             ) : (
               <>
                 <i className="fas fa-save mr-2"></i>
-                Save Settings
+                Lưu cài đặt
               </>
             )}
           </button>
           <button className="btn btn-outline-secondary" onClick={handleReset}>
             <i className="fas fa-undo mr-2"></i>
-            Reset to Default
+            Reset về mặc định
           </button>
         </div>
       </div>
@@ -211,7 +216,7 @@ export default function SettingsPage() {
                   onClick={() => setActiveTab("general")}
                 >
                   <i className="fas fa-cog mr-2"></i>
-                  General
+                  Chung
                 </button>
                 <button
                   className={`list-group-item list-group-item-action ${
@@ -220,7 +225,7 @@ export default function SettingsPage() {
                   onClick={() => setActiveTab("notifications")}
                 >
                   <i className="fas fa-bell mr-2"></i>
-                  Notifications
+                  Thông báo
                 </button>
                 <button
                   className={`list-group-item list-group-item-action ${
@@ -229,7 +234,7 @@ export default function SettingsPage() {
                   onClick={() => setActiveTab("security")}
                 >
                   <i className="fas fa-shield-alt mr-2"></i>
-                  Security
+                  Bảo mật
                 </button>
                 <button
                   className={`list-group-item list-group-item-action ${
@@ -238,7 +243,7 @@ export default function SettingsPage() {
                   onClick={() => setActiveTab("appearance")}
                 >
                   <i className="fas fa-palette mr-2"></i>
-                  Appearance
+                  Giao diện
                 </button>
               </div>
             </div>
@@ -248,14 +253,14 @@ export default function SettingsPage() {
         <div className="col-lg-9">
           <div className="card shadow">
             <div className="card-body">
-              {/* General Settings */}
+              {/* Cài đặt chung */}
               {activeTab === "general" && (
                 <div>
-                  <h5 className="mb-4">General Settings</h5>
+                  <h5 className="mb-4">Cài đặt chung</h5>
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Site Name</label>
+                        <label className="form-label">Tên trang web</label>
                         <input
                           type="text"
                           className="form-control"
@@ -268,7 +273,7 @@ export default function SettingsPage() {
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Admin Email</label>
+                        <label className="form-label">Email quản trị</label>
                         <input
                           type="email"
                           className="form-control"
@@ -281,7 +286,7 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Site Description</label>
+                    <label className="form-label">Mô tả trang web</label>
                     <textarea
                       className="form-control"
                       rows={3}
@@ -294,7 +299,7 @@ export default function SettingsPage() {
                   <div className="row">
                     <div className="col-md-4">
                       <div className="mb-3">
-                        <label className="form-label">Timezone</label>
+                        <label className="form-label">Múi giờ</label>
                         <select
                           className="form-select"
                           value={settings.general.timezone}
@@ -315,7 +320,7 @@ export default function SettingsPage() {
                     </div>
                     <div className="col-md-4">
                       <div className="mb-3">
-                        <label className="form-label">Language</label>
+                        <label className="form-label">Ngôn ngữ</label>
                         <select
                           className="form-select"
                           value={settings.general.language}
@@ -330,7 +335,7 @@ export default function SettingsPage() {
                     </div>
                     <div className="col-md-4">
                       <div className="mb-3">
-                        <label className="form-label">Currency</label>
+                        <label className="form-label">Tiền tệ</label>
                         <select
                           className="form-select"
                           value={settings.general.currency}
@@ -371,7 +376,7 @@ export default function SettingsPage() {
                           className="form-check-label"
                           htmlFor="emailNotifications"
                         >
-                          Email Notifications
+                          Thông báo Email
                         </label>
                       </div>
                       <div className="form-check mb-3">
@@ -391,7 +396,7 @@ export default function SettingsPage() {
                           className="form-check-label"
                           htmlFor="smsNotifications"
                         >
-                          SMS Notifications
+                          Thông báo SMS
                         </label>
                       </div>
                       <div className="form-check mb-3">
@@ -411,7 +416,7 @@ export default function SettingsPage() {
                           className="form-check-label"
                           htmlFor="pushNotifications"
                         >
-                          Push Notifications
+                          Thông báo Push
                         </label>
                       </div>
                     </div>
@@ -433,7 +438,7 @@ export default function SettingsPage() {
                           className="form-check-label"
                           htmlFor="eventReminders"
                         >
-                          Event Reminders
+                          Nhắc nhở sự kiện
                         </label>
                       </div>
                       <div className="form-check mb-3">
@@ -453,7 +458,7 @@ export default function SettingsPage() {
                           className="form-check-label"
                           htmlFor="paymentReminders"
                         >
-                          Payment Reminders
+                          Nhắc nhở thanh toán
                         </label>
                       </div>
                       <div className="form-check mb-3">
@@ -473,7 +478,7 @@ export default function SettingsPage() {
                           className="form-check-label"
                           htmlFor="systemAlerts"
                         >
-                          System Alerts
+                          Cảnh báo hệ thống
                         </label>
                       </div>
                     </div>
@@ -481,15 +486,15 @@ export default function SettingsPage() {
                 </div>
               )}
 
-              {/* Security Settings */}
+              {/* Cài đặt bảo mật */}
               {activeTab === "security" && (
                 <div>
-                  <h5 className="mb-4">Security Settings</h5>
+                  <h5 className="mb-4">Cài đặt bảo mật</h5>
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
                         <label className="form-label">
-                          Session Timeout (minutes)
+                          Thời gian hết hạn phiên (phút)
                         </label>
                         <input
                           type="number"
@@ -524,7 +529,9 @@ export default function SettingsPage() {
                         />
                       </div>
                       <div className="mb-3">
-                        <label className="form-label">Max Login Attempts</label>
+                        <label className="form-label">
+                          Số lần đăng nhập tối đa
+                        </label>
                         <input
                           type="number"
                           className="form-control"
@@ -578,7 +585,7 @@ export default function SettingsPage() {
                           className="form-check-label"
                           htmlFor="allowPasswordReset"
                         >
-                          Allow Password Reset
+                          Cho phép đặt lại mật khẩu
                         </label>
                       </div>
                     </div>
@@ -586,14 +593,14 @@ export default function SettingsPage() {
                 </div>
               )}
 
-              {/* Appearance Settings */}
+              {/* Cài đặt giao diện */}
               {activeTab === "appearance" && (
                 <div>
-                  <h5 className="mb-4">Appearance Settings</h5>
+                  <h5 className="mb-4">Cài đặt giao diện</h5>
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Theme</label>
+                        <label className="form-label">Chủ đề</label>
                         <select
                           className="form-select"
                           value={settings.appearance.theme}
@@ -607,7 +614,7 @@ export default function SettingsPage() {
                         </select>
                       </div>
                       <div className="mb-3">
-                        <label className="form-label">Primary Color</label>
+                        <label className="form-label">Màu chính</label>
                         <input
                           type="color"
                           className="form-control form-control-color"
@@ -623,7 +630,7 @@ export default function SettingsPage() {
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Logo URL</label>
+                        <label className="form-label">URL Logo</label>
                         <input
                           type="url"
                           className="form-control"
@@ -634,7 +641,7 @@ export default function SettingsPage() {
                         />
                       </div>
                       <div className="mb-3">
-                        <label className="form-label">Favicon URL</label>
+                        <label className="form-label">URL Favicon</label>
                         <input
                           type="url"
                           className="form-control"

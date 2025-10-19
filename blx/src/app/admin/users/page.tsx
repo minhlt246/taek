@@ -34,43 +34,19 @@ export default function UsersPage() {
   });
 
   useEffect(() => {
-    // Simulate API call to fetch users
+    // Lấy danh sách người dùng từ API
     const fetchUsers = async () => {
       setLoading(true);
-      // TODO: Replace with actual API calls
-      setTimeout(() => {
-        setUsers([
-          {
-            id: 1,
-            name: "Nguyễn Văn A",
-            email: "nguyenvana@example.com",
-            role: "student",
-            student_code: "ST001",
-            phone: "0123456789",
-            is_active: true,
-            created_at: "2024-01-15",
-          },
-          {
-            id: 2,
-            name: "Trần Thị B",
-            email: "tranthib@example.com",
-            role: "student",
-            student_code: "ST002",
-            phone: "0987654321",
-            is_active: true,
-            created_at: "2024-01-20",
-          },
-          {
-            id: 3,
-            name: "Admin User",
-            email: "admin@example.com",
-            role: "admin",
-            is_active: true,
-            created_at: "2024-01-01",
-          },
-        ]);
+      try {
+        // TODO: Thay thế bằng API call thực tế
+        // const response = await api.get('/users');
+        // setUsers(response.data);
+        setUsers([]);
+      } catch (error) {
+        console.error("Lỗi khi tải danh sách người dùng:", error);
+      } finally {
         setLoading(false);
-      }, 1000);
+      }
     };
 
     fetchUsers();
@@ -124,8 +100,8 @@ export default function UsersPage() {
       setEditingUser(null);
       resetForm();
     } catch (error) {
-      console.error("Failed to save user:", error);
-      alert("Failed to save user. Please try again.");
+      console.error("Lỗi khi lưu người dùng:", error);
+      alert("Lỗi khi lưu người dùng. Vui lòng thử lại.");
     }
   };
 
@@ -148,7 +124,7 @@ export default function UsersPage() {
         style={{ height: "400px" }}
       >
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">Đang tải...</span>
         </div>
       </div>
     );
@@ -157,8 +133,8 @@ export default function UsersPage() {
   return (
     <div className="admin-page">
       <div className="page-header">
-        <h2>User Management</h2>
-        <p>Manage all users in the system</p>
+        <h2>Quản lý người dùng</h2>
+        <p>Quản lý tất cả người dùng trong hệ thống</p>
       </div>
 
       {/* Filters and Actions */}
@@ -166,7 +142,9 @@ export default function UsersPage() {
         <div className="card-header py-3">
           <div className="row align-items-center">
             <div className="col">
-              <h6 className="m-0 font-weight-bold text-primary">Users</h6>
+              <h6 className="m-0 font-weight-bold text-primary">
+                Danh sách người dùng
+              </h6>
             </div>
             <div className="col-auto">
               <button
@@ -177,7 +155,7 @@ export default function UsersPage() {
                 }}
               >
                 <i className="fas fa-plus mr-2"></i>
-                Add New User
+                Thêm người dùng mới
               </button>
             </div>
           </div>
@@ -192,7 +170,7 @@ export default function UsersPage() {
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Search users..."
+                  placeholder="Tìm kiếm người dùng..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -206,9 +184,9 @@ export default function UsersPage() {
                   setFilterRole(e.target.value as "all" | "admin" | "student")
                 }
               >
-                <option value="all">All Roles</option>
-                <option value="admin">Admin</option>
-                <option value="student">Student</option>
+                <option value="all">Tất cả vai trò</option>
+                <option value="admin">Quản trị viên</option>
+                <option value="student">Học viên</option>
               </select>
             </div>
           </div>
@@ -219,14 +197,14 @@ export default function UsersPage() {
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Name</th>
+                  <th>Tên</th>
                   <th>Email</th>
-                  <th>Role</th>
-                  <th>Student Code</th>
-                  <th>Phone</th>
-                  <th>Status</th>
-                  <th>Created</th>
-                  <th>Actions</th>
+                  <th>Vai trò</th>
+                  <th>Mã học viên</th>
+                  <th>Số điện thoại</th>
+                  <th>Trạng thái</th>
+                  <th>Ngày tạo</th>
+                  <th>Thao tác</th>
                 </tr>
               </thead>
               <tbody>
@@ -252,7 +230,7 @@ export default function UsersPage() {
                           user.is_active ? "bg-success" : "bg-secondary"
                         }`}
                       >
-                        {user.is_active ? "Active" : "Inactive"}
+                        {user.is_active ? "Hoạt động" : "Không hoạt động"}
                       </span>
                     </td>
                     <td>{new Date(user.created_at).toLocaleDateString()}</td>
@@ -279,7 +257,7 @@ export default function UsersPage() {
             <div className="text-center py-4">
               <i className="fas fa-users fa-3x text-muted mb-3"></i>
               <p className="text-muted">
-                No users found matching your criteria.
+                Không tìm thấy người dùng nào phù hợp với tiêu chí tìm kiếm.
               </p>
             </div>
           )}
@@ -296,7 +274,7 @@ export default function UsersPage() {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">
-                  {editingUser ? "Edit User" : "Add New User"}
+                  {editingUser ? "Chỉnh sửa người dùng" : "Thêm người dùng mới"}
                 </h5>
                 <button
                   type="button"
@@ -312,7 +290,7 @@ export default function UsersPage() {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Name</label>
+                        <label className="form-label">Tên</label>
                         <input
                           type="text"
                           className="form-control"
@@ -342,7 +320,7 @@ export default function UsersPage() {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Role</label>
+                        <label className="form-label">Vai trò</label>
                         <select
                           className="form-select"
                           value={formData.role}
@@ -354,14 +332,14 @@ export default function UsersPage() {
                           }
                           required
                         >
-                          <option value="student">Student</option>
-                          <option value="admin">Admin</option>
+                          <option value="student">Học viên</option>
+                          <option value="admin">Quản trị viên</option>
                         </select>
                       </div>
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Student Code</label>
+                        <label className="form-label">Mã học viên</label>
                         <input
                           type="text"
                           className="form-control"
@@ -378,7 +356,7 @@ export default function UsersPage() {
                     </div>
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Phone</label>
+                    <label className="form-label">Số điện thoại</label>
                     <input
                       type="tel"
                       className="form-control"
@@ -401,7 +379,7 @@ export default function UsersPage() {
                           })
                         }
                       />
-                      <label className="form-check-label">Active</label>
+                      <label className="form-check-label">Hoạt động</label>
                     </div>
                   </div>
                 </div>
@@ -414,10 +392,10 @@ export default function UsersPage() {
                       resetForm();
                     }}
                   >
-                    Cancel
+                    Hủy
                   </button>
                   <button type="submit" className="btn btn-primary">
-                    {editingUser ? "Update" : "Create"}
+                    {editingUser ? "Cập nhật" : "Tạo mới"}
                   </button>
                 </div>
               </form>

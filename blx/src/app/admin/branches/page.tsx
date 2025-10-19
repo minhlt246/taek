@@ -36,7 +36,7 @@ export default function BranchesPage() {
         const data = await branchesApi.getAll();
         setBranches(data);
       } catch (error) {
-        console.error("Failed to fetch branches:", error);
+        console.error("Lỗi khi tải danh sách chi nhánh:", error);
         setBranches([]);
       } finally {
         setLoading(false);
@@ -78,8 +78,8 @@ export default function BranchesPage() {
       setEditingBranch(null);
       resetForm();
     } catch (error) {
-      console.error("Failed to save branch:", error);
-      alert("Failed to save branch. Please try again.");
+      console.error("Lỗi khi lưu chi nhánh:", error);
+      alert("Lỗi khi lưu chi nhánh. Vui lòng thử lại.");
     }
   };
 
@@ -97,15 +97,15 @@ export default function BranchesPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (confirm("Are you sure you want to delete this branch?")) {
+    if (confirm("Bạn có chắc chắn muốn xóa chi nhánh này?")) {
       try {
         await branchesApi.delete(id);
         // Remove from local state
         setBranches(branches.filter((branch) => branch.id !== id));
-        alert("Branch deleted successfully!");
+        alert("Xóa chi nhánh thành công!");
       } catch (error) {
         console.error("Failed to delete branch:", error);
-        alert("Failed to delete branch. Please try again.");
+        alert("Lỗi khi xóa chi nhánh. Vui lòng thử lại.");
       }
     }
   };
@@ -129,7 +129,7 @@ export default function BranchesPage() {
         style={{ height: "400px" }}
       >
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">Đang tải...</span>
         </div>
       </div>
     );

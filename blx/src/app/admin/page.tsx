@@ -29,10 +29,10 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate API call to fetch dashboard statistics
+    // Giả lập API call để lấy thống kê dashboard
     const fetchStats = async () => {
       setLoading(true);
-      // TODO: Replace with actual API calls
+      // TODO: Thay thế bằng API calls thực tế
       setTimeout(() => {
         setStats({
           totalUsers: 156,
@@ -60,7 +60,7 @@ export default function AdminDashboard() {
 
   const statCards = [
     {
-      title: "Total Users",
+      title: "Tổng người dùng",
       value: stats.totalUsers,
       icon: "fas fa-users",
       color: "primary",
@@ -68,7 +68,7 @@ export default function AdminDashboard() {
       changeType: "positive",
     },
     {
-      title: "Active Students",
+      title: "Học viên hoạt động",
       value: stats.activeStudents,
       icon: "fas fa-user-graduate",
       color: "success",
@@ -76,7 +76,7 @@ export default function AdminDashboard() {
       changeType: "positive",
     },
     {
-      title: "Coaches",
+      title: "Huấn luyện viên",
       value: stats.totalCoaches,
       icon: "fas fa-user-tie",
       color: "info",
@@ -84,7 +84,7 @@ export default function AdminDashboard() {
       changeType: "positive",
     },
     {
-      title: "Clubs",
+      title: "Câu lạc bộ",
       value: stats.totalClubs,
       icon: "fas fa-building",
       color: "warning",
@@ -92,7 +92,7 @@ export default function AdminDashboard() {
       changeType: "neutral",
     },
     {
-      title: "Branches",
+      title: "Chi nhánh",
       value: stats.totalBranches,
       icon: "fas fa-map-marker-alt",
       color: "secondary",
@@ -100,7 +100,7 @@ export default function AdminDashboard() {
       changeType: "positive",
     },
     {
-      title: "Courses",
+      title: "Khóa học",
       value: stats.totalCourses,
       icon: "fas fa-book",
       color: "dark",
@@ -108,7 +108,7 @@ export default function AdminDashboard() {
       changeType: "positive",
     },
     {
-      title: "Monthly Revenue",
+      title: "Doanh thu tháng",
       value: formatCurrency(stats.monthlyRevenue),
       icon: "fas fa-chart-line",
       color: "success",
@@ -116,7 +116,7 @@ export default function AdminDashboard() {
       changeType: "positive",
     },
     {
-      title: "Total Payments",
+      title: "Tổng thanh toán",
       value: stats.totalPayments,
       icon: "fas fa-credit-card",
       color: "primary",
@@ -133,7 +133,7 @@ export default function AdminDashboard() {
           style={{ height: "400px" }}
         >
           <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading...</span>
+            <span className="visually-hidden">Đang tải...</span>
           </div>
         </div>
       </div>
@@ -143,10 +143,10 @@ export default function AdminDashboard() {
   return (
     <div className="admin-dashboard">
       <div className="dashboard-header">
-        <h2>Dashboard Overview</h2>
+        <h2>Tổng quan Dashboard</h2>
         <p>
-          Welcome back, {account?.name || "Admin"}! Here's what's happening with
-          your Taekwondo club management system.
+          Chào mừng trở lại, {account?.name || "Quản trị viên"}! Đây là những gì
+          đang diễn ra với hệ thống quản lý câu lạc bộ Taekwondo của bạn.
         </p>
       </div>
 
@@ -193,7 +193,7 @@ export default function AdminDashboard() {
                     {card.change}
                   </span>
                   <span className="text-muted text-xs ml-2">
-                    from last month
+                    so với tháng trước
                   </span>
                 </div>
               </div>
@@ -208,7 +208,7 @@ export default function AdminDashboard() {
           <div className="card shadow mb-4">
             <div className="card-header py-3">
               <h6 className="m-0 font-weight-bold text-primary">
-                Quick Actions
+                Thao tác nhanh
               </h6>
             </div>
             <div className="card-body">
@@ -220,7 +220,7 @@ export default function AdminDashboard() {
                       onClick={() => (window.location.href = "/admin/users")}
                     >
                       <i className="fas fa-plus mr-2"></i>
-                      Add New Student
+                      Thêm học viên mới
                     </button>
                   </div>
                 </div>
@@ -231,7 +231,7 @@ export default function AdminDashboard() {
                       onClick={() => (window.location.href = "/admin/coaches")}
                     >
                       <i className="fas fa-user-plus mr-2"></i>
-                      Add New Coach
+                      Thêm huấn luyện viên
                     </button>
                   </div>
                 </div>
@@ -242,7 +242,7 @@ export default function AdminDashboard() {
                       onClick={() => (window.location.href = "/admin/events")}
                     >
                       <i className="fas fa-calendar-plus mr-2"></i>
-                      Create Event
+                      Tạo sự kiện
                     </button>
                   </div>
                 </div>
@@ -253,7 +253,7 @@ export default function AdminDashboard() {
                       onClick={() => (window.location.href = "/admin/news")}
                     >
                       <i className="fas fa-newspaper mr-2"></i>
-                      Publish News
+                      Đăng tin tức
                     </button>
                   </div>
                 </div>
@@ -266,7 +266,7 @@ export default function AdminDashboard() {
           <div className="card shadow mb-4">
             <div className="card-header py-3">
               <h6 className="m-0 font-weight-bold text-primary">
-                Recent Activities
+                Hoạt động gần đây
               </h6>
             </div>
             <div className="card-body">
@@ -276,8 +276,8 @@ export default function AdminDashboard() {
                     <i className="fas fa-user-plus"></i>
                   </div>
                   <div className="activity-content">
-                    <p className="mb-1">New student registered</p>
-                    <small className="text-muted">2 hours ago</small>
+                    <p className="mb-1">Học viên mới đăng ký</p>
+                    <small className="text-muted">2 giờ trước</small>
                   </div>
                 </div>
                 <div className="activity-item">
@@ -285,8 +285,8 @@ export default function AdminDashboard() {
                     <i className="fas fa-credit-card"></i>
                   </div>
                   <div className="activity-content">
-                    <p className="mb-1">Payment received</p>
-                    <small className="text-muted">4 hours ago</small>
+                    <p className="mb-1">Nhận thanh toán</p>
+                    <small className="text-muted">4 giờ trước</small>
                   </div>
                 </div>
                 <div className="activity-item">
@@ -294,8 +294,8 @@ export default function AdminDashboard() {
                     <i className="fas fa-calendar"></i>
                   </div>
                   <div className="activity-content">
-                    <p className="mb-1">New event scheduled</p>
-                    <small className="text-muted">6 hours ago</small>
+                    <p className="mb-1">Sự kiện mới được lên lịch</p>
+                    <small className="text-muted">6 giờ trước</small>
                   </div>
                 </div>
                 <div className="activity-item">
@@ -303,8 +303,8 @@ export default function AdminDashboard() {
                     <i className="fas fa-medal"></i>
                   </div>
                   <div className="activity-content">
-                    <p className="mb-1">Belt promotion completed</p>
-                    <small className="text-muted">1 day ago</small>
+                    <p className="mb-1">Hoàn thành thăng đai</p>
+                    <small className="text-muted">1 ngày trước</small>
                   </div>
                 </div>
               </div>

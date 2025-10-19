@@ -111,8 +111,8 @@ export default function CoursesPage() {
       setEditingCourse(null);
       resetForm();
     } catch (error) {
-      console.error("Failed to save course:", error);
-      alert("Failed to save course. Please try again.");
+      console.error("Lỗi khi lưu khóa học:", error);
+      alert("Lỗi khi lưu khóa học. Vui lòng thử lại.");
     }
   };
 
@@ -134,15 +134,15 @@ export default function CoursesPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (confirm("Are you sure you want to delete this course?")) {
+    if (confirm("Bạn có chắc chắn muốn xóa khóa học này?")) {
       try {
         await coursesApi.delete(id);
         // Remove from local state
         setCourses(courses.filter((course) => course.id !== id));
-        alert("Course deleted successfully!");
+        alert("Xóa khóa học thành công!");
       } catch (error) {
         console.error("Failed to delete course:", error);
-        alert("Failed to delete course. Please try again.");
+        alert("Lỗi khi xóa khóa học. Vui lòng thử lại.");
       }
     }
   };
@@ -170,7 +170,7 @@ export default function CoursesPage() {
         style={{ height: "400px" }}
       >
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">Đang tải...</span>
         </div>
       </div>
     );
@@ -179,7 +179,7 @@ export default function CoursesPage() {
   return (
     <div className="courses-page">
       <div className="page-header">
-        <h2>Courses Management</h2>
+        <h2>Quản lý khóa học</h2>
         <button
           className="btn btn-primary"
           onClick={() => {
@@ -188,7 +188,7 @@ export default function CoursesPage() {
           }}
         >
           <i className="fas fa-plus mr-2"></i>
-          Add New Course
+          Thêm khóa học mới
         </button>
       </div>
 
@@ -199,14 +199,14 @@ export default function CoursesPage() {
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Name</th>
-                  <th>Level</th>
-                  <th>Duration</th>
-                  <th>Price</th>
-                  <th>Students</th>
-                  <th>Instructor</th>
-                  <th>Status</th>
-                  <th>Actions</th>
+                  <th>Tên</th>
+                  <th>Cấp độ</th>
+                  <th>Thời gian</th>
+                  <th>Giá</th>
+                  <th>Học viên</th>
+                  <th>Giảng viên</th>
+                  <th>Trạng thái</th>
+                  <th>Thao tác</th>
                 </tr>
               </thead>
               <tbody>
@@ -225,7 +225,7 @@ export default function CoursesPage() {
                     <td>
                       <span className="badge bg-info">{course.level}</span>
                     </td>
-                    <td>{course.duration} weeks</td>
+                    <td>{course.duration} tuần</td>
                     <td>{formatCurrency(course.price)}</td>
                     <td>
                       {course.currentStudents}/{course.maxStudents}
@@ -252,7 +252,11 @@ export default function CoursesPage() {
                             : "bg-secondary"
                         }`}
                       >
-                        {course.status}
+                        {course.status === "active"
+                          ? "Hoạt động"
+                          : course.status === "completed"
+                          ? "Hoàn thành"
+                          : "Không hoạt động"}
                       </span>
                     </td>
                     <td>
@@ -287,7 +291,7 @@ export default function CoursesPage() {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">
-                  {editingCourse ? "Edit Course" : "Add New Course"}
+                  {editingCourse ? "Chỉnh sửa khóa học" : "Thêm khóa học mới"}
                 </h5>
                 <button
                   type="button"
@@ -303,7 +307,7 @@ export default function CoursesPage() {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Course Name</label>
+                        <label className="form-label">Tên khóa học</label>
                         <input
                           type="text"
                           className="form-control"
@@ -317,7 +321,7 @@ export default function CoursesPage() {
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Level</label>
+                        <label className="form-label">Cấp độ</label>
                         <select
                           className="form-select"
                           value={formData.level}
@@ -326,16 +330,16 @@ export default function CoursesPage() {
                           }
                           required
                         >
-                          <option value="">Select Level</option>
-                          <option value="beginner">Beginner</option>
-                          <option value="intermediate">Intermediate</option>
-                          <option value="advanced">Advanced</option>
+                          <option value="">Chọn cấp độ</option>
+                          <option value="beginner">Cơ bản</option>
+                          <option value="intermediate">Trung cấp</option>
+                          <option value="advanced">Nâng cao</option>
                         </select>
                       </div>
                     </div>
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Description</label>
+                    <label className="form-label">Mô tả</label>
                     <textarea
                       className="form-control"
                       rows={3}
@@ -352,7 +356,7 @@ export default function CoursesPage() {
                   <div className="row">
                     <div className="col-md-4">
                       <div className="mb-3">
-                        <label className="form-label">Duration (weeks)</label>
+                        <label className="form-label">Thời gian (tuần)</label>
                         <input
                           type="number"
                           className="form-control"
@@ -370,7 +374,7 @@ export default function CoursesPage() {
                     </div>
                     <div className="col-md-4">
                       <div className="mb-3">
-                        <label className="form-label">Price (VND)</label>
+                        <label className="form-label">Giá (VND)</label>
                         <input
                           type="number"
                           className="form-control"
@@ -388,7 +392,7 @@ export default function CoursesPage() {
                     </div>
                     <div className="col-md-4">
                       <div className="mb-3">
-                        <label className="form-label">Max Students</label>
+                        <label className="form-label">Số học viên tối đa</label>
                         <input
                           type="number"
                           className="form-control"
@@ -406,7 +410,7 @@ export default function CoursesPage() {
                     </div>
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Instructor</label>
+                    <label className="form-label">Giảng viên</label>
                     <input
                       type="text"
                       className="form-control"
@@ -420,7 +424,7 @@ export default function CoursesPage() {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Start Date</label>
+                        <label className="form-label">Ngày bắt đầu</label>
                         <input
                           type="date"
                           className="form-control"
@@ -437,7 +441,7 @@ export default function CoursesPage() {
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">End Date</label>
+                        <label className="form-label">Ngày kết thúc</label>
                         <input
                           type="date"
                           className="form-control"
@@ -454,7 +458,7 @@ export default function CoursesPage() {
                     </div>
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Status</label>
+                    <label className="form-label">Trạng thái</label>
                     <select
                       className="form-select"
                       value={formData.status}
@@ -468,9 +472,9 @@ export default function CoursesPage() {
                         })
                       }
                     >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                      <option value="completed">Completed</option>
+                      <option value="active">Hoạt động</option>
+                      <option value="inactive">Không hoạt động</option>
+                      <option value="completed">Hoàn thành</option>
                     </select>
                   </div>
                 </div>
@@ -483,10 +487,10 @@ export default function CoursesPage() {
                       resetForm();
                     }}
                   >
-                    Cancel
+                    Hủy
                   </button>
                   <button type="submit" className="btn btn-primary">
-                    {editingCourse ? "Update" : "Create"}
+                    {editingCourse ? "Cập nhật" : "Tạo mới"}
                   </button>
                 </div>
               </form>

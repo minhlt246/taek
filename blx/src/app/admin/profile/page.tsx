@@ -38,39 +38,19 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    // Simulate API call to fetch user profile
+    // Lấy thông tin profile từ API
     const fetchProfile = async () => {
       setLoading(true);
-      // TODO: Replace with actual API call
-      setTimeout(() => {
-        setProfile({
-          id: 1,
-          name: account?.name || "Admin User",
-          email: account?.email || "admin@taekwondo.com",
-          phone: "+84 123 456 789",
-          avatar: "/images/default-avatar.jpg",
-          role: "admin",
-          department: "Management",
-          position: "System Administrator",
-          bio: "Experienced Taekwondo instructor and system administrator with over 10 years of experience in martial arts and club management.",
-          address: "123 Nguyen Hue, District 1, Ho Chi Minh City",
-          dateOfBirth: "1985-06-15",
-          joinDate: "2020-01-15",
-          lastLogin: "2024-02-15T10:30:00Z",
-          status: "active",
-        });
-        setFormData({
-          name: account?.name || "Admin User",
-          email: account?.email || "admin@taekwondo.com",
-          phone: "+84 123 456 789",
-          bio: "Experienced Taekwondo instructor and system administrator with over 10 years of experience in martial arts and club management.",
-          address: "123 Nguyen Hue, District 1, Ho Chi Minh City",
-          dateOfBirth: "1985-06-15",
-          department: "Management",
-          position: "System Administrator",
-        });
+      try {
+        // TODO: Thay thế bằng API call thực tế
+        // const response = await api.get('/profile');
+        // setProfile(response.data);
+        setProfile(null);
+      } catch (error) {
+        console.error("Lỗi khi tải thông tin profile:", error);
+      } finally {
         setLoading(false);
-      }, 1000);
+      }
     };
 
     fetchProfile();
@@ -79,10 +59,10 @@ export default function ProfilePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Update profile via API
+      // Cập nhật profile qua API
       await usersApi.updateProfile(formData);
 
-      // Update local state
+      // Cập nhật state local
       if (profile) {
         setProfile({
           ...profile,
@@ -92,10 +72,10 @@ export default function ProfilePage() {
       }
 
       setEditing(false);
-      alert("Profile updated successfully!");
+      alert("Cập nhật profile thành công!");
     } catch (error) {
-      console.error("Failed to update profile:", error);
-      alert("Failed to update profile. Please try again.");
+      console.error("Lỗi khi cập nhật profile:", error);
+      alert("Lỗi khi cập nhật profile. Vui lòng thử lại.");
     }
   };
 
@@ -141,7 +121,7 @@ export default function ProfilePage() {
         style={{ height: "400px" }}
       >
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">Đang tải...</span>
         </div>
       </div>
     );
@@ -150,7 +130,7 @@ export default function ProfilePage() {
   if (!profile) {
     return (
       <div className="alert alert-danger" role="alert">
-        Unable to load profile information.
+        Không thể tải thông tin hồ sơ.
       </div>
     );
   }
@@ -158,7 +138,7 @@ export default function ProfilePage() {
   return (
     <div className="profile-page">
       <div className="page-header">
-        <h2>My Profile</h2>
+        <h2>Hồ sơ của tôi</h2>
         <div>
           {!editing ? (
             <button
@@ -166,17 +146,17 @@ export default function ProfilePage() {
               onClick={() => setEditing(true)}
             >
               <i className="fas fa-edit mr-2"></i>
-              Edit Profile
+              Chỉnh sửa hồ sơ
             </button>
           ) : (
             <div className="btn-group">
               <button className="btn btn-success" onClick={handleSubmit}>
                 <i className="fas fa-save mr-2"></i>
-                Save Changes
+                Lưu thay đổi
               </button>
               <button className="btn btn-secondary" onClick={handleCancel}>
                 <i className="fas fa-times mr-2"></i>
-                Cancel
+                Hủy
               </button>
             </div>
           )}
@@ -191,7 +171,7 @@ export default function ProfilePage() {
               <div className="profile-avatar mb-3">
                 <img
                   src={profile.avatar || "/images/default-avatar.jpg"}
-                  alt="Profile"
+                  alt="Hồ sơ"
                   className="rounded-circle"
                   style={{
                     width: "120px",
@@ -214,12 +194,12 @@ export default function ProfilePage() {
                   <div className="col-6">
                     <div className="border-end">
                       <h5 className="mb-0">Admin</h5>
-                      <small className="text-muted">Role</small>
+                      <small className="text-muted">Vai trò</small>
                     </div>
                   </div>
                   <div className="col-6">
                     <h5 className="mb-0">{profile.department}</h5>
-                    <small className="text-muted">Department</small>
+                    <small className="text-muted">Phòng ban</small>
                   </div>
                 </div>
               </div>
@@ -230,19 +210,19 @@ export default function ProfilePage() {
           <div className="card shadow mb-4">
             <div className="card-header">
               <h6 className="m-0 font-weight-bold text-primary">
-                Account Information
+                Thông tin tài khoản
               </h6>
             </div>
             <div className="card-body">
               <div className="mb-3">
-                <strong>Member Since:</strong>
+                <strong>Thành viên từ:</strong>
                 <br />
                 <span className="text-muted">
                   {formatDate(profile.joinDate)}
                 </span>
               </div>
               <div className="mb-3">
-                <strong>Last Login:</strong>
+                <strong>Đăng nhập cuối:</strong>
                 <br />
                 <span className="text-muted">
                   {formatDateTime(profile.lastLogin)}
@@ -301,7 +281,7 @@ export default function ProfilePage() {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Phone</label>
+                        <label className="form-label">Số điện thoại</label>
                         <input
                           type="tel"
                           className="form-control"
@@ -314,7 +294,7 @@ export default function ProfilePage() {
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Date of Birth</label>
+                        <label className="form-label">Ngày sinh</label>
                         <input
                           type="date"
                           className="form-control"
@@ -332,7 +312,7 @@ export default function ProfilePage() {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Department</label>
+                        <label className="form-label">Phòng ban</label>
                         <input
                           type="text"
                           className="form-control"
@@ -348,7 +328,7 @@ export default function ProfilePage() {
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Position</label>
+                        <label className="form-label">Chức vụ</label>
                         <input
                           type="text"
                           className="form-control"
@@ -364,7 +344,7 @@ export default function ProfilePage() {
                     </div>
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Address</label>
+                    <label className="form-label">Địa chỉ</label>
                     <textarea
                       className="form-control"
                       rows={2}
@@ -375,7 +355,7 @@ export default function ProfilePage() {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Bio</label>
+                    <label className="form-label">Tiểu sử</label>
                     <textarea
                       className="form-control"
                       rows={4}

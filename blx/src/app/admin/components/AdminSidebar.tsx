@@ -10,79 +10,83 @@ const AdminSidebar = () => {
 
   const menuItems = [
     {
-      title: "Dashboard",
+      title: "Tổng quan",
       icon: "fas fa-tachometer-alt",
       href: "/admin",
-      active: pathname === "/admin"
+      active: pathname === "/admin",
     },
     {
-      title: "Users",
+      title: "Người dùng",
       icon: "fas fa-users",
       href: "/admin/users",
-      active: pathname.startsWith("/admin/users")
+      active: pathname.startsWith("/admin/users"),
     },
     {
-      title: "Coaches",
+      title: "Huấn luyện viên",
       icon: "fas fa-user-tie",
       href: "/admin/coaches",
-      active: pathname.startsWith("/admin/coaches")
+      active: pathname.startsWith("/admin/coaches"),
     },
     {
-      title: "Clubs",
+      title: "Câu lạc bộ",
       icon: "fas fa-building",
       href: "/admin/clubs",
-      active: pathname.startsWith("/admin/clubs")
+      active: pathname.startsWith("/admin/clubs"),
     },
     {
-      title: "Branches",
+      title: "Chi nhánh",
       icon: "fas fa-map-marker-alt",
       href: "/admin/branches",
-      active: pathname.startsWith("/admin/branches")
+      active: pathname.startsWith("/admin/branches"),
     },
     {
-      title: "Courses",
+      title: "Khóa học",
       icon: "fas fa-book",
       href: "/admin/courses",
-      active: pathname.startsWith("/admin/courses")
+      active: pathname.startsWith("/admin/courses"),
     },
     {
-      title: "Belt Levels",
+      title: "Cấp đai",
       icon: "fas fa-medal",
       href: "/admin/belt-levels",
-      active: pathname.startsWith("/admin/belt-levels")
+      active: pathname.startsWith("/admin/belt-levels"),
     },
     {
-      title: "Payments",
+      title: "Thanh toán",
       icon: "fas fa-credit-card",
       href: "/admin/payments",
-      active: pathname.startsWith("/admin/payments")
+      active: pathname.startsWith("/admin/payments"),
     },
     {
-      title: "Events",
+      title: "Sự kiện",
       icon: "fas fa-calendar",
       href: "/admin/events",
-      active: pathname.startsWith("/admin/events")
+      active: pathname.startsWith("/admin/events"),
     },
     {
-      title: "News",
+      title: "Tin tức",
       icon: "fas fa-newspaper",
       href: "/admin/news",
-      active: pathname.startsWith("/admin/news")
-    }
+      active: pathname.startsWith("/admin/news"),
+    },
   ];
 
   return (
-    <div className={`admin-sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+    <div className={`admin-sidebar ${isCollapsed ? "collapsed" : ""}`}>
       <div className="sidebar-header">
         <div className="sidebar-logo">
           <i className="fas fa-shield-alt"></i>
-          {!isCollapsed && <span>Admin Panel</span>}
+          {!isCollapsed && <span>Bảng điều khiển</span>}
         </div>
-        <button 
+        <button
           className="sidebar-toggle"
           onClick={() => setIsCollapsed(!isCollapsed)}
         >
-          <i className={`fas ${isCollapsed ? 'fa-chevron-right' : 'fa-chevron-left'}`}></i>
+          <i
+            className={`fas ${
+              isCollapsed ? "fa-chevron-right" : "fa-chevron-left"
+            }`}
+          ></i>
         </button>
       </div>
 
@@ -90,9 +94,9 @@ const AdminSidebar = () => {
         <ul className="nav-list">
           {menuItems.map((item, index) => (
             <li key={index} className="nav-item">
-              <Link 
+              <Link
                 href={item.href}
-                className={`nav-link ${item.active ? 'active' : ''}`}
+                className={`nav-link ${item.active ? "active" : ""}`}
               >
                 <i className={item.icon}></i>
                 {!isCollapsed && <span>{item.title}</span>}
@@ -107,8 +111,8 @@ const AdminSidebar = () => {
           <i className="fas fa-user-circle"></i>
           {!isCollapsed && (
             <div className="user-details">
-              <span className="user-name">Admin User</span>
-              <span className="user-role">Administrator</span>
+              <span className="user-name">Quản trị viên</span>
+              <span className="user-role">Quản trị viên</span>
             </div>
           )}
         </div>

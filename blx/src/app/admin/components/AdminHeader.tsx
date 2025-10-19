@@ -15,7 +15,7 @@ const AdminHeader = () => {
   return (
     <header className="admin-header">
       <div className="header-left">
-        <h1>Admin Dashboard</h1>
+        <h1>Bảng điều khiển Admin</h1>
       </div>
 
       <div className="header-right">
@@ -32,17 +32,17 @@ const AdminHeader = () => {
               data-bs-toggle="dropdown"
             >
               <i className="fas fa-user"></i>
-              {account?.name || "Admin"}
+              {account?.name || "Quản trị viên"}
             </button>
             <ul className="dropdown-menu dropdown-menu-end">
               <li>
                 <a className="dropdown-item" href="/admin/profile">
-                  <i className="fas fa-user"></i> Profile
+                  <i className="fas fa-user"></i> Hồ sơ
                 </a>
               </li>
               <li>
                 <a className="dropdown-item" href="/admin/settings">
-                  <i className="fas fa-cog"></i> Settings
+                  <i className="fas fa-cog"></i> Cài đặt
                 </a>
               </li>
               <li>
@@ -50,7 +50,7 @@ const AdminHeader = () => {
               </li>
               <li>
                 <button className="dropdown-item" onClick={handleLogout}>
-                  <i className="fas fa-sign-out-alt"></i> Logout
+                  <i className="fas fa-sign-out-alt"></i> Đăng xuất
                 </button>
               </li>
             </ul>

@@ -9,7 +9,7 @@ interface Payment {
   user_email: string;
   amount: number;
   payment_method: string;
-  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  status: "pending" | "completed" | "failed" | "refunded";
   description: string;
   created_at: string;
   updated_at: string;
@@ -20,107 +20,84 @@ export default function PaymentsPage() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState<"all" | "pending" | "completed" | "failed" | "refunded">("all");
+  const [filterStatus, setFilterStatus] = useState<
+    "all" | "pending" | "completed" | "failed" | "refunded"
+  >("all");
 
   useEffect(() => {
-    // Simulate API call to fetch payments
+    // Lấy danh sách thanh toán từ API
     const fetchPayments = async () => {
       setLoading(true);
-      // TODO: Replace with actual API calls
-      setTimeout(() => {
-        setPayments([
-          {
-            id: 1,
-            user_name: "Nguyễn Văn A",
-            user_email: "nguyenvana@example.com",
-            amount: 500000,
-            payment_method: "Bank Transfer",
-            status: "completed",
-            description: "Monthly tuition fee - January 2024",
-            created_at: "2024-01-15T10:30:00Z",
-            updated_at: "2024-01-15T10:35:00Z"
-          },
-          {
-            id: 2,
-            user_name: "Trần Thị B",
-            user_email: "tranthib@example.com",
-            amount: 300000,
-            payment_method: "Cash",
-            status: "completed",
-            description: "Belt test fee",
-            created_at: "2024-01-16T14:20:00Z",
-            updated_at: "2024-01-16T14:20:00Z"
-          },
-          {
-            id: 3,
-            user_name: "Lê Văn C",
-            user_email: "levanc@example.com",
-            amount: 500000,
-            payment_method: "Credit Card",
-            status: "pending",
-            description: "Monthly tuition fee - February 2024",
-            created_at: "2024-01-17T09:15:00Z",
-            updated_at: "2024-01-17T09:15:00Z"
-          },
-          {
-            id: 4,
-            user_name: "Phạm Thị D",
-            user_email: "phamthid@example.com",
-            amount: 200000,
-            payment_method: "Bank Transfer",
-            status: "failed",
-            description: "Equipment fee",
-            created_at: "2024-01-18T16:45:00Z",
-            updated_at: "2024-01-18T16:50:00Z"
-          }
-        ]);
+      try {
+        // TODO: Thay thế bằng API call thực tế
+        // const response = await api.get('/payments');
+        // setPayments(response.data);
+        setPayments([]);
+      } catch (error) {
+        console.error("Lỗi khi tải danh sách thanh toán:", error);
+      } finally {
         setLoading(false);
-      }, 1000);
+      }
     };
 
     fetchPayments();
   }, []);
 
-  const filteredPayments = payments.filter(payment => {
-    const matchesSearch = payment.user_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         payment.user_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         payment.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === "all" || payment.status === filterStatus;
+  const filteredPayments = payments.filter((payment) => {
+    const matchesSearch =
+      payment.user_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      payment.user_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      payment.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      filterStatus === "all" || payment.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
     }).format(amount);
   };
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
-      case 'completed': return 'bg-success';
-      case 'pending': return 'bg-warning';
-      case 'failed': return 'bg-danger';
-      case 'refunded': return 'bg-info';
-      default: return 'bg-secondary';
+      case "completed":
+        return "bg-success";
+      case "pending":
+        return "bg-warning";
+      case "failed":
+        return "bg-danger";
+      case "refunded":
+        return "bg-info";
+      default:
+        return "bg-secondary";
     }
   };
 
   const getStatusDisplayName = (status: string) => {
     switch (status) {
-      case 'completed': return 'Completed';
-      case 'pending': return 'Pending';
-      case 'failed': return 'Failed';
-      case 'refunded': return 'Refunded';
-      default: return status;
+      case "completed":
+        return "Hoàn thành";
+      case "pending":
+        return "Đang chờ";
+      case "failed":
+        return "Thất bại";
+      case "refunded":
+        return "Đã hoàn tiền";
+      default:
+        return status;
     }
   };
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ height: '400px' }}>
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: "400px" }}
+      >
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">Đang tải...</span>
         </div>
       </div>
     );
@@ -129,8 +106,8 @@ export default function PaymentsPage() {
   return (
     <div className="admin-page">
       <div className="page-header">
-        <h2>Payment Management</h2>
-        <p>Manage all payment transactions</p>
+        <h2>Quản lý thanh toán</h2>
+        <p>Quản lý tất cả giao dịch thanh toán</p>
       </div>
 
       {/* Summary Cards */}
@@ -141,12 +118,18 @@ export default function PaymentsPage() {
               <div className="row no-gutters align-items-center">
                 <div className="col mr-2">
                   <div className="text-xs font-weight-bold text-success text-uppercase mb-1">
-                    Total Revenue
+                    Tổng doanh thu
                   </div>
                   <div className="h5 mb-0 font-weight-bold text-gray-800">
-                    {formatCurrency(payments.reduce((sum, payment) => 
-                      payment.status === 'completed' ? sum + payment.amount : sum, 0
-                    ))}
+                    {formatCurrency(
+                      payments.reduce(
+                        (sum, payment) =>
+                          payment.status === "completed"
+                            ? sum + payment.amount
+                            : sum,
+                        0
+                      )
+                    )}
                   </div>
                 </div>
                 <div className="col-auto">
@@ -163,10 +146,10 @@ export default function PaymentsPage() {
               <div className="row no-gutters align-items-center">
                 <div className="col mr-2">
                   <div className="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                    Pending Payments
+                    Thanh toán đang chờ
                   </div>
                   <div className="h5 mb-0 font-weight-bold text-gray-800">
-                    {payments.filter(p => p.status === 'pending').length}
+                    {payments.filter((p) => p.status === "pending").length}
                   </div>
                 </div>
                 <div className="col-auto">
@@ -183,10 +166,10 @@ export default function PaymentsPage() {
               <div className="row no-gutters align-items-center">
                 <div className="col mr-2">
                   <div className="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                    Failed Payments
+                    Thanh toán thất bại
                   </div>
                   <div className="h5 mb-0 font-weight-bold text-gray-800">
-                    {payments.filter(p => p.status === 'failed').length}
+                    {payments.filter((p) => p.status === "failed").length}
                   </div>
                 </div>
                 <div className="col-auto">
@@ -203,7 +186,7 @@ export default function PaymentsPage() {
               <div className="row no-gutters align-items-center">
                 <div className="col mr-2">
                   <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                    Total Transactions
+                    Tổng giao dịch
                   </div>
                   <div className="h5 mb-0 font-weight-bold text-gray-800">
                     {payments.length}
@@ -221,7 +204,9 @@ export default function PaymentsPage() {
       {/* Filters and Actions */}
       <div className="card shadow mb-4">
         <div className="card-header py-3">
-          <h6 className="m-0 font-weight-bold text-primary">Payment Transactions</h6>
+          <h6 className="m-0 font-weight-bold text-primary">
+            Giao dịch thanh toán
+          </h6>
         </div>
         <div className="card-body">
           <div className="row mb-3">
@@ -233,7 +218,7 @@ export default function PaymentsPage() {
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Search payments..."
+                  placeholder="Tìm kiếm thanh toán..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -243,13 +228,22 @@ export default function PaymentsPage() {
               <select
                 className="form-select"
                 value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value as "all" | "pending" | "completed" | "failed" | "refunded")}
+                onChange={(e) =>
+                  setFilterStatus(
+                    e.target.value as
+                      | "all"
+                      | "pending"
+                      | "completed"
+                      | "failed"
+                      | "refunded"
+                  )
+                }
               >
-                <option value="all">All Status</option>
-                <option value="completed">Completed</option>
-                <option value="pending">Pending</option>
-                <option value="failed">Failed</option>
-                <option value="refunded">Refunded</option>
+                <option value="all">Tất cả trạng thái</option>
+                <option value="completed">Hoàn thành</option>
+                <option value="pending">Đang chờ</option>
+                <option value="failed">Thất bại</option>
+                <option value="refunded">Đã hoàn tiền</option>
               </select>
             </div>
           </div>
@@ -260,13 +254,13 @@ export default function PaymentsPage() {
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>User</th>
-                  <th>Amount</th>
-                  <th>Method</th>
-                  <th>Status</th>
-                  <th>Description</th>
-                  <th>Created</th>
-                  <th>Actions</th>
+                  <th>Người dùng</th>
+                  <th>Số tiền</th>
+                  <th>Phương thức</th>
+                  <th>Trạng thái</th>
+                  <th>Mô tả</th>
+                  <th>Ngày tạo</th>
+                  <th>Thao tác</th>
                 </tr>
               </thead>
               <tbody>
@@ -275,14 +269,24 @@ export default function PaymentsPage() {
                     <td>{payment.id}</td>
                     <td>
                       <div>
-                        <div className="font-weight-bold">{payment.user_name}</div>
-                        <small className="text-muted">{payment.user_email}</small>
+                        <div className="font-weight-bold">
+                          {payment.user_name}
+                        </div>
+                        <small className="text-muted">
+                          {payment.user_email}
+                        </small>
                       </div>
                     </td>
-                    <td className="font-weight-bold">{formatCurrency(payment.amount)}</td>
+                    <td className="font-weight-bold">
+                      {formatCurrency(payment.amount)}
+                    </td>
                     <td>{payment.payment_method}</td>
                     <td>
-                      <span className={`badge ${getStatusBadgeClass(payment.status)}`}>
+                      <span
+                        className={`badge ${getStatusBadgeClass(
+                          payment.status
+                        )}`}
+                      >
                         {getStatusDisplayName(payment.status)}
                       </span>
                     </td>
@@ -293,12 +297,12 @@ export default function PaymentsPage() {
                         <button className="btn btn-sm btn-outline-primary">
                           <i className="fas fa-eye"></i>
                         </button>
-                        {payment.status === 'pending' && (
+                        {payment.status === "pending" && (
                           <button className="btn btn-sm btn-outline-success">
                             <i className="fas fa-check"></i>
                           </button>
                         )}
-                        {payment.status === 'completed' && (
+                        {payment.status === "completed" && (
                           <button className="btn btn-sm btn-outline-warning">
                             <i className="fas fa-undo"></i>
                           </button>
@@ -314,7 +318,9 @@ export default function PaymentsPage() {
           {filteredPayments.length === 0 && (
             <div className="text-center py-4">
               <i className="fas fa-credit-card fa-3x text-muted mb-3"></i>
-              <p className="text-muted">No payments found matching your criteria.</p>
+              <p className="text-muted">
+                Không tìm thấy thanh toán nào phù hợp với tiêu chí tìm kiếm.
+              </p>
             </div>
           )}
         </div>
