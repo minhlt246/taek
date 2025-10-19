@@ -851,9 +851,9 @@ INSERT INTO tro_giang_chi_nhanh (branch_id, assistant_id) VALUES
 (2, 4), (2, 5),  -- CLB Tiểu Học Tân Lập có 2 trợ giảng: Thầy Minh, Cô Lan
 (3, 4), (3, 5);  -- CLB Tiểu Học Tân Tiến có 2 trợ giảng: Thầy Minh, Cô Lan
 
--- Insert sample coach
-INSERT INTO huan_luyen_vien (coach_code, name, phone, email, belt_level_id, experience_years, specialization, club_id) VALUES
-('COACH001', 'Master Nguyen Van A', '0987654321', 'hlv@taekwondomaster.com', 9, 10, 'Sparring and Forms', 1);
+-- Insert sample coach (using existing structure)
+INSERT INTO huan_luyen_vien (ma_hoi_vien, ho_va_ten, ngay_thang_nam_sinh, ma_clb, ma_don_vi, quyen_so, cap_dai_id, gioi_tinh, email, password, role, phone, is_active) VALUES
+(generate_member_code('Master Nguyen Van A', '1980-01-01', 'HLV'), 'Master Nguyen Van A', '1980-01-01', 'CLB_00468', 'DNAI', 9, 9, 'Nam', 'hlv@taekwondomaster.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'head_coach', '0987654321', TRUE);
 
 
 SET FOREIGN_KEY_CHECKS = 1;
