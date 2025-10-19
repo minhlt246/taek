@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { beltLevelsApi } from "@/services/adminApi";
+import { beltLevelsApi, poomsaeApi } from "@/services/adminApi";
 
 interface BeltLevel {
   id: number;
@@ -13,13 +13,29 @@ interface BeltLevel {
   updated_at: string;
 }
 
+interface Poomsae {
+  id: number;
+  tenBaiQuyenVietnamese: string;
+  tenBaiQuyenEnglish: string;
+  tenBaiQuyenKorean?: string;
+  capDo: string;
+  moTa?: string;
+  soDongTac?: number;
+  thoiGianThucHien?: number;
+}
+
 export default function BeltLevelsPage() {
   const [beltLevels, setBeltLevels] = useState<BeltLevel[]>([]);
+  const [poomsaes, setPoomsaes] = useState<Poomsae[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingBeltLevel, setEditingBeltLevel] = useState<BeltLevel | null>(
     null
   );
+  const [selectedBeltLevel, setSelectedBeltLevel] = useState<BeltLevel | null>(
+    null
+  );
+  const [requiredPoomsaes, setRequiredPoomsaes] = useState<Poomsae[]>([]);
   const [formData, setFormData] = useState({
     name: "",
     color: "",
@@ -28,15 +44,20 @@ export default function BeltLevelsPage() {
   });
 
   useEffect(() => {
-    const fetchBeltLevels = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        console.log("Đang tải danh sách cấp đai...");
-        const data = await beltLevelsApi.getAll();
-        console.log("Dữ liệu cấp đai từ API:", data);
-        setBeltLevels(data);
+        console.log("Đang tải danh sách cấp đai và bài quyền...");
+        const [beltLevelData, poomsaeData] = await Promise.all([
+          beltLevelsApi.getAll(),
+          poomsaeApi.getAll(),
+        ]);
+        console.log("Dữ liệu cấp đai từ API:", beltLevelData);
+        console.log("Dữ liệu bài quyền từ API:", poomsaeData);
+        setBeltLevels(beltLevelData);
+        setPoomsaes(poomsaeData);
       } catch (error) {
-        console.error("Lỗi khi tải danh sách cấp đai:", error);
+        console.error("Lỗi khi tải dữ liệu:", error);
         // Tạm thời sử dụng dữ liệu mẫu khi API không hoạt động
         const sampleData = [
           {
@@ -208,7 +229,7 @@ export default function BeltLevelsPage() {
       }
     };
 
-    fetchBeltLevels();
+    fetchData();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -275,6 +296,19 @@ export default function BeltLevelsPage() {
       order_sequence: 1,
     });
     setEditingBeltLevel(null);
+  };
+
+  const handleViewRequiredPoomsaes = async (beltLevel: BeltLevel) => {
+    setSelectedBeltLevel(beltLevel);
+    try {
+      const requiredPoomsaeData = await poomsaeApi.getRequiredByBeltLevel(
+        beltLevel.id
+      );
+      setRequiredPoomsaes(requiredPoomsaeData);
+    } catch (error) {
+      console.error("Lỗi khi tải bài quyền bắt buộc:", error);
+      setRequiredPoomsaes([]);
+    }
   };
 
   if (loading) {
@@ -367,6 +401,13 @@ export default function BeltLevelsPage() {
                         )}
                       </td>
                       <td>
+                        <button
+                          className="btn btn-sm btn-outline-info me-2"
+                          onClick={() => handleViewRequiredPoomsaes(beltLevel)}
+                          title="Xem bài quyền bắt buộc"
+                        >
+                          <i className="fas fa-fist-raised"></i>
+                        </button>
                         <button
                           className="btn btn-sm btn-outline-primary me-2"
                           onClick={() => handleEdit(beltLevel)}
@@ -503,6 +544,103 @@ export default function BeltLevelsPage() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal for Required Poomsaes */}
+      {selectedBeltLevel && (
+        <div
+          className="modal show d-block"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  Bài quyền bắt buộc cho {selectedBeltLevel.name}
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => {
+                    setSelectedBeltLevel(null);
+                    setRequiredPoomsaes([]);
+                  }}
+                ></button>
+              </div>
+              <div className="modal-body">
+                {requiredPoomsaes.length > 0 ? (
+                  <div className="table-responsive">
+                    <table className="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th>Tên tiếng Việt</th>
+                          <th>Tên tiếng Anh</th>
+                          <th>Tên tiếng Hàn</th>
+                          <th>Cấp độ</th>
+                          <th>Số động tác</th>
+                          <th>Thời gian (s)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {requiredPoomsaes.map((poomsae) => (
+                          <tr key={poomsae.id}>
+                            <td>
+                              <strong>{poomsae.tenBaiQuyenVietnamese}</strong>
+                              {poomsae.moTa && (
+                                <>
+                                  <br />
+                                  <small className="text-muted">
+                                    {poomsae.moTa}
+                                  </small>
+                                </>
+                              )}
+                            </td>
+                            <td>{poomsae.tenBaiQuyenEnglish}</td>
+                            <td>{poomsae.tenBaiQuyenKorean || "-"}</td>
+                            <td>
+                              <span
+                                className={`badge ${
+                                  poomsae.capDo === "Cơ bản"
+                                    ? "bg-success"
+                                    : poomsae.capDo === "Trung cấp"
+                                    ? "bg-warning"
+                                    : "bg-danger"
+                                }`}
+                              >
+                                {poomsae.capDo}
+                              </span>
+                            </td>
+                            <td>{poomsae.soDongTac || "-"}</td>
+                            <td>{poomsae.thoiGianThucHien || "-"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <i className="fas fa-fist-raised fa-3x text-muted mb-3"></i>
+                    <p className="text-muted">
+                      Chưa có bài quyền bắt buộc nào cho cấp đai này.
+                    </p>
+                  </div>
+                )}
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    setSelectedBeltLevel(null);
+                    setRequiredPoomsaes([]);
+                  }}
+                >
+                  Đóng
+                </button>
+              </div>
             </div>
           </div>
         </div>

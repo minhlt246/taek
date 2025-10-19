@@ -27,24 +27,20 @@ export class UsersService implements IUserService {
       throw new ConflictException('Email already exists');
     }
 
-    // Check if student_code already exists (if provided)
-    if (createUserDto.student_code) {
-      const existingStudentCode = await this.userRepository.findOne({
-        where: { student_code: createUserDto.student_code },
+    // Check if ma_hoi_vien already exists (if provided)
+    if (createUserDto.ma_hoi_vien) {
+      const existingMemberCode = await this.userRepository.findOne({
+        where: { ma_hoi_vien: createUserDto.ma_hoi_vien },
       });
 
-      if (existingStudentCode) {
-        throw new ConflictException('Student code already exists');
+      if (existingMemberCode) {
+        throw new ConflictException('Member code already exists');
       }
     }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
     // Create user
     const user = this.userRepository.create({
       ...createUserDto,
-      password: hashedPassword,
     });
 
     return await this.userRepository.save(user);
@@ -54,15 +50,14 @@ export class UsersService implements IUserService {
     return await this.userRepository.find({
       select: [
         'id',
-        'name',
+        'ho_va_ten',
         'email',
-        'role',
-        'student_code',
+        'ma_hoi_vien',
         'phone',
-        'date_of_birth',
-        'gender',
+        'ngay_thang_nam_sinh',
+        'gioi_tinh',
         'address',
-        'is_active',
+        'active_status',
         'created_at',
         'updated_at',
       ],
@@ -74,15 +69,14 @@ export class UsersService implements IUserService {
       where: { id },
       select: [
         'id',
-        'name',
+        'ho_va_ten',
         'email',
-        'role',
-        'student_code',
+        'ma_hoi_vien',
         'phone',
-        'date_of_birth',
-        'gender',
+        'ngay_thang_nam_sinh',
+        'gioi_tinh',
         'address',
-        'is_active',
+        'active_status',
         'created_at',
         'updated_at',
       ],
@@ -121,24 +115,21 @@ export class UsersService implements IUserService {
       }
     }
 
-    // Check if student_code already exists (if being updated)
+    // Check if ma_hoi_vien already exists (if being updated)
     if (
-      updateUserDto.student_code &&
-      updateUserDto.student_code !== user.student_code
+      updateUserDto.ma_hoi_vien &&
+      updateUserDto.ma_hoi_vien !== user.ma_hoi_vien
     ) {
-      const existingStudentCode = await this.userRepository.findOne({
-        where: { student_code: updateUserDto.student_code },
+      const existingMemberCode = await this.userRepository.findOne({
+        where: { ma_hoi_vien: updateUserDto.ma_hoi_vien },
       });
 
-      if (existingStudentCode) {
-        throw new ConflictException('Student code already exists');
+      if (existingMemberCode) {
+        throw new ConflictException('Member code already exists');
       }
     }
 
-    // Hash password if being updated
-    if (updateUserDto.password) {
-      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
-    }
+    // Note: Password handling removed as User entity doesn't have password field
 
     // Update user
     await this.userRepository.update(id, updateUserDto);

@@ -53,7 +53,7 @@ export class Club {
   updated_at: Date;
 
   // Relations
-  @OneToMany(() => User, (user) => user.club)
+  @OneToMany(() => User, (user) => user.cau_lac_bo)
   users: User[];
 
   @OneToMany(() => Branch, (branch) => branch.club)

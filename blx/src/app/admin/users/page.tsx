@@ -243,29 +243,23 @@ export default function UsersPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredUsers.map((user) => (
+                {filteredVoSinh.map((user) => (
                   <tr key={user.id}>
                     <td>{user.id}</td>
-                    <td>{user.name}</td>
+                    <td>{user.ho_va_ten}</td>
                     <td>{user.email}</td>
                     <td>
-                      <span
-                        className={`badge ${
-                          user.role === "admin" ? "bg-danger" : "bg-primary"
-                        }`}
-                      >
-                        {user.role}
-                      </span>
+                      <span className="badge bg-primary">Võ sinh</span>
                     </td>
-                    <td>{user.student_code || "-"}</td>
+                    <td>{user.ma_hoi_vien || "-"}</td>
                     <td>{user.phone || "-"}</td>
                     <td>
                       <span
                         className={`badge ${
-                          user.is_active ? "bg-success" : "bg-secondary"
+                          user.active_status ? "bg-success" : "bg-secondary"
                         }`}
                       >
-                        {user.is_active ? "Hoạt động" : "Không hoạt động"}
+                        {user.active_status ? "Hoạt động" : "Không hoạt động"}
                       </span>
                     </td>
                     <td>{new Date(user.created_at).toLocaleDateString()}</td>
@@ -288,7 +282,7 @@ export default function UsersPage() {
             </table>
           </div>
 
-          {filteredUsers.length === 0 && (
+          {filteredVoSinh.length === 0 && (
             <div className="text-center py-4">
               <i className="fas fa-users fa-3x text-muted mb-3"></i>
               <p className="text-muted">
@@ -309,7 +303,7 @@ export default function UsersPage() {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">
-                  {editingUser ? "Chỉnh sửa võ sinh" : "Thêm võ sinh mới"}
+                  {editingVoSinh ? "Chỉnh sửa võ sinh" : "Thêm võ sinh mới"}
                 </h5>
                 <button
                   type="button"
@@ -329,9 +323,12 @@ export default function UsersPage() {
                         <input
                           type="text"
                           className="form-control"
-                          value={formData.name}
+                          value={formData.ho_va_ten}
                           onChange={(e) =>
-                            setFormData({ ...formData, name: e.target.value })
+                            setFormData({
+                              ...formData,
+                              ho_va_ten: e.target.value,
+                            })
                           }
                           required
                         />
@@ -355,37 +352,34 @@ export default function UsersPage() {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Vai trò</label>
-                        <select
-                          className="form-select"
-                          value={formData.role}
+                        <label className="form-label">Mã hội viên</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={formData.ma_hoi_vien}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              role: e.target.value as "admin" | "student",
+                              ma_hoi_vien: e.target.value,
                             })
                           }
                           required
-                        >
-                          <option value="student">Học viên</option>
-                          <option value="admin">Quản trị viên</option>
-                        </select>
+                        />
                       </div>
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Mã học viên</label>
+                        <label className="form-label">Mã CLB</label>
                         <input
                           type="text"
                           className="form-control"
-                          value={formData.student_code}
+                          value={formData.ma_clb}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              student_code: e.target.value,
+                              ma_clb: e.target.value,
                             })
                           }
-                          disabled={formData.role === "admin"}
                         />
                       </div>
                     </div>
@@ -406,11 +400,11 @@ export default function UsersPage() {
                       <input
                         className="form-check-input"
                         type="checkbox"
-                        checked={formData.is_active}
+                        checked={formData.active_status}
                         onChange={(e) =>
                           setFormData({
                             ...formData,
-                            is_active: e.target.checked,
+                            active_status: e.target.checked,
                           })
                         }
                       />
@@ -430,7 +424,7 @@ export default function UsersPage() {
                     Hủy
                   </button>
                   <button type="submit" className="btn btn-primary">
-                    {editingUser ? "Cập nhật" : "Tạo mới"}
+                    {editingVoSinh ? "Cập nhật" : "Tạo mới"}
                   </button>
                 </div>
               </form>

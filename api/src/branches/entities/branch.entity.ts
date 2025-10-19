@@ -52,7 +52,7 @@ export class Branch {
   @JoinColumn({ name: 'club_id' })
   club: Club;
 
-  @OneToMany(() => User, (user) => user.branch)
+  @OneToMany(() => User, (user) => user.chi_nhanh)
   users: User[];
 
   @OneToMany(() => Coach, (coach) => coach.branch)

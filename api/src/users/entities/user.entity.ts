@@ -13,7 +13,6 @@ import { BeltLevel } from '../../belt-levels/entities/belt-level.entity';
 import { Branch } from '../../branches/entities/branch.entity';
 import { Enrollment } from '../../enrollments/entities/enrollment.entity';
 import { Payment } from '../../payments/entities/payment.entity';
-import { News } from '../../news/entities/news.entity';
 import { BeltPromotion } from '../../belt-promotions/entities/belt-promotion.entity';
 // import { TestRegistration } from '../../test-registrations/entities/test-registration.entity';
 import { Certificate } from '../../certificates/entities/certificate.entity';
@@ -24,7 +23,7 @@ import { LearningProgress } from '../../learning-progress/entities/learning-prog
 import { StudentParent } from '../../student-parents/entities/student-parent.entity';
 
 @Entity('vo_sinh')
-export class VoSinh {
+export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -84,34 +83,42 @@ export class VoSinh {
   updated_at: Date;
 
   // Relations
-  @ManyToOne(() => BeltLevel, (beltLevel) => beltLevel.vo_sinh)
+  @ManyToOne(() => BeltLevel)
   @JoinColumn({ name: 'cap_dai_id' })
   cap_dai: BeltLevel;
 
-  @OneToMany(() => Enrollment, (enrollment) => enrollment.vo_sinh)
+  @ManyToOne(() => Branch)
+  @JoinColumn({ name: 'chi_nhanh_id' })
+  chi_nhanh: Branch;
+
+  @ManyToOne(() => Club)
+  @JoinColumn({ name: 'cau_lac_bo_id' })
+  cau_lac_bo: Club;
+
+  @OneToMany(() => Enrollment, (enrollment) => enrollment.user)
   enrollments: Enrollment[];
 
-  @OneToMany(() => Payment, (payment) => payment.vo_sinh)
+  @OneToMany(() => Payment, (payment) => payment.user)
   payments: Payment[];
 
-  @OneToMany(() => BeltPromotion, (promotion) => promotion.vo_sinh)
+  @OneToMany(() => BeltPromotion, (promotion) => promotion.user)
   belt_promotions: BeltPromotion[];
 
-  @OneToMany(() => Certificate, (certificate) => certificate.vo_sinh)
+  @OneToMany(() => Certificate, (certificate) => certificate.user)
   certificates: Certificate[];
 
-  @OneToMany(() => StudentEvaluation, (evaluation) => evaluation.vo_sinh)
+  @OneToMany(() => StudentEvaluation, (evaluation) => evaluation.user)
   student_evaluations: StudentEvaluation[];
 
-  @OneToMany(() => Feedback, (feedback) => feedback.vo_sinh)
+  @OneToMany(() => Feedback, (feedback) => feedback.user)
   feedbacks: Feedback[];
 
-  @OneToMany(() => Attendance, (attendance) => attendance.vo_sinh)
+  @OneToMany(() => Attendance, (attendance) => attendance.user)
   attendance: Attendance[];
 
-  @OneToMany(() => LearningProgress, (progress) => progress.vo_sinh)
+  @OneToMany(() => LearningProgress, (progress) => progress.user)
   learning_progress: LearningProgress[];
 
-  @OneToMany(() => StudentParent, (studentParent) => studentParent.vo_sinh)
+  @OneToMany(() => StudentParent, (studentParent) => studentParent.student)
   student_parents: StudentParent[];
 }

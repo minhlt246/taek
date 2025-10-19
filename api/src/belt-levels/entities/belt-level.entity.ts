@@ -36,7 +36,7 @@ export class BeltLevel {
   updated_at: Date;
 
   // Relations
-  @OneToMany(() => User, (user) => user.belt_level)
+  @OneToMany(() => User, (user) => user.cap_dai)
   users: User[];
 
   @OneToMany(() => Coach, (coach) => coach.belt_level)

@@ -13,25 +13,16 @@ export class CreateUserDto {
   @IsString()
   @MinLength(2)
   @MaxLength(100)
-  name: string;
+  ho_va_ten: string;
 
   @IsEmail()
   @MaxLength(100)
   email: string;
 
-  @IsString()
-  @MinLength(6)
-  @MaxLength(255)
-  password: string;
-
-  @IsOptional()
-  @IsEnum(['admin', 'student'])
-  role?: 'admin' | 'student';
-
   @IsOptional()
   @IsString()
   @MaxLength(20)
-  student_code?: string;
+  ma_hoi_vien?: string;
 
   @IsOptional()
   @IsString()
@@ -40,11 +31,11 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsDateString()
-  date_of_birth?: string;
+  ngay_thang_nam_sinh?: string;
 
   @IsOptional()
-  @IsEnum(['male', 'female', 'other'])
-  gender?: 'male' | 'female' | 'other';
+  @IsEnum(['Nam', 'Nữ'])
+  gioi_tinh?: 'Nam' | 'Nữ';
 
   @IsOptional()
   @IsString()
@@ -52,5 +43,5 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsBoolean()
-  is_active?: boolean;
+  active_status?: boolean;
 }

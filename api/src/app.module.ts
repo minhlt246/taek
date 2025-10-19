@@ -26,6 +26,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { PaymentDetailsModule } from './payment-details/payment-details.module';
 import { StudentEvaluationsModule } from './student-evaluations/student-evaluations.module';
 import { TuitionPackagesModule } from './tuition-packages/tuition-packages.module';
+import { PoomsaeModule } from './poomsae/poomsae.module';
 
 const createDatabaseConfig = (
   configService: ConfigService,
@@ -77,6 +78,7 @@ const createDatabaseConfig = (
     PaymentDetailsModule,
     StudentEvaluationsModule,
     TuitionPackagesModule,
+    PoomsaeModule,
   ],
   controllers: [],
   providers: [],

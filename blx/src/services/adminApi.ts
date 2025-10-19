@@ -1,6 +1,5 @@
 // Admin API service for CRUD operations
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 // Generic API request function
 const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
@@ -231,10 +230,50 @@ export const paymentsApi = {
     }),
 };
 
+// Poomsae API
+export const poomsaeApi = {
+  getAll: () => apiRequest("/poomsae"),
+  getById: (id: number) => apiRequest(`/poomsae/${id}`),
+  create: (data: any) =>
+    apiRequest("/poomsae", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  update: (id: number, data: any) =>
+    apiRequest(`/poomsae/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+  delete: (id: number) =>
+    apiRequest(`/poomsae/${id}`, {
+      method: "DELETE",
+    }),
+  getByBeltLevel: (beltLevelId: number) =>
+    apiRequest(`/poomsae/belt-level/${beltLevelId}`),
+  getRequiredByBeltLevel: (beltLevelId: number) =>
+    apiRequest(`/poomsae/belt-level/${beltLevelId}/required`),
+  linkBeltLevel: (data: {
+    beltLevelId: number;
+    poomsaeId: number;
+    loaiQuyen?: "bat_buoc" | "tu_chon" | "bo_sung";
+    thuTuUuTien?: number;
+  }) =>
+    apiRequest("/poomsae/link-belt-level", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  unlinkBeltLevel: (data: { beltLevelId: number; poomsaeId: number }) =>
+    apiRequest("/poomsae/unlink-belt-level", {
+      method: "DELETE",
+      body: JSON.stringify(data),
+    }),
+};
+
 export default {
   branchesApi,
   coursesApi,
   eventsApi,
+  poomsaeApi,
   newsApi,
   beltLevelsApi,
   usersApi,

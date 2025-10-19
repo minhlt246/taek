@@ -45,7 +45,7 @@ export class News {
   updated_at: Date;
 
   // Relations
-  @ManyToOne(() => User, (user) => user.news)
+  @ManyToOne(() => User)
   @JoinColumn({ name: 'author_id' })
   author: User;
 }
