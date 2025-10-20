@@ -355,8 +355,6 @@ export default function BeltLevelsPage() {
                   <th>Màu sắc</th>
                   <th>Bài quyền</th>
                   <th>Mô tả</th>
-                  <th>Ngày tạo</th>
-                  <th>Ngày cập nhật</th>
                   <th>Thao tác</th>
                 </tr>
               </thead>
@@ -409,16 +407,6 @@ export default function BeltLevelsPage() {
                         >
                           {beltLevel.description}
                         </div>
-                      </td>
-                      <td>
-                        {new Date(beltLevel.created_at).toLocaleDateString(
-                          "vi-VN"
-                        )}
-                      </td>
-                      <td>
-                        {new Date(beltLevel.updated_at).toLocaleDateString(
-                          "vi-VN"
-                        )}
                       </td>
                       <td>
                         <button
