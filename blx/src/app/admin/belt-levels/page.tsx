@@ -9,6 +9,8 @@ interface BeltLevel {
   color: string;
   order_sequence: number;
   description: string;
+  required_poomsae_code?: string;
+  required_poomsae_name?: string;
   created_at: string;
   updated_at: string;
 }
@@ -66,6 +68,8 @@ export default function BeltLevelsPage() {
             color: "White",
             description: "Đai trắng cấp 8",
             order_sequence: 1,
+            required_poomsae_code: "TG1",
+            required_poomsae_name: "Thái cực 1 Jang",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -75,6 +79,8 @@ export default function BeltLevelsPage() {
             color: "Yellow",
             description: "Đai vàng cấp 7",
             order_sequence: 2,
+            required_poomsae_code: "TG2",
+            required_poomsae_name: "Thái cực 2 Jang",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -84,6 +90,8 @@ export default function BeltLevelsPage() {
             color: "Green",
             description: "Đai xanh lá cấp 6",
             order_sequence: 3,
+            required_poomsae_code: "TG3",
+            required_poomsae_name: "Thái cực 3 Jang",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -93,6 +101,8 @@ export default function BeltLevelsPage() {
             color: "Blue",
             description: "Đai xanh dương cấp 5",
             order_sequence: 4,
+            required_poomsae_code: "TG4",
+            required_poomsae_name: "Thái cực 4 Jang",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -102,6 +112,8 @@ export default function BeltLevelsPage() {
             color: "Red",
             description: "Đai đỏ cấp 4",
             order_sequence: 5,
+            required_poomsae_code: "TG5",
+            required_poomsae_name: "Thái cực 5 Jang",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -111,6 +123,8 @@ export default function BeltLevelsPage() {
             color: "Red",
             description: "Đai đỏ cấp 3",
             order_sequence: 6,
+            required_poomsae_code: "TG6",
+            required_poomsae_name: "Thái cực 6 Jang",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -120,6 +134,8 @@ export default function BeltLevelsPage() {
             color: "Red",
             description: "Đai đỏ cấp 2",
             order_sequence: 7,
+            required_poomsae_code: "TG7",
+            required_poomsae_name: "Thái cực 7 Jang",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -129,6 +145,8 @@ export default function BeltLevelsPage() {
             color: "Red",
             description: "Đai đỏ cấp 1",
             order_sequence: 8,
+            required_poomsae_code: "TG8",
+            required_poomsae_name: "Thái cực 8 Jang",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -138,6 +156,8 @@ export default function BeltLevelsPage() {
             color: "Black",
             description: "Đai đen 1 đẳng",
             order_sequence: 9,
+            required_poomsae_code: "KR",
+            required_poomsae_name: "Koryo",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -147,6 +167,8 @@ export default function BeltLevelsPage() {
             color: "Black",
             description: "Đai đen 2 đẳng",
             order_sequence: 10,
+            required_poomsae_code: "KG",
+            required_poomsae_name: "Keumgang",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -156,6 +178,8 @@ export default function BeltLevelsPage() {
             color: "Black",
             description: "Đai đen 3 đẳng",
             order_sequence: 11,
+            required_poomsae_code: "TB",
+            required_poomsae_name: "Taebaek",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -165,6 +189,8 @@ export default function BeltLevelsPage() {
             color: "Black",
             description: "Đai đen 4 đẳng",
             order_sequence: 12,
+            required_poomsae_code: "PW",
+            required_poomsae_name: "Pyongwon",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -174,6 +200,8 @@ export default function BeltLevelsPage() {
             color: "Black",
             description: "Đai đen 5 đẳng",
             order_sequence: 13,
+            required_poomsae_code: "SJ",
+            required_poomsae_name: "Sipjin",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -183,6 +211,8 @@ export default function BeltLevelsPage() {
             color: "Black",
             description: "Đai đen 6 đẳng",
             order_sequence: 14,
+            required_poomsae_code: "JT",
+            required_poomsae_name: "Jitae",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -192,6 +222,8 @@ export default function BeltLevelsPage() {
             color: "Black",
             description: "Đai đen 7 đẳng",
             order_sequence: 15,
+            required_poomsae_code: "CK",
+            required_poomsae_name: "Cheonkwon",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -201,6 +233,8 @@ export default function BeltLevelsPage() {
             color: "Black",
             description: "Đai đen 8 đẳng",
             order_sequence: 16,
+            required_poomsae_code: "HS",
+            required_poomsae_name: "Hansoo",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -210,6 +244,8 @@ export default function BeltLevelsPage() {
             color: "Black",
             description: "Đai đen 9 đẳng",
             order_sequence: 17,
+            required_poomsae_code: "IY",
+            required_poomsae_name: "Ilyeo",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -219,6 +255,8 @@ export default function BeltLevelsPage() {
             color: "Black",
             description: "Đai đen 10 đẳng",
             order_sequence: 18,
+            required_poomsae_code: "IY",
+            required_poomsae_name: "Ilyeo",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -349,6 +387,7 @@ export default function BeltLevelsPage() {
                   <th>Thứ tự</th>
                   <th>Tên cấp đai</th>
                   <th>Màu sắc</th>
+                  <th>Bài quyền</th>
                   <th>Mô tả</th>
                   <th>Ngày tạo</th>
                   <th>Ngày cập nhật</th>
@@ -381,6 +420,21 @@ export default function BeltLevelsPage() {
                           }}
                         ></div>
                         <span className="ms-2">{beltLevel.color}</span>
+                      </td>
+                      <td>
+                        {beltLevel.required_poomsae_name ? (
+                          <div>
+                            <span className="badge bg-info me-1">
+                              {beltLevel.required_poomsae_code}
+                            </span>
+                            <br />
+                            <small className="text-muted">
+                              {beltLevel.required_poomsae_name}
+                            </small>
+                          </div>
+                        ) : (
+                          <span className="text-muted">-</span>
+                        )}
                       </td>
                       <td>
                         <div
