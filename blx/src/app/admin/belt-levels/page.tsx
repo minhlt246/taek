@@ -15,7 +15,6 @@ interface BeltLevel {
   updated_at: string;
 }
 
-
 export default function BeltLevelsPage() {
   const [beltLevels, setBeltLevels] = useState<BeltLevel[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,7 +48,7 @@ export default function BeltLevelsPage() {
             description: "Đai trắng cấp 8",
             order_sequence: 1,
             required_poomsae_code: "TG1",
-            required_poomsae_name: "Thái cực 1 Jang",
+            required_poomsae_name: "Taegeuk Il-jang",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -60,7 +59,7 @@ export default function BeltLevelsPage() {
             description: "Đai vàng cấp 7",
             order_sequence: 2,
             required_poomsae_code: "TG2",
-            required_poomsae_name: "Thái cực 2 Jang",
+            required_poomsae_name: "Taegeuk I-jang",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -71,7 +70,7 @@ export default function BeltLevelsPage() {
             description: "Đai xanh lá cấp 6",
             order_sequence: 3,
             required_poomsae_code: "TG3",
-            required_poomsae_name: "Thái cực 3 Jang",
+            required_poomsae_name: "Taegeuk Sam-jang",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -82,7 +81,7 @@ export default function BeltLevelsPage() {
             description: "Đai xanh dương cấp 5",
             order_sequence: 4,
             required_poomsae_code: "TG4",
-            required_poomsae_name: "Thái cực 4 Jang",
+            required_poomsae_name: "Taegeuk Sa-jang",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -93,7 +92,7 @@ export default function BeltLevelsPage() {
             description: "Đai đỏ cấp 4",
             order_sequence: 5,
             required_poomsae_code: "TG5",
-            required_poomsae_name: "Thái cực 5 Jang",
+            required_poomsae_name: "Taegeuk O-jang",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -104,7 +103,7 @@ export default function BeltLevelsPage() {
             description: "Đai đỏ cấp 3",
             order_sequence: 6,
             required_poomsae_code: "TG6",
-            required_poomsae_name: "Thái cực 6 Jang",
+            required_poomsae_name: "Taegeuk Yuk-jang",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -115,7 +114,7 @@ export default function BeltLevelsPage() {
             description: "Đai đỏ cấp 2",
             order_sequence: 7,
             required_poomsae_code: "TG7",
-            required_poomsae_name: "Thái cực 7 Jang",
+            required_poomsae_name: "Taegeuk Chil-jang",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -126,7 +125,7 @@ export default function BeltLevelsPage() {
             description: "Đai đỏ cấp 1",
             order_sequence: 8,
             required_poomsae_code: "TG8",
-            required_poomsae_name: "Thái cực 8 Jang",
+            required_poomsae_name: "Taegeuk Pal-jang",
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -316,7 +315,6 @@ export default function BeltLevelsPage() {
     setEditingBeltLevel(null);
   };
 
-
   if (loading) {
     return (
       <div
@@ -396,9 +394,9 @@ export default function BeltLevelsPage() {
                               {beltLevel.required_poomsae_code}
                             </span>
                             <br />
-                            <small className="text-muted">
+                            <strong className="text-primary">
                               {beltLevel.required_poomsae_name}
-                            </small>
+                            </strong>
                           </div>
                         ) : (
                           <span className="text-muted">-</span>
@@ -563,7 +561,6 @@ export default function BeltLevelsPage() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
