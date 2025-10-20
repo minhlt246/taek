@@ -31,6 +31,8 @@ CREATE TABLE cap_dai (
     name VARCHAR(50) UNIQUE NOT NULL,
     color VARCHAR(20),
     order_sequence INT,
+    required_poomsae_code VARCHAR(20) COMMENT 'Mã bài quyền bắt buộc cho cấp đai này',
+    required_poomsae_name VARCHAR(100) COMMENT 'Tên bài quyền bắt buộc',
     description TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -650,25 +652,25 @@ CREATE INDEX idx_lich_su_thi_quyen_ngay_thi ON lich_su_thi_quyen(ngay_thi);
 -- =====================================================
 
 -- Insert sample belt levels
-INSERT INTO cap_dai (name, color, order_sequence, description) VALUES
-('Cấp 8', 'White', 1, 'Đai trắng cấp 8'),
-('Cấp 7', 'Yellow', 2, 'Đai vàng cấp 7'),
-('Cấp 6', 'Green', 3, 'Đai xanh lá cấp 6'),
-('Cấp 5', 'Blue', 4, 'Đai xanh dương cấp 5'),
-('Cấp 4', 'Red', 5, 'Đai đỏ cấp 4'),
-('Cấp 3', 'Red', 6, 'Đai đỏ cấp 3'),
-('Cấp 2', 'Red', 7, 'Đai đỏ cấp 2'),
-('Cấp 1', 'Red', 8, 'Đai đỏ cấp 1'),
-('Nhất đẳng (1 Dan)', 'Black', 9, 'Đai đen 1 đẳng'),
-('Nhị đẳng (2 Dan)', 'Black', 10, 'Đai đen 2 đẳng'),
-('Tam đẳng (3 Dan)', 'Black', 11, 'Đai đen 3 đẳng'),
-('Tứ đẳng (4 Dan)', 'Black', 12, 'Đai đen 4 đẳng'),
-('Ngũ đẳng (5 Dan)', 'Black', 13, 'Đai đen 5 đẳng'),
-('Lục đẳng (6 Dan)', 'Black', 14, 'Đai đen 6 đẳng'),
-('Thất đẳng (7 Dan)', 'Black', 15, 'Đai đen 7 đẳng'),
-('Bát đẳng (8 Dan)', 'Black', 16, 'Đai đen 8 đẳng'),
-('Cửu đẳng (9 Dan)', 'Black', 17, 'Đai đen 9 đẳng'),
-('Thập đẳng (10 Dan)', 'Black', 18, 'Đai đen 10 đẳng');
+INSERT INTO cap_dai (name, color, order_sequence, required_poomsae_code, required_poomsae_name, description) VALUES
+('Cấp 8', 'White', 1, 'TG1', 'Thái cực 1 Jang', 'Đai trắng cấp 8'),
+('Cấp 7', 'Yellow', 2, 'TG2', 'Thái cực 2 Jang', 'Đai vàng cấp 7'),
+('Cấp 6', 'Green', 3, 'TG3', 'Thái cực 3 Jang', 'Đai xanh lá cấp 6'),
+('Cấp 5', 'Blue', 4, 'TG4', 'Thái cực 4 Jang', 'Đai xanh dương cấp 5'),
+('Cấp 4', 'Red', 5, 'TG5', 'Thái cực 5 Jang', 'Đai đỏ cấp 4'),
+('Cấp 3', 'Red', 6, 'TG6', 'Thái cực 6 Jang', 'Đai đỏ cấp 3'),
+('Cấp 2', 'Red', 7, 'TG7', 'Thái cực 7 Jang', 'Đai đỏ cấp 2'),
+('Cấp 1', 'Red', 8, 'TG8', 'Thái cực 8 Jang', 'Đai đỏ cấp 1'),
+('Nhất đẳng (1 Dan)', 'Black', 9, 'KR', 'Koryo', 'Đai đen 1 đẳng'),
+('Nhị đẳng (2 Dan)', 'Black', 10, 'KG', 'Keumgang', 'Đai đen 2 đẳng'),
+('Tam đẳng (3 Dan)', 'Black', 11, 'TB', 'Taebaek', 'Đai đen 3 đẳng'),
+('Tứ đẳng (4 Dan)', 'Black', 12, 'PW', 'Pyongwon', 'Đai đen 4 đẳng'),
+('Ngũ đẳng (5 Dan)', 'Black', 13, 'SJ', 'Sipjin', 'Đai đen 5 đẳng'),
+('Lục đẳng (6 Dan)', 'Black', 14, 'JT', 'Jitae', 'Đai đen 6 đẳng'),
+('Thất đẳng (7 Dan)', 'Black', 15, 'CK', 'Cheonkwon', 'Đai đen 7 đẳng'),
+('Bát đẳng (8 Dan)', 'Black', 16, 'HS', 'Hansoo', 'Đai đen 8 đẳng'),
+('Cửu đẳng (9 Dan)', 'Black', 17, 'IY', 'Ilyeo', 'Đai đen 9 đẳng'),
+('Thập đẳng (10 Dan)', 'Black', 18, 'IY', 'Ilyeo', 'Đai đen 10 đẳng');
 
 -- Insert sample poomsae (bài quyền) theo chuẩn liên đoàn Taekwondo
 INSERT INTO bai_quyen (ten_bai_quyen_vietnamese, ten_bai_quyen_english, ten_bai_quyen_korean, cap_do, mo_ta, so_dong_tac, thoi_gian_thuc_hien, khoi_luong_ly_thuyet) VALUES
@@ -850,10 +852,6 @@ INSERT INTO tro_giang_chi_nhanh (branch_id, assistant_id) VALUES
 (1, 4), (1, 5),  -- CLB Giáo Xứ Tân Lập có 2 trợ giảng: Thầy Minh, Cô Lan
 (2, 4), (2, 5),  -- CLB Tiểu Học Tân Lập có 2 trợ giảng: Thầy Minh, Cô Lan
 (3, 4), (3, 5);  -- CLB Tiểu Học Tân Tiến có 2 trợ giảng: Thầy Minh, Cô Lan
-
--- Insert sample coach (using existing structure)
-INSERT INTO huan_luyen_vien (ma_hoi_vien, ho_va_ten, ngay_thang_nam_sinh, ma_clb, ma_don_vi, quyen_so, cap_dai_id, gioi_tinh, email, password, role, phone, is_active) VALUES
-(generate_member_code('Master Nguyen Van A', '1980-01-01', 'HLV'), 'Master Nguyen Van A', '1980-01-01', 'CLB_00468', 'DNAI', 9, 9, 'Nam', 'hlv@taekwondomaster.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'head_coach', '0987654321', TRUE);
 
 
 SET FOREIGN_KEY_CHECKS = 1;
