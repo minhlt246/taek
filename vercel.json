@@ -1,5 +1,0 @@
-{
-  "buildCommand": "cd blx && npm install && npm run build",
-  "outputDirectory": "blx/.next"
-}
-
