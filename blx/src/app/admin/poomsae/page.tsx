@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { poomsaeApi, beltLevelsApi } from "@/services/adminApi";
+import { poomsaeApi } from "@/services/api/poomsae";
+import { beltLevelsApi } from "@/services/api/belt-levels";
 
 interface Poomsae {
   id: number;
@@ -177,10 +178,6 @@ export default function PoomsaePage() {
 
   return (
     <div className="admin-page">
-      <div className="page-header">
-        <h2>Quản lý bài quyền</h2>
-        <p>Quản lý tất cả bài quyền Taekwondo theo chuẩn liên đoàn</p>
-      </div>
 
       {/* Filters and Actions */}
       <div className="card shadow mb-4">

@@ -10,10 +10,10 @@ import {
 } from 'class-validator';
 
 export class CreateCoachDto {
+  @IsOptional()
   @IsString()
-  @MinLength(2)
   @MaxLength(20)
-  coach_code: string;
+  coach_code?: string;
 
   @IsString()
   @MinLength(2)

@@ -10,9 +10,11 @@ export interface LoginRequest {
 }
 
 export interface RegisterRequest {
+  name: string;
   email: string;
   password: string;
-  confirmPassword: string;
+  phone?: string;
+  role?: 'admin' | 'student' | 'HLV' | 'parent';
 }
 
 export const authApi = {
@@ -34,7 +36,11 @@ export const authApi = {
 
   async register(
     userData: RegisterRequest
-  ): Promise<{ token: string; user: any }> {
+  ): Promise<{
+    success: boolean;
+    message: string;
+    data: { user: any };
+  }> {
     const response = await http.post("/auth/register", userData);
     return response.data;
   },

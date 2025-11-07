@@ -1,32 +1,22 @@
 import {
   IsNumber,
   IsOptional,
-  IsEnum,
   IsString,
   MaxLength,
+  MinLength,
 } from 'class-validator';
 
 export class CreateScheduleDto {
   @IsNumber()
-  course_id: number;
+  club_id: number;
 
-  @IsEnum([
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday',
-  ])
-  day_of_week:
-    | 'Monday'
-    | 'Tuesday'
-    | 'Wednesday'
-    | 'Thursday'
-    | 'Friday'
-    | 'Saturday'
-    | 'Sunday';
+  @IsNumber()
+  branch_id: number;
+
+  @IsString()
+  @MinLength(1)
+  @MaxLength(255)
+  day_of_week: string;
 
   @IsOptional()
   @IsString()

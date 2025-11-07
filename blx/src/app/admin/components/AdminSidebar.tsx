@@ -2,113 +2,153 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 const AdminSidebar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
 
   const menuItems = [
     {
-      title: "Tổng quan",
-      icon: "fas fa-tachometer-alt",
+      title: "Dashboard",
+      icon: "ti ti-dashboard",
       href: "/admin",
       active: pathname === "/admin",
     },
     {
       title: "Võ sinh",
-      icon: "fas fa-users",
+      icon: "ti ti-users",
       href: "/admin/users",
       active: pathname.startsWith("/admin/users"),
     },
     {
       title: "Huấn luyện viên",
-      icon: "fas fa-user-tie",
+      icon: "ti ti-user-star",
       href: "/admin/coaches",
       active: pathname.startsWith("/admin/coaches"),
     },
     {
       title: "Câu lạc bộ",
-      icon: "fas fa-building",
+      icon: "ti ti-building-store",
       href: "/admin/clubs",
       active: pathname.startsWith("/admin/clubs"),
     },
     {
       title: "Khóa học",
-      icon: "fas fa-book",
+      icon: "ti ti-book",
       href: "/admin/courses",
       active: pathname.startsWith("/admin/courses"),
     },
     {
+      title: "Lịch tập",
+      icon: "ti ti-calendar-event",
+      href: "/admin/schedules",
+      active: pathname.startsWith("/admin/schedules"),
+    },
+    {
       title: "Cấp đai",
-      icon: "fas fa-medal",
+      icon: "ti ti-award",
       href: "/admin/belt-levels",
       active: pathname.startsWith("/admin/belt-levels"),
     },
     {
       title: "Thanh toán",
-      icon: "fas fa-credit-card",
+      icon: "ti ti-credit-card",
       href: "/admin/payments",
       active: pathname.startsWith("/admin/payments"),
     },
     {
       title: "Sự kiện",
-      icon: "fas fa-calendar",
+      icon: "ti ti-calendar",
       href: "/admin/events",
       active: pathname.startsWith("/admin/events"),
     },
     {
       title: "Tin tức",
-      icon: "fas fa-newspaper",
+      icon: "ti ti-brand-blogger",
       href: "/admin/news",
       active: pathname.startsWith("/admin/news"),
     },
   ];
 
   return (
-    <div className={`admin-sidebar ${isCollapsed ? "collapsed" : ""}`}>
-      <div className="sidebar-header">
-        <div className="sidebar-logo">
-          <i className="fas fa-shield-alt"></i>
-          {!isCollapsed && <span>Bảng điều khiển</span>}
+    <div className="sidebar" id="sidebar">
+      {/* Start Logo */}
+      <div className="sidebar-logo">
+        <div>
+          {/* Logo Normal */}
+          <Link href="/admin" className="logo logo-normal">
+            <Image
+              src="/styles/images/logo.png"
+              alt="Logo"
+              width={180}
+              height={60}
+              priority
+              style={{ objectFit: "contain" }}
+            />
+          </Link>
+
+          {/* Logo Small */}
+          <Link href="/admin" className="logo-small">
+            <Image
+              src="/styles/images/logo.png"
+              alt="Logo"
+              width={40}
+              height={40}
+              priority
+              style={{ objectFit: "contain" }}
+            />
+          </Link>
+
+          {/* Logo Dark */}
+          <Link href="/admin" className="dark-logo">
+            <Image
+              src="/styles/images/logo.png"
+              alt="Logo"
+              width={180}
+              height={60}
+              priority
+              style={{ objectFit: "contain" }}
+            />
+          </Link>
         </div>
         <button
-          className="sidebar-toggle"
-          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="sidenav-toggle-btn btn border-0 p-0 active"
+          id="toggle_btn"
         >
-          <i
-            className={`fas ${
-              isCollapsed ? "fa-chevron-right" : "fa-chevron-left"
-            }`}
-          ></i>
+          <i className="ti ti-arrow-bar-to-left"></i>
+        </button>
+
+        {/* Sidebar Menu Close */}
+        <button className="sidebar-close">
+          <i className="ti ti-x align-middle"></i>
         </button>
       </div>
+      {/* End Logo */}
 
-      <nav className="sidebar-nav">
-        <ul className="nav-list">
-          {menuItems.map((item, index) => (
-            <li key={index} className="nav-item">
-              <Link
-                href={item.href}
-                className={`nav-link ${item.active ? "active" : ""}`}
-              >
-                <i className={item.icon}></i>
-                {!isCollapsed && <span>{item.title}</span>}
-              </Link>
+      {/* Sidenav Menu */}
+      <div className="sidebar-inner" data-simplebar>
+        <div id="sidebar-menu" className="sidebar-menu">
+          <ul>
+            <li className="menu-title">
+              <span>Main Menu</span>
             </li>
-          ))}
-        </ul>
-      </nav>
-
-      <div className="sidebar-footer">
-        <div className="user-info">
-          <i className="fas fa-user-circle"></i>
-          {!isCollapsed && (
-            <div className="user-details">
-              <span className="user-name">Quản trị viên</span>
-              <span className="user-role">Quản trị viên</span>
-            </div>
-          )}
+            <li>
+              <ul>
+                {menuItems.map((item, index) => (
+                  <li key={index}>
+                    <Link
+                      href={item.href}
+                      className={item.active ? "active" : ""}
+                    >
+                      <i className={item.icon}></i>
+                      <span>{item.title}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          </ul>
         </div>
       </div>
     </div>

@@ -19,49 +19,68 @@ export class PaymentsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createPaymentDto: CreatePaymentDto) {
-    return this.paymentsService.create(createPaymentDto);
+  async create(@Body() createPaymentDto: CreatePaymentDto) {
+    const payment = await this.paymentsService.create(createPaymentDto);
+    return {
+      success: true,
+      message: 'Payment created successfully',
+      data: payment,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.paymentsService.findAll();
+  async findAll() {
+    const payments = await this.paymentsService.findAll();
+    return payments; // Return array directly for frontend compatibility
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.paymentsService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const payment = await this.paymentsService.findOne(id);
+    return payment; // Return object directly for frontend compatibility
   }
 
   @Get('user/:user_id')
-  findByUser(@Param('user_id', ParseIntPipe) user_id: number) {
-    return this.paymentsService.findByUser(user_id);
+  async findByUser(@Param('user_id', ParseIntPipe) user_id: number) {
+    const payments = await this.paymentsService.findByUser(user_id);
+    return payments; // Return array directly for frontend compatibility
   }
 
   @Get('status/:status')
-  findByStatus(@Param('status') status: string) {
-    return this.paymentsService.findByStatus(status);
+  async findByStatus(@Param('status') status: string) {
+    const payments = await this.paymentsService.findByStatus(status);
+    return payments; // Return array directly for frontend compatibility
   }
 
   @Get('month/:month/year/:year')
-  findByMonthYear(
+  async findByMonthYear(
     @Param('month', ParseIntPipe) month: number,
     @Param('year', ParseIntPipe) year: number,
   ) {
-    return this.paymentsService.findByMonthYear(month, year);
+    const payments = await this.paymentsService.findByMonthYear(month, year);
+    return payments; // Return array directly for frontend compatibility
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updatePaymentDto: UpdatePaymentDto,
   ) {
-    return this.paymentsService.update(id, updatePaymentDto);
+    const payment = await this.paymentsService.update(id, updatePaymentDto);
+    return {
+      success: true,
+      message: 'Payment updated successfully',
+      data: payment,
+    };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.paymentsService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.paymentsService.remove(id);
+    return {
+      success: true,
+      message: 'Payment deleted successfully',
+    };
   }
 }

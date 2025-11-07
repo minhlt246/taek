@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { newsApi } from "@/services/adminApi";
+import { newsApi } from "@/services/api/news";
 
 interface News {
   id: number;
@@ -262,8 +262,7 @@ export default function NewsPage() {
 
   return (
     <div className="news-page">
-      <div className="page-header">
-        <h2>Quản lý tin tức</h2>
+      <div>
         <button
           className="btn btn-primary"
           onClick={() => {

@@ -19,41 +19,65 @@ export class SchedulesController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createScheduleDto: CreateScheduleDto) {
-    return this.schedulesService.create(createScheduleDto);
+  async create(@Body() createScheduleDto: CreateScheduleDto) {
+    const schedule = await this.schedulesService.create(createScheduleDto);
+    return {
+      success: true,
+      message: 'Schedule created successfully',
+      data: schedule,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.schedulesService.findAll();
+  async findAll() {
+    const schedules = await this.schedulesService.findAll();
+    return schedules; // Return array directly for frontend compatibility
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.schedulesService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const schedule = await this.schedulesService.findOne(id);
+    return schedule; // Return object directly for frontend compatibility
   }
 
-  @Get('course/:course_id')
-  findByCourse(@Param('course_id', ParseIntPipe) course_id: number) {
-    return this.schedulesService.findByCourse(course_id);
+  @Get('club/:club_id')
+  async findByClub(@Param('club_id', ParseIntPipe) club_id: number) {
+    const schedules = await this.schedulesService.findByClub(club_id);
+    return schedules; // Return array directly for frontend compatibility
+  }
+
+  @Get('branch/:branch_id')
+  async findByBranch(@Param('branch_id', ParseIntPipe) branch_id: number) {
+    const schedules = await this.schedulesService.findByBranch(branch_id);
+    return schedules; // Return array directly for frontend compatibility
   }
 
   @Get('day/:day_of_week')
-  findByDay(@Param('day_of_week') day_of_week: string) {
-    return this.schedulesService.findByDay(day_of_week);
+  async findByDay(@Param('day_of_week') day_of_week: string) {
+    const schedules = await this.schedulesService.findByDay(day_of_week);
+    return schedules; // Return array directly for frontend compatibility
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateScheduleDto: UpdateScheduleDto,
   ) {
-    return this.schedulesService.update(id, updateScheduleDto);
+    const schedule = await this.schedulesService.update(id, updateScheduleDto);
+    return {
+      success: true,
+      message: 'Schedule updated successfully',
+      data: schedule,
+    };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.schedulesService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.schedulesService.remove(id);
+    return {
+      success: true,
+      message: 'Schedule deleted successfully',
+    };
   }
 }

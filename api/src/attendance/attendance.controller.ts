@@ -20,41 +20,59 @@ export class AttendanceController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() input: CreateAttendanceDto) {
-    return this.attendanceService.create(input);
+  async create(@Body() input: CreateAttendanceDto) {
+    const attendance = await this.attendanceService.create(input);
+    return {
+      success: true,
+      message: 'Attendance created successfully',
+      data: attendance,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.attendanceService.findAll();
+  async findAll() {
+    const attendances = await this.attendanceService.findAll();
+    return attendances; // Return array directly for frontend compatibility
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.attendanceService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const attendance = await this.attendanceService.findOne(id);
+    return attendance; // Return object directly for frontend compatibility
   }
 
   @Get('user/:user_id')
-  findByUser(@Param('user_id', ParseIntPipe) user_id: number) {
-    return this.attendanceService.findByUser(user_id);
+  async findByUser(@Param('user_id', ParseIntPipe) user_id: number) {
+    const attendances = await this.attendanceService.findByUser(user_id);
+    return attendances; // Return array directly for frontend compatibility
   }
 
   @Get('course/:course_id')
-  findByCourse(@Param('course_id', ParseIntPipe) course_id: number) {
-    return this.attendanceService.findByCourse(course_id);
+  async findByCourse(@Param('course_id', ParseIntPipe) course_id: number) {
+    const attendances = await this.attendanceService.findByCourse(course_id);
+    return attendances; // Return array directly for frontend compatibility
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() input: UpdateAttendanceDto,
   ) {
-    return this.attendanceService.update(id, input);
+    const attendance = await this.attendanceService.update(id, input);
+    return {
+      success: true,
+      message: 'Attendance updated successfully',
+      data: attendance,
+    };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.attendanceService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.attendanceService.remove(id);
+    return {
+      success: true,
+      message: 'Attendance deleted successfully',
+    };
   }
 }

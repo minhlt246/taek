@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAccountStore } from "@/stores/account";
-import { usersApi } from "@/services/adminApi";
+import { usersApi } from "@/services/api/users";
+import Image from "next/image";
 
 interface UserProfile {
   id: number;
@@ -22,10 +23,14 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
-  const { account } = useAccountStore();
+  const { account, token, updateUser } = useAccountStore();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -41,33 +46,245 @@ export default function ProfilePage() {
     // Lấy thông tin profile từ API
     const fetchProfile = async () => {
       setLoading(true);
+
+      // Helper function to create fallback profile
+      const createFallbackProfile = (): UserProfile => {
+        if (!account) {
+          throw new Error("No account data available");
+        }
+
+        return {
+          id: parseInt(account.id?.toString() || "0"),
+          name: account.name || "Admin",
+          email: account.email || "",
+          phone: account.phone || "",
+          avatar: account.avatar,
+          role: account.role || "admin",
+          department: account.department || "",
+          position: account.position || "",
+          bio: "",
+          address: "",
+          dateOfBirth: "",
+          joinDate: new Date().toISOString(),
+          lastLogin: new Date().toISOString(),
+          status: "active",
+        };
+      };
+
       try {
-        // TODO: Thay thế bằng API call thực tế
-        // const response = await api.get('/profile');
-        // setProfile(response.data);
-        setProfile(null);
+        const response = await usersApi.getProfile();
+        console.log("Profile API response:", response);
+
+        // Handle different response formats
+        let profileData: any = null;
+
+        if (response) {
+          // Case 1: response has data property
+          if (
+            response.data &&
+            typeof response.data === "object" &&
+            !Array.isArray(response.data)
+          ) {
+            profileData = response.data;
+          }
+          // Case 2: response is the profile object directly
+          else if (
+            typeof response === "object" &&
+            !Array.isArray(response) &&
+            response.email
+          ) {
+            profileData = response;
+          }
+          // Case 3: response is in nested format
+          else if (response.user) {
+            profileData = response.user;
+          }
+        }
+
+        if (profileData && profileData.email) {
+          // Valid profile data from API
+          const profile: UserProfile = {
+            id: profileData.id || parseInt(account?.id?.toString() || "0"),
+            name: profileData.name || account?.name || "Admin",
+            email: profileData.email || account?.email || "",
+            phone:
+              profileData.phone ||
+              profileData.phoneNumber ||
+              account?.phone ||
+              "",
+            avatar:
+              profileData.avatar ||
+              profileData.profile_image_url ||
+              account?.avatar,
+            role: profileData.role || account?.role || "admin",
+            department: profileData.department || account?.department || "",
+            position: profileData.position || account?.position || "",
+            bio: profileData.bio || profileData.biography || "",
+            address: profileData.address || "",
+            dateOfBirth: profileData.dateOfBirth || profileData.birthDate || "",
+            joinDate:
+              profileData.joinDate ||
+              profileData.createdAt ||
+              new Date().toISOString(),
+            lastLogin:
+              profileData.lastLogin ||
+              profileData.lastLoginAt ||
+              new Date().toISOString(),
+            status: profileData.status || "active",
+          };
+
+          setProfile(profile);
+          setFormData({
+            name: profile.name,
+            email: profile.email,
+            phone: profile.phone,
+            bio: profile.bio,
+            address: profile.address,
+            dateOfBirth: profile.dateOfBirth
+              ? profile.dateOfBirth.split("T")[0]
+              : "",
+            department: profile.department,
+            position: profile.position,
+          });
+        } else {
+          // No valid profile data, always use fallback from account
+          console.warn(
+            "No valid profile data from API, using account fallback"
+          );
+          if (account) {
+            const fallbackProfile = createFallbackProfile();
+            setProfile(fallbackProfile);
+            setFormData({
+              name: fallbackProfile.name,
+              email: fallbackProfile.email,
+              phone: fallbackProfile.phone || "",
+              bio: fallbackProfile.bio,
+              address: fallbackProfile.address,
+              dateOfBirth: fallbackProfile.dateOfBirth
+                ? fallbackProfile.dateOfBirth.split("T")[0]
+                : "",
+              department: fallbackProfile.department,
+              position: fallbackProfile.position,
+            });
+          }
+        }
       } catch (error) {
         console.error("Lỗi khi tải thông tin profile:", error);
+
+        // Always use fallback on error
+        if (account) {
+          const fallbackProfile = createFallbackProfile();
+          setProfile(fallbackProfile);
+          setFormData({
+            name: fallbackProfile.name,
+            email: fallbackProfile.email,
+            phone: fallbackProfile.phone || "",
+            bio: fallbackProfile.bio,
+            address: fallbackProfile.address,
+            dateOfBirth: fallbackProfile.dateOfBirth
+              ? fallbackProfile.dateOfBirth.split("T")[0]
+              : "",
+            department: fallbackProfile.department,
+            position: fallbackProfile.position,
+          });
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProfile();
+    if (account) {
+      fetchProfile();
+    } else {
+      // No account, wait a bit and try again
+      const timer = setTimeout(() => {
+        if (account) {
+          fetchProfile();
+        } else {
+          setLoading(false);
+        }
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
   }, [account]);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        alert("Vui lòng chọn file ảnh");
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Kích thước file không được vượt quá 5MB");
+        return;
+      }
+
+      setAvatarFile(file);
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleUploadAvatar = async () => {
+    if (!avatarFile) return;
+
+    setUploadingAvatar(true);
+    try {
+      const formData = new FormData();
+      formData.append("image", avatarFile);
+
+      const response = await usersApi.updateProfileWithAvatar(
+        formData,
+        token || undefined
+      );
+
+      if (response && response.data) {
+        const newAvatarUrl =
+          response.data.avatar || response.data.profile_image_url;
+        setProfile((prev) => (prev ? { ...prev, avatar: newAvatarUrl } : prev));
+
+        // Cập nhật account store để avatar hiển thị ở header
+        if (newAvatarUrl) {
+          updateUser({ avatar: newAvatarUrl } as any);
+        }
+
+        setAvatarFile(null);
+        setAvatarPreview(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+        alert("Cập nhật avatar thành công!");
+      }
+    } catch (error) {
+      console.error("Lỗi khi cập nhật avatar:", error);
+      alert("Lỗi khi cập nhật avatar. Vui lòng thử lại.");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       // Cập nhật profile qua API
-      await usersApi.updateProfile(formData);
+      const response = await usersApi.updateProfile(formData);
 
       // Cập nhật state local
-      if (profile) {
+      if (profile && response) {
         setProfile({
           ...profile,
           ...formData,
-          updatedAt: new Date().toISOString(),
+          ...(response.data || {}),
         });
       }
 
@@ -137,9 +354,7 @@ export default function ProfilePage() {
 
   return (
     <div className="profile-page">
-      <div className="page-header">
-        <h2>Hồ sơ của tôi</h2>
-        <div>
+      <div>
           {!editing ? (
             <button
               className="btn btn-primary"
@@ -168,17 +383,76 @@ export default function ProfilePage() {
         <div className="col-lg-4">
           <div className="card shadow mb-4">
             <div className="card-body text-center">
-              <div className="profile-avatar mb-3">
-                <img
-                  src={profile.avatar || "/images/default-avatar.jpg"}
-                  alt="Hồ sơ"
-                  className="rounded-circle"
-                  style={{
-                    width: "120px",
-                    height: "120px",
-                    objectFit: "cover",
-                  }}
-                />
+              <div className="profile-avatar mb-3 position-relative d-inline-block">
+                {avatarPreview ? (
+                  <img
+                    src={avatarPreview}
+                    alt="Hồ sơ preview"
+                    className="rounded-circle"
+                    style={{
+                      width: "120px",
+                      height: "120px",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  <Image
+                    src={
+                      profile.avatar || "/styles/assets/img/users/user-40.jpg"
+                    }
+                    alt="Hồ sơ"
+                    width={120}
+                    height={120}
+                    className="rounded-circle"
+                    unoptimized={!!profile.avatar}
+                    style={{
+                      objectFit: "cover",
+                    }}
+                  />
+                )}
+                {editing && (
+                  <div className="mt-3">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarChange}
+                      className="form-control form-control-sm"
+                      style={{ display: "none" }}
+                      id="avatar-upload"
+                    />
+                    <label
+                      htmlFor="avatar-upload"
+                      className="btn btn-sm btn-outline-primary me-2"
+                    >
+                      <i className="ti ti-upload me-1"></i>
+                      Chọn ảnh
+                    </label>
+                    {avatarFile && (
+                      <button
+                        className="btn btn-sm btn-success"
+                        onClick={handleUploadAvatar}
+                        disabled={uploadingAvatar}
+                      >
+                        {uploadingAvatar ? (
+                          <>
+                            <span
+                              className="spinner-border spinner-border-sm me-1"
+                              role="status"
+                              aria-hidden="true"
+                            ></span>
+                            Đang tải...
+                          </>
+                        ) : (
+                          <>
+                            <i className="ti ti-check me-1"></i>
+                            Lưu ảnh
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
               <h4 className="mb-1">{profile.name}</h4>
               <p className="text-muted mb-2">{profile.position}</p>

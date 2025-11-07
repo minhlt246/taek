@@ -38,9 +38,21 @@ export class UsersService implements IUserService {
       }
     }
 
-    // Create user
+    // Hash password if provided and not empty
+    let hashedPassword: string | undefined;
+    if (createUserDto.password && createUserDto.password.trim().length > 0) {
+      if (createUserDto.password.trim().length < 6) {
+        throw new ConflictException('Password must be at least 6 characters long');
+      }
+      const saltRounds = 10;
+      hashedPassword = await bcrypt.hash(createUserDto.password.trim(), saltRounds);
+    }
+
+    // Create user - exclude password from spread, add hashed password separately
+    const { password, ...userData } = createUserDto;
     const user = this.userRepository.create({
-      ...createUserDto,
+      ...userData,
+      password: hashedPassword,
     });
 
     return await this.userRepository.save(user);
@@ -53,13 +65,20 @@ export class UsersService implements IUserService {
         'ho_va_ten',
         'email',
         'ma_hoi_vien',
+        'ma_clb',
+        'ma_don_vi',
+        'quyen_so',
+        'cap_dai_id',
         'phone',
         'ngay_thang_nam_sinh',
         'gioi_tinh',
         'address',
+        'emergency_contact_name',
+        'emergency_contact_phone',
         'active_status',
         'created_at',
         'updated_at',
+        // Note: password is not included in select for security
       ],
     });
   }
@@ -129,10 +148,23 @@ export class UsersService implements IUserService {
       }
     }
 
-    // Note: Password handling removed as User entity doesn't have password field
+    // Hash password if provided in update and not empty
+    let hashedPassword: string | undefined;
+    if (updateUserDto.password && updateUserDto.password.trim().length > 0) {
+      if (updateUserDto.password.trim().length < 6) {
+        throw new ConflictException('Password must be at least 6 characters long');
+      }
+      const saltRounds = 10;
+      hashedPassword = await bcrypt.hash(updateUserDto.password.trim(), saltRounds);
+    }
 
-    // Update user
-    await this.userRepository.update(id, updateUserDto);
+    // Update user - exclude password from spread, add hashed password separately
+    const { password, ...updateData } = updateUserDto;
+    const finalUpdateData: any = { ...updateData };
+    if (hashedPassword) {
+      finalUpdateData.password = hashedPassword;
+    }
+    await this.userRepository.update(id, finalUpdateData);
     return await this.findOne(id);
   }
 

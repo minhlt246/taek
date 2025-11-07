@@ -20,41 +20,59 @@ export class NotificationsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() input: CreateNotificationDto) {
-    return this.notificationsService.create(input);
+  async create(@Body() input: CreateNotificationDto) {
+    const notification = await this.notificationsService.create(input);
+    return {
+      success: true,
+      message: 'Notification created successfully',
+      data: notification,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.notificationsService.findAll();
+  async findAll() {
+    const notifications = await this.notificationsService.findAll();
+    return notifications; // Return array directly for frontend compatibility
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.notificationsService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const notification = await this.notificationsService.findOne(id);
+    return notification; // Return object directly for frontend compatibility
   }
 
   @Get('club/:club_id')
-  findByClub(@Param('club_id', ParseIntPipe) club_id: number) {
-    return this.notificationsService.findByClub(club_id);
+  async findByClub(@Param('club_id', ParseIntPipe) club_id: number) {
+    const notifications = await this.notificationsService.findByClub(club_id);
+    return notifications; // Return array directly for frontend compatibility
   }
 
   @Get('type/:type')
-  findByType(@Param('type') type: string) {
-    return this.notificationsService.findByType(type);
+  async findByType(@Param('type') type: string) {
+    const notifications = await this.notificationsService.findByType(type);
+    return notifications; // Return array directly for frontend compatibility
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() input: UpdateNotificationDto,
   ) {
-    return this.notificationsService.update(id, input);
+    const notification = await this.notificationsService.update(id, input);
+    return {
+      success: true,
+      message: 'Notification updated successfully',
+      data: notification,
+    };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.notificationsService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.notificationsService.remove(id);
+    return {
+      success: true,
+      message: 'Notification deleted successfully',
+    };
   }
 }

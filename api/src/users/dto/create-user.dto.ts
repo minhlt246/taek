@@ -5,8 +5,10 @@ import {
   IsEnum,
   IsDateString,
   IsBoolean,
+  IsNumber,
   MinLength,
   MaxLength,
+  ValidateIf,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -44,4 +46,29 @@ export class CreateUserDto {
   @IsOptional()
   @IsBoolean()
   active_status?: boolean;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  ma_clb?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  ma_don_vi?: string;
+
+  @IsOptional()
+  @IsNumber()
+  quyen_so?: number;
+
+  @IsOptional()
+  @IsNumber()
+  cap_dai_id?: number;
+
+  @IsOptional()
+  @ValidateIf((o) => o.password !== undefined && o.password !== null && o.password !== '')
+  @IsString()
+  @MinLength(6, { message: 'Password must be at least 6 characters long' })
+  @MaxLength(255)
+  password?: string;
 }

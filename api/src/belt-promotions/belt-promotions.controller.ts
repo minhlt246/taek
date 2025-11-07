@@ -20,36 +20,53 @@ export class BeltPromotionsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() input: CreateBeltPromotionDto) {
-    return this.beltPromotionsService.create(input);
+  async create(@Body() input: CreateBeltPromotionDto) {
+    const promotion = await this.beltPromotionsService.create(input);
+    return {
+      success: true,
+      message: 'Belt promotion created successfully',
+      data: promotion,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.beltPromotionsService.findAll();
+  async findAll() {
+    const promotions = await this.beltPromotionsService.findAll();
+    return promotions; // Return array directly for frontend compatibility
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.beltPromotionsService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const promotion = await this.beltPromotionsService.findOne(id);
+    return promotion; // Return object directly for frontend compatibility
   }
 
   @Get('user/:user_id')
-  findByUser(@Param('user_id', ParseIntPipe) user_id: number) {
-    return this.beltPromotionsService.findByUser(user_id);
+  async findByUser(@Param('user_id', ParseIntPipe) user_id: number) {
+    const promotions = await this.beltPromotionsService.findByUser(user_id);
+    return promotions; // Return array directly for frontend compatibility
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() input: UpdateBeltPromotionDto,
   ) {
-    return this.beltPromotionsService.update(id, input);
+    const promotion = await this.beltPromotionsService.update(id, input);
+    return {
+      success: true,
+      message: 'Belt promotion updated successfully',
+      data: promotion,
+    };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.beltPromotionsService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.beltPromotionsService.remove(id);
+    return {
+      success: true,
+      message: 'Belt promotion deleted successfully',
+    };
   }
 }

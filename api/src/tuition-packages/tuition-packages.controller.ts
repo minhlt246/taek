@@ -22,36 +22,53 @@ export class TuitionPackagesController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() input: CreateTuitionPackageDto) {
-    return this.tuitionPackagesService.create(input);
+  async create(@Body() input: CreateTuitionPackageDto) {
+    const package_ = await this.tuitionPackagesService.create(input);
+    return {
+      success: true,
+      message: 'Tuition package created successfully',
+      data: package_,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.tuitionPackagesService.findAll();
+  async findAll() {
+    const packages = await this.tuitionPackagesService.findAll();
+    return packages; // Return array directly for frontend compatibility
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.tuitionPackagesService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const package_ = await this.tuitionPackagesService.findOne(id);
+    return package_; // Return object directly for frontend compatibility
   }
 
   @Get('club/:club_id')
-  findByClub(@Param('club_id', ParseIntPipe) club_id: number) {
-    return this.tuitionPackagesService.findByClub(club_id);
+  async findByClub(@Param('club_id', ParseIntPipe) club_id: number) {
+    const packages = await this.tuitionPackagesService.findByClub(club_id);
+    return packages; // Return array directly for frontend compatibility
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() input: UpdateTuitionPackageDto,
   ) {
-    return this.tuitionPackagesService.update(id, input);
+    const package_ = await this.tuitionPackagesService.update(id, input);
+    return {
+      success: true,
+      message: 'Tuition package updated successfully',
+      data: package_,
+    };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.tuitionPackagesService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.tuitionPackagesService.remove(id);
+    return {
+      success: true,
+      message: 'Tuition package deleted successfully',
+    };
   }
 }

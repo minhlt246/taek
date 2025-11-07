@@ -7,7 +7,7 @@ import React from "react";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import Loading from "@/components/ui/loading";
 
-export default function RootLayout({
+export default function ClientLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -20,11 +20,9 @@ export default function RootLayout({
 
   return (
     <AuthProvider>
-      <div className="main-layout">
-        <Header />
-        <main className="main-content">{children}</main>
-        <Footer />
-      </div>
+      <Header />
+      <main className="main-content">{children}</main>
+      <Footer />
     </AuthProvider>
   );
 }

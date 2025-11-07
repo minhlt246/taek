@@ -19,46 +19,65 @@ export class EnrollmentsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createEnrollmentDto: CreateEnrollmentDto) {
-    return this.enrollmentsService.create(createEnrollmentDto);
+  async create(@Body() createEnrollmentDto: CreateEnrollmentDto) {
+    const enrollment = await this.enrollmentsService.create(createEnrollmentDto);
+    return {
+      success: true,
+      message: 'Enrollment created successfully',
+      data: enrollment,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.enrollmentsService.findAll();
+  async findAll() {
+    const enrollments = await this.enrollmentsService.findAll();
+    return enrollments; // Return array directly for frontend compatibility
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.enrollmentsService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const enrollment = await this.enrollmentsService.findOne(id);
+    return enrollment; // Return object directly for frontend compatibility
   }
 
   @Get('user/:user_id')
-  findByUser(@Param('user_id', ParseIntPipe) user_id: number) {
-    return this.enrollmentsService.findByUser(user_id);
+  async findByUser(@Param('user_id', ParseIntPipe) user_id: number) {
+    const enrollments = await this.enrollmentsService.findByUser(user_id);
+    return enrollments; // Return array directly for frontend compatibility
   }
 
   @Get('course/:course_id')
-  findByCourse(@Param('course_id', ParseIntPipe) course_id: number) {
-    return this.enrollmentsService.findByCourse(course_id);
+  async findByCourse(@Param('course_id', ParseIntPipe) course_id: number) {
+    const enrollments = await this.enrollmentsService.findByCourse(course_id);
+    return enrollments; // Return array directly for frontend compatibility
   }
 
   @Get('status/:status')
-  findByStatus(@Param('status') status: string) {
-    return this.enrollmentsService.findByStatus(status);
+  async findByStatus(@Param('status') status: string) {
+    const enrollments = await this.enrollmentsService.findByStatus(status);
+    return enrollments; // Return array directly for frontend compatibility
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateEnrollmentDto: UpdateEnrollmentDto,
   ) {
-    return this.enrollmentsService.update(id, updateEnrollmentDto);
+    const enrollment = await this.enrollmentsService.update(id, updateEnrollmentDto);
+    return {
+      success: true,
+      message: 'Enrollment updated successfully',
+      data: enrollment,
+    };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.enrollmentsService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.enrollmentsService.remove(id);
+    return {
+      success: true,
+      message: 'Enrollment deleted successfully',
+    };
   }
 }

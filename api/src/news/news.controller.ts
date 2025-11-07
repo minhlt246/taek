@@ -19,46 +19,65 @@ export class NewsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createNewsDto: CreateNewsDto) {
-    return this.newsService.create(createNewsDto);
+  async create(@Body() createNewsDto: CreateNewsDto) {
+    const news = await this.newsService.create(createNewsDto);
+    return {
+      success: true,
+      message: 'News created successfully',
+      data: news,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.newsService.findAll();
+  async findAll() {
+    const news = await this.newsService.findAll();
+    return news; // Return array directly for frontend compatibility
   }
 
   @Get('published')
-  findPublished() {
-    return this.newsService.findPublished();
+  async findPublished() {
+    const news = await this.newsService.findPublished();
+    return news; // Return array directly for frontend compatibility
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.newsService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const news = await this.newsService.findOne(id);
+    return news; // Return object directly for frontend compatibility
   }
 
   @Get('slug/:slug')
-  findBySlug(@Param('slug') slug: string) {
-    return this.newsService.findBySlug(slug);
+  async findBySlug(@Param('slug') slug: string) {
+    const news = await this.newsService.findBySlug(slug);
+    return news; // Return object directly for frontend compatibility
   }
 
   @Get('author/:author_id')
-  findByAuthor(@Param('author_id', ParseIntPipe) author_id: number) {
-    return this.newsService.findByAuthor(author_id);
+  async findByAuthor(@Param('author_id', ParseIntPipe) author_id: number) {
+    const news = await this.newsService.findByAuthor(author_id);
+    return news; // Return array directly for frontend compatibility
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateNewsDto: UpdateNewsDto,
   ) {
-    return this.newsService.update(id, updateNewsDto);
+    const news = await this.newsService.update(id, updateNewsDto);
+    return {
+      success: true,
+      message: 'News updated successfully',
+      data: news,
+    };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.newsService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.newsService.remove(id);
+    return {
+      success: true,
+      message: 'News deleted successfully',
+    };
   }
 }

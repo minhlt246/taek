@@ -1,317 +1,462 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAccountStore } from "@/stores/account";
-
-interface DashboardStats {
-  totalUsers: number;
-  totalCoaches: number;
-  totalClubs: number;
-  totalBranches: number;
-  totalCourses: number;
-  totalPayments: number;
-  monthlyRevenue: number;
-  activeStudents: number;
-}
 
 export default function AdminDashboard() {
   const { account } = useAccountStore();
-  const [stats, setStats] = useState<DashboardStats>({
-    totalUsers: 0,
-    totalCoaches: 0,
-    totalClubs: 0,
-    totalBranches: 0,
-    totalCourses: 0,
-    totalPayments: 0,
-    monthlyRevenue: 0,
-    activeStudents: 0,
-  });
-  const [loading, setLoading] = useState(true);
+  const [scriptsLoaded, setScriptsLoaded] = useState(false);
 
   useEffect(() => {
-    // Giả lập API call để lấy thống kê dashboard
-    const fetchStats = async () => {
-      setLoading(true);
-      // TODO: Thay thế bằng API calls thực tế
-      setTimeout(() => {
-        setStats({
-          totalUsers: 156,
-          totalCoaches: 12,
-          totalClubs: 3,
-          totalBranches: 8,
-          totalCourses: 24,
-          totalPayments: 89,
-          monthlyRevenue: 12500000,
-          activeStudents: 142,
-        });
-        setLoading(false);
-      }, 1000);
+    // Load additional scripts for dashboard after DOM is ready
+    // jQuery must be loaded first (loaded in layout)
+    const loadScript = (src: string): Promise<void> => {
+      return new Promise((resolve, reject) => {
+        const existingScript = document.querySelector(`script[src="${src}"]`);
+        if (existingScript) {
+          resolve();
+          return;
+        }
+
+        const script = document.createElement("script");
+        script.src = src;
+        script.async = true;
+        script.defer = true;
+
+        // Add timeout to prevent hanging
+        const timeout = setTimeout(() => {
+          reject(new Error(`Timeout loading script: ${src}`));
+        }, 5000);
+
+        script.onload = () => {
+          clearTimeout(timeout);
+          resolve();
+        };
+        script.onerror = () => {
+          clearTimeout(timeout);
+          reject(new Error(`Failed to load script: ${src}`));
+        };
+
+        document.body.appendChild(script);
+      });
     };
 
-    fetchStats();
+    // Wait for jQuery to be available, then load dashboard scripts
+    const loadDashboardScripts = async () => {
+      // Wait for jQuery to be ready with timeout
+      const waitForJQuery = () => {
+        return new Promise<void>((resolve, reject) => {
+          if (typeof window !== "undefined" && (window as any).jQuery) {
+            resolve();
+            return;
+          }
+
+          let attempts = 0;
+          const maxAttempts = 20; // Max 1 second (20 * 50ms)
+          const checkInterval = setInterval(() => {
+            attempts++;
+            if ((window as any).jQuery) {
+              clearInterval(checkInterval);
+              resolve();
+            } else if (attempts >= maxAttempts) {
+              clearInterval(checkInterval);
+              reject(new Error("jQuery timeout"));
+            }
+          }, 50);
+        });
+      };
+
+      try {
+        // Wait for jQuery to be ready (with timeout)
+        await waitForJQuery();
+
+        // Load scripts in parallel for faster loading
+        await Promise.allSettled([
+          loadScript(
+            "/styles/assets/plugins/datatables/js/jquery.dataTables.min.js"
+          ),
+          loadScript(
+            "/styles/assets/plugins/datatables/js/dataTables.bootstrap5.min.js"
+          ),
+          loadScript("/styles/assets/js/moment.min.js"),
+          loadScript(
+            "/styles/assets/plugins/daterangepicker/daterangepicker.js"
+          ),
+          loadScript("/styles/assets/plugins/apexchart/apexcharts.min.js"),
+        ]);
+
+        console.log("Dashboard scripts loaded successfully");
+        setScriptsLoaded(true);
+      } catch (error) {
+        console.error("Error loading dashboard scripts:", error);
+        // Still set to loaded to show content even if scripts fail
+        setScriptsLoaded(true);
+      }
+    };
+
+    // Start loading after a short delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      loadDashboardScripts();
+    }, 100);
+
+    return () => {
+      clearTimeout(timer);
+    };
   }, []);
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(amount);
-  };
-
-  const statCards = [
-    {
-      title: "Tổng võ sinh",
-      value: stats.totalUsers,
-      icon: "fas fa-users",
-      color: "primary",
-      change: "+12%",
-      changeType: "positive",
-    },
-    {
-      title: "Học viên hoạt động",
-      value: stats.activeStudents,
-      icon: "fas fa-user-graduate",
-      color: "success",
-      change: "+8%",
-      changeType: "positive",
-    },
-    {
-      title: "Huấn luyện viên",
-      value: stats.totalCoaches,
-      icon: "fas fa-user-tie",
-      color: "info",
-      change: "+2",
-      changeType: "positive",
-    },
-    {
-      title: "Câu lạc bộ",
-      value: stats.totalClubs,
-      icon: "fas fa-building",
-      color: "warning",
-      change: "0",
-      changeType: "neutral",
-    },
-    {
-      title: "Chi nhánh",
-      value: stats.totalBranches,
-      icon: "fas fa-map-marker-alt",
-      color: "secondary",
-      change: "+1",
-      changeType: "positive",
-    },
-    {
-      title: "Khóa học",
-      value: stats.totalCourses,
-      icon: "fas fa-book",
-      color: "dark",
-      change: "+3",
-      changeType: "positive",
-    },
-    {
-      title: "Doanh thu tháng",
-      value: formatCurrency(stats.monthlyRevenue),
-      icon: "fas fa-chart-line",
-      color: "success",
-      change: "+15%",
-      changeType: "positive",
-    },
-    {
-      title: "Tổng thanh toán",
-      value: stats.totalPayments,
-      icon: "fas fa-credit-card",
-      color: "primary",
-      change: "+23",
-      changeType: "positive",
-    },
-  ];
-
-  if (loading) {
-    return (
-      <div className="admin-dashboard">
-        <div
-          className="d-flex justify-content-center align-items-center"
-          style={{ height: "400px" }}
-        >
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Đang tải...</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="admin-dashboard">
-      <div className="dashboard-header">
-        <h2>Tổng quan Dashboard</h2>
-        <p>
-          Chào mừng trở lại, {account?.name || "Quản trị viên"}! Đây là những gì
-          đang diễn ra với hệ thống quản lý câu lạc bộ Taekwondo của bạn.
-        </p>
-      </div>
+    <>
+      {/* Scripts are loaded via useEffect above */}
 
-      {/* Statistics Cards */}
-      <div className="row mb-4">
-        {statCards.map((card, index) => (
-          <div key={index} className="col-xl-3 col-md-6 mb-4">
-            <div className={`card border-left-${card.color} shadow h-100 py-2`}>
-              <div className="card-body">
-                <div className="row no-gutters align-items-center">
-                  <div className="col mr-2">
-                    <div
-                      className={`text-xs font-weight-bold text-${card.color} text-uppercase mb-1`}
-                    >
-                      {card.title}
-                    </div>
-                    <div className="h5 mb-0 font-weight-bold text-gray-800">
-                      {card.value}
-                    </div>
-                  </div>
-                  <div className="col-auto">
-                    <i className={`${card.icon} fa-2x text-gray-300`}></i>
-                  </div>
-                </div>
-                <div className="mt-2">
-                  <span
-                    className={`text-${
-                      card.changeType === "positive"
-                        ? "success"
-                        : card.changeType === "negative"
-                        ? "danger"
-                        : "muted"
-                    } text-xs`}
-                  >
-                    <i
-                      className={`fas fa-arrow-${
-                        card.changeType === "positive"
-                          ? "up"
-                          : card.changeType === "negative"
-                          ? "down"
-                          : "right"
-                      } mr-1`}
-                    ></i>
-                    {card.change}
-                  </span>
-                  <span className="text-muted text-xs ml-2">
-                    so với tháng trước
-                  </span>
-                </div>
-              </div>
-            </div>
+      {/* Page Header */}
+      <div className="d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
+        <div>
+          <h4 className="mb-0">Tổng Quan Hệ Thống</h4>
+          <p className="text-muted mb-0">
+            Bảng điều khiển quản lý câu lạc bộ Taekwondo
+          </p>
+        </div>
+        <div className="gap-2 d-flex align-items-center flex-wrap">
+          <div className="daterangepick form-control w-auto d-flex align-items-center">
+            <i className="ti ti-calendar text-dark me-2"></i>
+            <span className="reportrange-picker-field text-dark">
+              Tuần trước
+            </span>
           </div>
-        ))}
+          <a
+            href="javascript:void(0);"
+            className="btn btn-icon btn-outline-light shadow"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            aria-label="Làm mới"
+            data-bs-original-title="Làm mới"
+          >
+            <i className="ti ti-refresh"></i>
+          </a>
+          <a
+            href="javascript:void(0);"
+            className="btn btn-icon btn-outline-light shadow"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            aria-label="Thu gọn"
+            data-bs-original-title="Thu gọn"
+            id="collapse-header"
+          >
+            <i className="ti ti-transition-top"></i>
+          </a>
+        </div>
       </div>
 
-      {/* Quick Actions */}
+      {/* Dashboard Content from HTML */}
       <div className="row">
-        <div className="col-lg-8">
-          <div className="card shadow mb-4">
-            <div className="card-header py-3">
-              <h6 className="m-0 font-weight-bold text-primary">
-                Thao tác nhanh
-              </h6>
+        <div className="col-md-6 d-flex">
+          <div className="card flex-fill">
+            <div className="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
+              <h6 className="mb-0">Võ Sinh Mới Đăng Ký</h6>
+              <div className="dropdown">
+                <a
+                  className="dropdown-toggle btn btn-outline-light shadow"
+                  data-bs-toggle="dropdown"
+                  href="javascript:void(0);"
+                >
+                  30 ngày qua
+                </a>
+                <div className="dropdown-menu dropdown-menu-end">
+                  <a href="javascript:void(0);" className="dropdown-item">
+                    15 ngày qua
+                  </a>
+                  <a href="javascript:void(0);" className="dropdown-item">
+                    30 ngày qua
+                  </a>
+                  <a href="javascript:void(0);" className="dropdown-item">
+                    3 tháng qua
+                  </a>
+                </div>
+              </div>
             </div>
             <div className="card-body">
-              <div className="row">
-                <div className="col-md-6 mb-3">
-                  <div className="d-grid">
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => (window.location.href = "/admin/users")}
-                    >
-                      <i className="fas fa-plus mr-2"></i>
-                      Thêm học viên mới
-                    </button>
-                  </div>
-                </div>
-                <div className="col-md-6 mb-3">
-                  <div className="d-grid">
-                    <button
-                      className="btn btn-success"
-                      onClick={() => (window.location.href = "/admin/coaches")}
-                    >
-                      <i className="fas fa-user-plus mr-2"></i>
-                      Thêm huấn luyện viên
-                    </button>
-                  </div>
-                </div>
-                <div className="col-md-6 mb-3">
-                  <div className="d-grid">
-                    <button
-                      className="btn btn-info"
-                      onClick={() => (window.location.href = "/admin/events")}
-                    >
-                      <i className="fas fa-calendar-plus mr-2"></i>
-                      Tạo sự kiện
-                    </button>
-                  </div>
-                </div>
-                <div className="col-md-6 mb-3">
-                  <div className="d-grid">
-                    <button
-                      className="btn btn-warning"
-                      onClick={() => (window.location.href = "/admin/news")}
-                    >
-                      <i className="fas fa-newspaper mr-2"></i>
-                      Đăng tin tức
-                    </button>
-                  </div>
-                </div>
+              <div className="table-responsive custom-table">
+                <table
+                  className="table dataTable table-nowrap"
+                  id="deals-project"
+                >
+                  <thead className="table-light">
+                    <tr>
+                      <th>Họ Tên</th>
+                      <th>Cấp Đai</th>
+                      <th>Ngày Đăng Ký</th>
+                      <th>Trạng Thái</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Nguyễn Văn A</td>
+                      <td>
+                        <span className="badge bg-warning">Trắng</span>
+                      </td>
+                      <td>20/11/2024</td>
+                      <td>
+                        <span className="badge bg-success">Hoạt Động</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Trần Thị B</td>
+                      <td>
+                        <span className="badge bg-info">Vàng</span>
+                      </td>
+                      <td>18/11/2024</td>
+                      <td>
+                        <span className="badge bg-success">Hoạt Động</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Lê Văn C</td>
+                      <td>
+                        <span className="badge bg-secondary">Đen</span>
+                      </td>
+                      <td>15/11/2024</td>
+                      <td>
+                        <span className="badge bg-warning">Tạm Nghỉ</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="col-lg-4">
-          <div className="card shadow mb-4">
-            <div className="card-header py-3">
-              <h6 className="m-0 font-weight-bold text-primary">
-                Hoạt động gần đây
-              </h6>
-            </div>
-            <div className="card-body">
-              <div className="activity-list">
-                <div className="activity-item">
-                  <div className="activity-icon bg-primary">
-                    <i className="fas fa-user-plus"></i>
+        <div className="col-md-6 d-flex">
+          <div className="card flex-fill">
+            <div className="card-header">
+              <div className="d-flex align-items-center justify-content-between flex-wrap row-gap-3">
+                <h6 className="mb-0">Thống Kê Võ Sinh Theo Cấp Đai</h6>
+                <div className="d-flex align-items-center flex-wrap row-gap-3">
+                  <div className="dropdown me-2">
+                    <a
+                      className="dropdown-toggle btn btn-outline-light shadow"
+                      data-bs-toggle="dropdown"
+                      href="javascript:void(0);"
+                    >
+                      Tất Cả
+                    </a>
+                    <div className="dropdown-menu dropdown-menu-end">
+                      <a href="javascript:void(0);" className="dropdown-item">
+                        Trắng - Vàng
+                      </a>
+                      <a href="javascript:void(0);" className="dropdown-item">
+                        Xanh - Đỏ
+                      </a>
+                      <a href="javascript:void(0);" className="dropdown-item">
+                        Đen
+                      </a>
+                      <a href="javascript:void(0);" className="dropdown-item">
+                        Tất Cả
+                      </a>
+                    </div>
                   </div>
-                  <div className="activity-content">
-                    <p className="mb-1">Học viên mới đăng ký</p>
-                    <small className="text-muted">2 giờ trước</small>
-                  </div>
-                </div>
-                <div className="activity-item">
-                  <div className="activity-icon bg-success">
-                    <i className="fas fa-credit-card"></i>
-                  </div>
-                  <div className="activity-content">
-                    <p className="mb-1">Nhận thanh toán</p>
-                    <small className="text-muted">4 giờ trước</small>
-                  </div>
-                </div>
-                <div className="activity-item">
-                  <div className="activity-icon bg-info">
-                    <i className="fas fa-calendar"></i>
-                  </div>
-                  <div className="activity-content">
-                    <p className="mb-1">Sự kiện mới được lên lịch</p>
-                    <small className="text-muted">6 giờ trước</small>
-                  </div>
-                </div>
-                <div className="activity-item">
-                  <div className="activity-icon bg-warning">
-                    <i className="fas fa-medal"></i>
-                  </div>
-                  <div className="activity-content">
-                    <p className="mb-1">Hoàn thành thăng đai</p>
-                    <small className="text-muted">1 ngày trước</small>
+                  <div className="dropdown">
+                    <a
+                      className="dropdown-toggle btn btn-outline-light shadow"
+                      data-bs-toggle="dropdown"
+                      href="javascript:void(0);"
+                    >
+                      30 Ngày
+                    </a>
+                    <div className="dropdown-menu dropdown-menu-end">
+                      <a href="javascript:void(0);" className="dropdown-item">
+                        7 Ngày
+                      </a>
+                      <a href="javascript:void(0);" className="dropdown-item">
+                        30 Ngày
+                      </a>
+                      <a href="javascript:void(0);" className="dropdown-item">
+                        90 Ngày
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+            <div className="card-body py-0">
+              <div id="deals-chart"></div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      <div className="row">
+        <div className="col-md-6 d-flex">
+          <div className="card flex-fill">
+            <div className="card-header">
+              <div className="d-flex align-items-center justify-content-between flex-wrap row-gap-3">
+                <h6 className="mb-0">Võ Sinh Đã Nghỉ Học</h6>
+                <div className="d-flex align-items-center flex-wrap row-gap-3">
+                  <div className="dropdown me-2">
+                    <a
+                      className="dropdown-toggle btn btn-outline-light shadow"
+                      data-bs-toggle="dropdown"
+                      href="javascript:void(0);"
+                    >
+                      Lý Do
+                    </a>
+                    <div className="dropdown-menu dropdown-menu-end">
+                      <a href="javascript:void(0);" className="dropdown-item">
+                        Tự Động Nghỉ
+                      </a>
+                      <a href="javascript:void(0);" className="dropdown-item">
+                        Chuyển Lớp
+                      </a>
+                      <a href="javascript:void(0);" className="dropdown-item">
+                        Tất Cả
+                      </a>
+                    </div>
+                  </div>
+                  <div className="dropdown">
+                    <a
+                      className="dropdown-toggle btn btn-outline-light shadow"
+                      data-bs-toggle="dropdown"
+                      href="javascript:void(0);"
+                    >
+                      30 Ngày
+                    </a>
+                    <div className="dropdown-menu dropdown-menu-end">
+                      <a href="javascript:void(0);" className="dropdown-item">
+                        30 Ngày
+                      </a>
+                      <a href="javascript:void(0);" className="dropdown-item">
+                        6 Tháng
+                      </a>
+                      <a href="javascript:void(0);" className="dropdown-item">
+                        12 Tháng
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="card-body py-0">
+              <div id="last-chart"></div>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-md-6 d-flex">
+          <div className="card flex-fill">
+            <div className="card-header">
+              <div className="d-flex align-items-center justify-content-between flex-wrap row-gap-3">
+                <h6 className="mb-0">Võ Sinh Thăng Đai Thành Công</h6>
+                <div className="d-flex align-items-center flex-wrap row-gap-3">
+                  <div className="dropdown me-2">
+                    <a
+                      className="dropdown-toggle btn btn-outline-light shadow"
+                      data-bs-toggle="dropdown"
+                      href="javascript:void(0);"
+                    >
+                      Cấp Đai
+                    </a>
+                    <div className="dropdown-menu dropdown-menu-end">
+                      <a href="javascript:void(0);" className="dropdown-item">
+                        Trắng - Vàng
+                      </a>
+                      <a href="javascript:void(0);" className="dropdown-item">
+                        Xanh - Đỏ
+                      </a>
+                      <a href="javascript:void(0);" className="dropdown-item">
+                        Đen
+                      </a>
+                      <a href="javascript:void(0);" className="dropdown-item">
+                        Tất Cả
+                      </a>
+                    </div>
+                  </div>
+                  <div className="dropdown">
+                    <a
+                      className="dropdown-toggle btn btn-outline-light shadow"
+                      data-bs-toggle="dropdown"
+                      href="javascript:void(0);"
+                    >
+                      30 Ngày
+                    </a>
+                    <div className="dropdown-menu dropdown-menu-end">
+                      <a href="javascript:void(0);" className="dropdown-item">
+                        30 Ngày
+                      </a>
+                      <a href="javascript:void(0);" className="dropdown-item">
+                        6 Tháng
+                      </a>
+                      <a href="javascript:void(0);" className="dropdown-item">
+                        12 Tháng
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="card-body py-0">
+              <div id="won-chart"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="row">
+        <div className="col-md-12 d-flex">
+          <div className="card w-100">
+            <div className="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
+              <h6 className="mb-0">Thống Kê Theo Năm</h6>
+              <div className="d-flex align-items-center flex-wrap row-gap-3">
+                <div className="dropdown me-2">
+                  <a
+                    className="dropdown-toggle btn btn-outline-light shadow"
+                    data-bs-toggle="dropdown"
+                    href="javascript:void(0);"
+                  >
+                    Loại Thống Kê
+                  </a>
+                  <div className="dropdown-menu dropdown-menu-end">
+                    <a href="javascript:void(0);" className="dropdown-item">
+                      Đăng Ký Mới
+                    </a>
+                    <a href="javascript:void(0);" className="dropdown-item">
+                      Thăng Đai
+                    </a>
+                    <a href="javascript:void(0);" className="dropdown-item">
+                      Doanh Thu
+                    </a>
+                    <a href="javascript:void(0);" className="dropdown-item">
+                      Tất Cả
+                    </a>
+                  </div>
+                </div>
+                <div className="dropdown">
+                  <a
+                    className="dropdown-toggle btn btn-outline-light shadow"
+                    data-bs-toggle="dropdown"
+                    href="javascript:void(0);"
+                  >
+                    Khoảng Thời Gian
+                  </a>
+                  <div className="dropdown-menu dropdown-menu-end">
+                    <a href="javascript:void(0);" className="dropdown-item">
+                      3 Tháng
+                    </a>
+                    <a href="javascript:void(0);" className="dropdown-item">
+                      6 Tháng
+                    </a>
+                    <a href="javascript:void(0);" className="dropdown-item">
+                      12 Tháng
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="card-body py-0">
+              <div id="deals-year"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

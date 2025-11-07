@@ -19,41 +19,59 @@ export class StudentParentsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createStudentParentDto: CreateStudentParentDto) {
-    return this.studentParentsService.create(createStudentParentDto);
+  async create(@Body() createStudentParentDto: CreateStudentParentDto) {
+    const studentParent = await this.studentParentsService.create(createStudentParentDto);
+    return {
+      success: true,
+      message: 'Student parent relationship created successfully',
+      data: studentParent,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.studentParentsService.findAll();
+  async findAll() {
+    const studentParents = await this.studentParentsService.findAll();
+    return studentParents; // Return array directly for frontend compatibility
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.studentParentsService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const studentParent = await this.studentParentsService.findOne(id);
+    return studentParent; // Return object directly for frontend compatibility
   }
 
   @Get('student/:student_id')
-  findByStudent(@Param('student_id', ParseIntPipe) student_id: number) {
-    return this.studentParentsService.findByStudent(student_id);
+  async findByStudent(@Param('student_id', ParseIntPipe) student_id: number) {
+    const studentParents = await this.studentParentsService.findByStudent(student_id);
+    return studentParents; // Return array directly for frontend compatibility
   }
 
   @Get('parent/:parent_id')
-  findByParent(@Param('parent_id', ParseIntPipe) parent_id: number) {
-    return this.studentParentsService.findByParent(parent_id);
+  async findByParent(@Param('parent_id', ParseIntPipe) parent_id: number) {
+    const studentParents = await this.studentParentsService.findByParent(parent_id);
+    return studentParents; // Return array directly for frontend compatibility
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateStudentParentDto: UpdateStudentParentDto,
   ) {
-    return this.studentParentsService.update(id, updateStudentParentDto);
+    const studentParent = await this.studentParentsService.update(id, updateStudentParentDto);
+    return {
+      success: true,
+      message: 'Student parent relationship updated successfully',
+      data: studentParent,
+    };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.studentParentsService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.studentParentsService.remove(id);
+    return {
+      success: true,
+      message: 'Student parent relationship deleted successfully',
+    };
   }
 }

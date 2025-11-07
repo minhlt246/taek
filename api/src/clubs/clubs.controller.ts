@@ -19,36 +19,65 @@ export class ClubsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createClubDto: CreateClubDto) {
-    return this.clubsService.create(createClubDto);
+  async create(@Body() createClubDto: CreateClubDto) {
+    const club = await this.clubsService.create(createClubDto);
+    return {
+      success: true,
+      message: 'Club created successfully',
+      data: club,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.clubsService.findAll();
+  async findAll() {
+    const clubs = await this.clubsService.findAll();
+    return clubs; // Return array directly for frontend compatibility
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.clubsService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const club = await this.clubsService.findOne(id);
+    return club; // Return object directly for frontend compatibility
   }
 
   @Get('code/:club_code')
-  findByCode(@Param('club_code') club_code: string) {
-    return this.clubsService.findByCode(club_code);
+  async findByCode(@Param('club_code') club_code: string) {
+    const club = await this.clubsService.findByCode(club_code);
+    return club; // Return object directly for frontend compatibility
+  }
+
+  @Get(':id/stats')
+  async getStats(@Param('id', ParseIntPipe) id: number) {
+    const stats = await this.clubsService.getStats(id);
+    return stats; // Return stats directly for frontend compatibility
+  }
+
+  @Get(':id/overview')
+  async getOverview(@Param('id', ParseIntPipe) id: number) {
+    const overview = await this.clubsService.getOverview(id);
+    return overview; // Return overview directly for frontend compatibility
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateClubDto: UpdateClubDto,
   ) {
-    return this.clubsService.update(id, updateClubDto);
+    const club = await this.clubsService.update(id, updateClubDto);
+    return {
+      success: true,
+      message: 'Club updated successfully',
+      data: club,
+    };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.clubsService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.clubsService.remove(id);
+    return {
+      success: true,
+      message: 'Club deleted successfully',
+    };
   }
 }

@@ -56,6 +56,29 @@ export class CreateCourseDto {
   current_students?: number;
 
   @IsOptional()
+  @IsNumber()
+  max_students?: number;
+
+  @IsOptional()
+  @IsNumber()
+  price?: number;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  instructor_name?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  training_time?: string; // Giờ tập (ví dụ: "18:00-19:30")
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  training_days?: string; // Buổi tập (ví dụ: "Thứ 2, 4, 6")
+
+  @IsOptional()
   @IsString()
   @MaxLength(255)
   image_url?: string;

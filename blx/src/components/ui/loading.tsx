@@ -1,31 +1,25 @@
 "use client";
 
 import React from "react";
+import styles from "@/styles/scss/loading.module.scss";
 
 interface LoadingProps {
   size?: "sm" | "md" | "lg";
   text?: string;
 }
 
+/**
+ * Component hiển thị animation loading spinner
+ * @param size - Kích thước loading: "sm" | "md" | "lg"
+ * @param text - Text hiển thị (hiện tại chưa sử dụng)
+ */
 const Loading: React.FC<LoadingProps> = ({
   size = "md",
   text = "Loading...",
 }) => {
-  const sizeClasses = {
-    sm: "spinner-border-sm",
-    md: "",
-    lg: "spinner-border-lg",
-  };
-
   return (
-    <div className="d-flex flex-column align-items-center justify-content-center p-4">
-      <div
-        className={`spinner-border text-primary ${sizeClasses[size]}`}
-        role="status"
-      >
-        <span className="visually-hidden">{text}</span>
-      </div>
-      {text && <div className="mt-2 text-muted">{text}</div>}
+    <div className={styles["loading-container"]}>
+      <div className={styles.spinner}></div>
     </div>
   );
 };

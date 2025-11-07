@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { beltLevelsApi } from "@/services/adminApi";
+import { beltLevelsApi } from "@/services/api/belt-levels";
 
 interface BeltLevel {
   id: number;
@@ -330,8 +330,7 @@ export default function BeltLevelsPage() {
 
   return (
     <div className="belt-levels-page">
-      <div className="page-header">
-        <h2>Quản lý cấp đai</h2>
+      <div>
         <button
           className="btn btn-primary"
           onClick={() => {

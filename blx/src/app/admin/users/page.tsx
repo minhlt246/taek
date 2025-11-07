@@ -2,14 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { useAccountStore } from "@/stores/account";
+import { usersApi } from "@/services/api/users";
+import http from "@/services/http";
 
 interface VoSinh {
   id: number;
   ho_va_ten: string;
   ngay_thang_nam_sinh: string;
   ma_hoi_vien: string;
-  ma_clb: string;
-  ma_don_vi: string;
+  ma_clb?: string | null;
+  ma_don_vi?: string | null;
   quyen_so: number;
   cap_dai_id: number;
   gioi_tinh: "Nam" | "Nữ";
@@ -29,9 +31,6 @@ export default function UsersPage() {
   const [voSinh, setVoSinh] = useState<VoSinh[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterRole, setFilterRole] = useState<"all" | "admin" | "student">(
-    "all"
-  );
   const [showModal, setShowModal] = useState(false);
   const [editingVoSinh, setEditingVoSinh] = useState<VoSinh | null>(null);
   const [formData, setFormData] = useState({
@@ -51,22 +50,46 @@ export default function UsersPage() {
     active_status: true,
   });
 
-  useEffect(() => {
-    // Lấy danh sách võ sinh từ API
-    const fetchVoSinh = async () => {
-      setLoading(true);
-      try {
-        // TODO: Thay thế bằng API call thực tế
-        // const response = await api.get('/vo-sinh');
-        // setVoSinh(response.data);
-        setVoSinh([]);
-      } catch (error) {
-        console.error("Lỗi khi tải danh sách võ sinh:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  /**
+   * Fetch võ sinh data from API
+   * Lấy raw data từ backend để có đầy đủ thông tin
+   */
+  const fetchVoSinh = async () => {
+    setLoading(true);
+    try {
+      // Gọi API trực tiếp để lấy raw data với đầy đủ fields
+      const response = await http.get<VoSinh[]>("/users");
+      const data: VoSinh[] = Array.isArray(response.data) ? response.data : [];
 
+      // Debug: Log dữ liệu để kiểm tra
+      console.log("[UsersPage] Raw users data:", data);
+      if (data.length > 0) {
+        const firstUser = data[0];
+        console.log("[UsersPage] First user sample - ALL FIELDS:", firstUser);
+        console.log("[UsersPage] First user - specific fields:", {
+          id: firstUser.id,
+          ho_va_ten: firstUser.ho_va_ten,
+          ma_don_vi: firstUser.ma_don_vi,
+          ma_don_vi_type: typeof firstUser.ma_don_vi,
+          ma_don_vi_value: JSON.stringify(firstUser.ma_don_vi),
+          ma_clb: firstUser.ma_clb,
+          ma_clb_type: typeof firstUser.ma_clb,
+          ma_clb_value: JSON.stringify(firstUser.ma_clb),
+          ma_hoi_vien: firstUser.ma_hoi_vien,
+          allKeys: Object.keys(firstUser),
+        });
+      }
+
+      setVoSinh(data);
+    } catch (error) {
+      console.error("Lỗi khi tải danh sách võ sinh:", error);
+      setVoSinh([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchVoSinh();
   }, []);
 
@@ -104,31 +127,101 @@ export default function UsersPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Clean up form data: remove empty strings and convert 0 to undefined for optional fields
+      const cleanData: any = {
+        ho_va_ten: formData.ho_va_ten.trim(),
+        email: formData.email.trim() || undefined,
+        ngay_thang_nam_sinh: formData.ngay_thang_nam_sinh || undefined,
+        gioi_tinh: formData.gioi_tinh || undefined,
+        ma_hoi_vien: formData.ma_hoi_vien.trim() || undefined,
+        ma_clb: formData.ma_clb.trim() || undefined,
+        ma_don_vi: formData.ma_don_vi.trim() || undefined,
+        phone: formData.phone.trim() || undefined,
+        address: formData.address.trim() || undefined,
+        emergency_contact_name:
+          formData.emergency_contact_name.trim() || undefined,
+        emergency_contact_phone:
+          formData.emergency_contact_phone.trim() || undefined,
+        quyen_so: formData.quyen_so || undefined,
+        cap_dai_id: formData.cap_dai_id || undefined,
+        active_status: formData.active_status,
+      };
+
+      // Remove undefined values
+      Object.keys(cleanData).forEach((key) => {
+        if (
+          cleanData[key] === undefined ||
+          cleanData[key] === null ||
+          cleanData[key] === ""
+        ) {
+          delete cleanData[key];
+        }
+      });
+
       if (editingVoSinh) {
         // Update existing võ sinh
-        setVoSinh(
-          voSinh.map((voSinh) =>
-            voSinh.id === editingVoSinh.id
-              ? { ...voSinh, ...formData, updated_at: new Date().toISOString() }
-              : voSinh
-          )
+        const updateResponse = await usersApi.update(
+          editingVoSinh.id,
+          cleanData
         );
+        console.log("[UsersPage] Update response:", updateResponse);
+        alert("Cập nhật võ sinh thành công!");
       } else {
-        // Create new võ sinh
-        const newVoSinh = {
-          id: Math.max(...voSinh.map((v) => v.id)) + 1,
-          ...formData,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        };
-        setVoSinh([...voSinh, newVoSinh]);
+        // Create new võ sinh - email is required for create
+        if (!cleanData.email) {
+          alert("Email là bắt buộc khi tạo mới võ sinh!");
+          return;
+        }
+        const createResponse = await usersApi.create(cleanData);
+        console.log("[UsersPage] Create response:", createResponse);
+        alert("Tạo võ sinh mới thành công!");
       }
+
+      // Refresh data
+      await fetchVoSinh();
+
       setShowModal(false);
       setEditingVoSinh(null);
       resetForm();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Lỗi khi lưu võ sinh:", error);
-      alert("Lỗi khi lưu võ sinh. Vui lòng thử lại.");
+      let errorMessage = "Lỗi khi lưu võ sinh. Vui lòng thử lại.";
+
+      if (error?.response?.data) {
+        const errorData = error.response.data;
+        if (Array.isArray(errorData.message)) {
+          errorMessage = errorData.message.join(", ");
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        } else if (errorData.error) {
+          errorMessage = errorData.error;
+        }
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+
+      alert(errorMessage);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm("Bạn có chắc chắn muốn xóa võ sinh này?")) {
+      return;
+    }
+
+    try {
+      await usersApi.delete(id);
+      alert("Xóa võ sinh thành công!");
+
+      // Refresh data
+      await fetchVoSinh();
+    } catch (error: any) {
+      console.error("Lỗi khi xóa võ sinh:", error);
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Lỗi khi xóa võ sinh. Vui lòng thử lại.";
+      alert(errorMessage);
     }
   };
 
@@ -167,11 +260,6 @@ export default function UsersPage() {
 
   return (
     <div className="admin-page">
-      <div className="page-header">
-        <h2>Quản lý võ sinh</h2>
-        <p>Quản lý tất cả võ sinh trong hệ thống</p>
-      </div>
-
       {/* Filters and Actions */}
       <div className="card shadow mb-4">
         <div className="card-header py-3">
@@ -211,19 +299,6 @@ export default function UsersPage() {
                 />
               </div>
             </div>
-            <div className="col-md-3">
-              <select
-                className="form-select"
-                value={filterRole}
-                onChange={(e) =>
-                  setFilterRole(e.target.value as "all" | "admin" | "student")
-                }
-              >
-                <option value="all">Tất cả vai trò</option>
-                <option value="admin">Quản trị viên</option>
-                <option value="student">Học viên</option>
-              </select>
-            </div>
           </div>
 
           {/* Users Table */}
@@ -232,13 +307,15 @@ export default function UsersPage() {
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Tên</th>
-                  <th>Email</th>
-                  <th>Vai trò</th>
-                  <th>Mã học viên</th>
-                  <th>Số điện thoại</th>
-                  <th>Trạng thái</th>
-                  <th>Ngày tạo</th>
+                  <th>Họ và tên</th>
+                  <th>Ngày sinh</th>
+                  <th>Mã đơn vị</th>
+                  <th>Mã CLB</th>
+                  <th>Mã HV</th>
+                  <th>Cấp đai</th>
+                  <th>Quyền</th>
+                  <th>Ngày đăng ký</th>
+                  <th>SĐT</th>
                   <th>Thao tác</th>
                 </tr>
               </thead>
@@ -247,22 +324,70 @@ export default function UsersPage() {
                   <tr key={user.id}>
                     <td>{user.id}</td>
                     <td>{user.ho_va_ten}</td>
-                    <td>{user.email}</td>
                     <td>
-                      <span className="badge bg-primary">Võ sinh</span>
+                      {new Date(user.ngay_thang_nam_sinh).toLocaleDateString()}
                     </td>
-                    <td>{user.ma_hoi_vien || "-"}</td>
-                    <td>{user.phone || "-"}</td>
                     <td>
-                      <span
-                        className={`badge ${
-                          user.active_status ? "bg-success" : "bg-secondary"
-                        }`}
-                      >
-                        {user.active_status ? "Hoạt động" : "Không hoạt động"}
+                      {(() => {
+                        const maDonVi = user.ma_don_vi;
+                        // Xử lý các trường hợp: null, undefined, "null", "", hoặc string rỗng
+                        if (
+                          maDonVi &&
+                          typeof maDonVi === "string" &&
+                          maDonVi.trim() &&
+                          maDonVi.toLowerCase() !== "null"
+                        ) {
+                          return (
+                            <span className="badge bg-info">{maDonVi}</span>
+                          );
+                        }
+                        return <span className="text-muted">Chưa có</span>;
+                      })()}
+                    </td>
+                    <td>
+                      {(() => {
+                        const maClb = user.ma_clb;
+                        // Xử lý các trường hợp: null, undefined, "null", "", hoặc string rỗng
+                        if (
+                          maClb &&
+                          typeof maClb === "string" &&
+                          maClb.trim() &&
+                          maClb.toLowerCase() !== "null"
+                        ) {
+                          return (
+                            <span className="badge bg-warning">{maClb}</span>
+                          );
+                        }
+                        return <span className="text-muted">Chưa có</span>;
+                      })()}
+                    </td>
+                    <td>
+                      {user.ma_hoi_vien && user.ma_hoi_vien.trim() ? (
+                        <span className="badge bg-primary">
+                          {user.ma_hoi_vien}
+                        </span>
+                      ) : (
+                        <span className="text-muted">Chưa có</span>
+                      )}
+                    </td>
+                    <td>
+                      <span className="badge bg-success">
+                        {user.cap_dai_id ? `Đai ${user.cap_dai_id}` : "Chưa có"}
                       </span>
                     </td>
-                    <td>{new Date(user.created_at).toLocaleDateString()}</td>
+                    <td>
+                      <span className="badge bg-secondary">
+                        Quyền {user.quyen_so}
+                      </span>
+                    </td>
+                    <td>
+                      {user.created_at
+                        ? new Date(user.created_at).toLocaleDateString()
+                        : "Chưa có"}
+                    </td>
+                    <td>
+                      {user.phone && user.phone.trim() ? user.phone : "Chưa có"}
+                    </td>
                     <td>
                       <div className="btn-group" role="group">
                         <button
@@ -271,7 +396,10 @@ export default function UsersPage() {
                         >
                           <i className="fas fa-edit"></i>
                         </button>
-                        <button className="btn btn-sm btn-outline-danger">
+                        <button
+                          className="btn btn-sm btn-outline-danger"
+                          onClick={() => handleDelete(user.id)}
+                        >
                           <i className="fas fa-trash"></i>
                         </button>
                       </div>
@@ -352,6 +480,45 @@ export default function UsersPage() {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
+                        <label className="form-label">
+                          Ngày tháng năm sinh
+                        </label>
+                        <input
+                          type="date"
+                          className="form-control"
+                          value={formData.ngay_thang_nam_sinh}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              ngay_thang_nam_sinh: e.target.value,
+                            })
+                          }
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <label className="form-label">Giới tính</label>
+                        <select
+                          className="form-select"
+                          value={formData.gioi_tinh}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              gioi_tinh: e.target.value as "Nam" | "Nữ",
+                            })
+                          }
+                        >
+                          <option value="Nam">Nam</option>
+                          <option value="Nữ">Nữ</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-md-6">
+                      <div className="mb-3">
                         <label className="form-label">Mã hội viên</label>
                         <input
                           type="text"
@@ -384,14 +551,122 @@ export default function UsersPage() {
                       </div>
                     </div>
                   </div>
+                  <div className="row">
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <label className="form-label">Mã đơn vị</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={formData.ma_don_vi}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              ma_don_vi: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <label className="form-label">Quyền số</label>
+                        <input
+                          type="number"
+                          className="form-control"
+                          value={formData.quyen_so}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              quyen_so: parseInt(e.target.value) || 1,
+                            })
+                          }
+                          min="1"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <label className="form-label">Cấp đai ID</label>
+                        <input
+                          type="number"
+                          className="form-control"
+                          value={formData.cap_dai_id}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              cap_dai_id: parseInt(e.target.value) || 1,
+                            })
+                          }
+                          min="1"
+                        />
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <label className="form-label">Địa chỉ</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={formData.address}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              address: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <label className="form-label">Số điện thoại</label>
+                        <input
+                          type="tel"
+                          className="form-control"
+                          value={formData.phone}
+                          onChange={(e) =>
+                            setFormData({ ...formData, phone: e.target.value })
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <label className="form-label">
+                          Tên người liên hệ khẩn cấp
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={formData.emergency_contact_name}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              emergency_contact_name: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
                   <div className="mb-3">
-                    <label className="form-label">Số điện thoại</label>
+                    <label className="form-label">
+                      Số điện thoại liên hệ khẩn cấp
+                    </label>
                     <input
                       type="tel"
                       className="form-control"
-                      value={formData.phone}
+                      value={formData.emergency_contact_phone}
                       onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value })
+                        setFormData({
+                          ...formData,
+                          emergency_contact_phone: e.target.value,
+                        })
                       }
                     />
                   </div>

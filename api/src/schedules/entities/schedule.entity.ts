@@ -7,7 +7,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Course } from '../../courses/entities/course.entity';
+import { Club } from '../../clubs/entities/club.entity';
+import { Branch } from '../../branches/entities/branch.entity';
 
 @Entity('lich_hoc')
 export class Schedule {
@@ -15,28 +16,13 @@ export class Schedule {
   id: number;
 
   @Column({ nullable: true })
-  course_id: number;
+  club_id: number;
 
-  @Column({
-    type: 'enum',
-    enum: [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday',
-    ],
-  })
-  day_of_week:
-    | 'Monday'
-    | 'Tuesday'
-    | 'Wednesday'
-    | 'Thursday'
-    | 'Friday'
-    | 'Saturday'
-    | 'Sunday';
+  @Column({ nullable: true })
+  branch_id: number;
+
+  @Column({ type: 'varchar', length: 255 })
+  day_of_week: string;
 
   @Column({ type: 'time', nullable: true })
   start_time: string;
@@ -54,7 +40,11 @@ export class Schedule {
   updated_at: Date;
 
   // Relations
-  @ManyToOne(() => Course, (course) => course.schedules)
-  @JoinColumn({ name: 'course_id' })
-  course: Course;
+  @ManyToOne(() => Club)
+  @JoinColumn({ name: 'club_id' })
+  club: Club;
+
+  @ManyToOne(() => Branch)
+  @JoinColumn({ name: 'branch_id' })
+  branch: Branch;
 }

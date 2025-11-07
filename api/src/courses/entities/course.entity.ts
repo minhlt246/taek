@@ -12,7 +12,7 @@ import { Club } from '../../clubs/entities/club.entity';
 import { Branch } from '../../branches/entities/branch.entity';
 import { Coach } from '../../coaches/entities/coach.entity';
 import { Enrollment } from '../../enrollments/entities/enrollment.entity';
-import { Schedule } from '../../schedules/entities/schedule.entity';
+// import { Schedule } from '../../schedules/entities/schedule.entity'; // Removed - schedules now reference club/branch
 import { Attendance } from '../../attendance/entities/attendance.entity';
 import { StudentEvaluation } from '../../student-evaluations/entities/student-evaluation.entity';
 import { Feedback } from '../../feedbacks/entities/feedback.entity';
@@ -64,6 +64,21 @@ export class Course {
   @Column({ default: 0 })
   current_students: number;
 
+  @Column({ nullable: true })
+  max_students: number;
+
+  @Column({ nullable: true })
+  price: number;
+
+  @Column({ length: 255, nullable: true })
+  instructor_name: string;
+
+  @Column({ length: 100, nullable: true })
+  training_time: string; // Giờ tập (ví dụ: "18:00-19:30")
+
+  @Column({ length: 255, nullable: true })
+  training_days: string; // Buổi tập (ví dụ: "Thứ 2, 4, 6" hoặc "Monday, Wednesday, Friday")
+
   @Column({ length: 255, nullable: true })
   image_url: string;
 
@@ -92,8 +107,9 @@ export class Course {
   @OneToMany(() => Enrollment, (enrollment) => enrollment.course)
   enrollments: Enrollment[];
 
-  @OneToMany(() => Schedule, (schedule) => schedule.course)
-  schedules: Schedule[];
+  // Schedule relation removed - schedules now reference club/branch instead of course
+  // @OneToMany(() => Schedule, (schedule) => schedule.course)
+  // schedules: Schedule[];
 
   @OneToMany(() => Attendance, (attendance) => attendance.course)
   attendance: Attendance[];

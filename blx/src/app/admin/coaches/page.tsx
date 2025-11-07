@@ -2,22 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useAccountStore } from "@/stores/account";
-import { coachesApi, clubsApi } from "@/services/adminApi";
+import { coachesApi, CoachResponse } from "@/services/api/coaches";
+import { clubsApi } from "@/services/api/clubs";
+import http from "@/services/http";
 
-interface Coach {
-  id: number;
-  coach_code: string;
-  name: string;
-  email?: string;
-  phone?: string;
-  role: "head_coach" | "main_manager" | "assistant_manager" | "assistant";
-  experience_years?: number;
-  specialization?: string;
-  is_active: boolean;
-  created_at: string;
-  club_id?: number;
-  club_name?: string;
-}
+// Sử dụng CoachResponse từ API service thay vì interface local
+type Coach = CoachResponse;
 
 export default function CoachesPage() {
   const { account } = useAccountStore();
@@ -37,33 +27,63 @@ export default function CoachesPage() {
       | "main_manager"
       | "assistant_manager"
       | "assistant",
+    belt_level_id: 0,
     experience_years: 0,
-    specialization: "Taekwondo",
+    specialization: "",
+    bio: "",
     is_active: true,
     club_id: 0,
+    branch_id: 0,
   });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        // Tạm thời chỉ load clubs vì coaches endpoint chưa có
-        const clubsData = await clubsApi.getAll();
-        setClubs(clubsData);
+  /**
+   * Fetch coaches and clubs data from API
+   * Lấy dữ liệu raw từ backend để có đầy đủ relations (club, belt_level)
+   */
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // Load clubs và coaches data
+      // Gọi API trực tiếp để lấy raw data với đầy đủ relations
+      const [clubsData, coachesResponse] = await Promise.all([
+        clubsApi.getAll(),
+        http.get<CoachResponse[]>("/coaches"),
+      ]);
 
-        // TODO: Khi có coaches endpoint, uncomment dòng dưới
-        // const coachesData = await coachesApi.getAll();
-        // setCoaches(coachesData);
-        setCoaches([]);
-      } catch (error) {
-        console.error("Lỗi khi tải dữ liệu:", error);
-        setCoaches([]);
-        setClubs([]);
-      } finally {
-        setLoading(false);
+      setClubs(Array.isArray(clubsData) ? clubsData : []);
+
+      // Backend trả về array trực tiếp
+      const coachesData: CoachResponse[] = Array.isArray(coachesResponse.data)
+        ? coachesResponse.data
+        : [];
+
+      // Debug: Log dữ liệu để kiểm tra
+      console.log("[CoachesPage] Raw coaches data:", coachesData);
+      if (coachesData.length > 0) {
+        const firstCoach = coachesData[0];
+        console.log(
+          "[CoachesPage] First coach sample - ALL FIELDS:",
+          firstCoach
+        );
+        console.log("[CoachesPage] First coach - name field:", {
+          name: firstCoach.name,
+          full_name: (firstCoach as any).full_name,
+          username: (firstCoach as any).username,
+          allKeys: Object.keys(firstCoach),
+        });
       }
-    };
 
+      setCoaches(coachesData);
+    } catch (error) {
+      console.error("Lỗi khi tải dữ liệu:", error);
+      setCoaches([]);
+      setClubs([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -73,8 +93,8 @@ export default function CoachesPage() {
       coach.coach_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (coach.email &&
         coach.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (coach.club_name &&
-        coach.club_name.toLowerCase().includes(searchTerm.toLowerCase()));
+      (coach.club?.name &&
+        coach.club.name.toLowerCase().includes(searchTerm.toLowerCase()));
     return matchesSearch;
   });
 
@@ -111,15 +131,18 @@ export default function CoachesPage() {
   const handleEdit = (coach: Coach) => {
     setEditingCoach(coach);
     setFormData({
-      coach_code: coach.coach_code,
+      coach_code: coach.coach_code || "",
       name: coach.name,
       email: coach.email || "",
       phone: coach.phone || "",
-      role: coach.role,
+      role: coach.role || "assistant",
+      belt_level_id: coach.belt_level_id || 0,
       experience_years: coach.experience_years || 0,
       specialization: coach.specialization || "",
-      is_active: coach.is_active,
+      bio: coach.bio || "",
+      is_active: coach.is_active !== false, // Mặc định true nếu undefined
       club_id: coach.club_id || 0,
+      branch_id: coach.branch_id || 0,
     });
     setShowModal(true);
   };
@@ -127,23 +150,101 @@ export default function CoachesPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Clean up form data: remove empty strings and convert 0 to undefined for optional fields
+      const cleanData: any = {
+        name: formData.name.trim(),
+        coach_code: formData.coach_code.trim() || undefined,
+        email: formData.email.trim() || undefined,
+        phone: formData.phone.trim() || undefined,
+        role: formData.role || undefined,
+        belt_level_id: formData.belt_level_id || undefined,
+        experience_years: formData.experience_years || undefined,
+        specialization: formData.specialization.trim() || undefined,
+        bio: formData.bio.trim() || undefined,
+        club_id: formData.club_id || undefined,
+        branch_id: formData.branch_id || undefined,
+        is_active: formData.is_active,
+      };
+
+      // Remove undefined, null, empty string, or 0 values for optional number fields
+      Object.keys(cleanData).forEach((key) => {
+        if (
+          cleanData[key] === undefined ||
+          cleanData[key] === null ||
+          cleanData[key] === ""
+        ) {
+          delete cleanData[key];
+        }
+        // Remove 0 values for optional number fields
+        if (
+          (key === "belt_level_id" ||
+            key === "club_id" ||
+            key === "branch_id" ||
+            key === "experience_years") &&
+          cleanData[key] === 0
+        ) {
+          delete cleanData[key];
+        }
+      });
+
       if (editingCoach) {
-        await coachesApi.update(editingCoach.id, formData);
-        const updatedCoaches = await coachesApi.getAll();
-        setCoaches(updatedCoaches);
+        const updateResponse = await coachesApi.update(
+          editingCoach.id,
+          cleanData
+        );
+        console.log("[CoachesPage] Update response:", updateResponse);
         alert("Cập nhật huấn luyện viên thành công!");
       } else {
-        await coachesApi.create(formData);
-        const updatedCoaches = await coachesApi.getAll();
-        setCoaches(updatedCoaches);
+        const createResponse = await coachesApi.create(cleanData);
+        console.log("[CoachesPage] Create response:", createResponse);
         alert("Tạo huấn luyện viên mới thành công!");
       }
+
+      // Refresh data
+      await fetchData();
+
       setShowModal(false);
       setEditingCoach(null);
       resetForm();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Lỗi khi lưu huấn luyện viên:", error);
-      alert("Lỗi khi lưu huấn luyện viên. Vui lòng thử lại.");
+      let errorMessage = "Lỗi khi lưu huấn luyện viên. Vui lòng thử lại.";
+
+      if (error?.response?.data) {
+        const errorData = error.response.data;
+        if (Array.isArray(errorData.message)) {
+          errorMessage = errorData.message.join(", ");
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        } else if (errorData.error) {
+          errorMessage = errorData.error;
+        }
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+
+      alert(errorMessage);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm("Bạn có chắc chắn muốn xóa huấn luyện viên này?")) {
+      return;
+    }
+
+    try {
+      await coachesApi.delete(id);
+      alert("Xóa huấn luyện viên thành công!");
+
+      // Refresh data
+      await fetchData();
+    } catch (error: any) {
+      console.error("Lỗi khi xóa huấn luyện viên:", error);
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Lỗi khi xóa huấn luyện viên. Vui lòng thử lại.";
+      alert(errorMessage);
     }
   };
 
@@ -154,10 +255,13 @@ export default function CoachesPage() {
       email: "",
       phone: "",
       role: "assistant",
+      belt_level_id: 0,
       experience_years: 0,
-      specialization: "Taekwondo",
+      specialization: "",
+      bio: "",
       is_active: true,
       club_id: 0,
+      branch_id: 0,
     });
     setEditingCoach(null);
   };
@@ -177,11 +281,6 @@ export default function CoachesPage() {
 
   return (
     <div className="admin-page">
-      <div className="page-header">
-        <h2>Quản lý huấn luyện viên</h2>
-        <p>Quản lý tất cả huấn luyện viên và giảng viên</p>
-      </div>
-
       {/* Filters and Actions */}
       <div className="card shadow mb-4">
         <div className="card-header py-3">
@@ -235,62 +334,107 @@ export default function CoachesPage() {
                   <th>Số điện thoại</th>
                   <th>CLB</th>
                   <th>Vai trò</th>
-                  <th>Kinh nghiệm</th>
-                  <th>Chuyên môn</th>
+                  <th>Cấp đai</th>
                   <th>Trạng thái</th>
                   <th>Thao tác</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredCoaches.map((coach) => (
-                  <tr key={coach.id}>
-                    <td>{coach.id}</td>
-                    <td>{coach.coach_code}</td>
-                    <td>{coach.name}</td>
-                    <td>{coach.email || "-"}</td>
-                    <td>{coach.phone || "-"}</td>
-                    <td>
-                      <span className="badge bg-info">
-                        {coach.club_name || "Chưa phân công"}
-                      </span>
-                    </td>
-                    <td>
-                      <span
-                        className={`badge ${getRoleBadgeClass(coach.role)}`}
-                      >
-                        {getRoleDisplayName(coach.role)}
-                      </span>
-                    </td>
-                    <td>
-                      {coach.experience_years
-                        ? `${coach.experience_years} năm`
-                        : "-"}
-                    </td>
-                    <td>{coach.specialization || "-"}</td>
-                    <td>
-                      <span
-                        className={`badge ${
-                          coach.is_active ? "bg-success" : "bg-secondary"
-                        }`}
-                      >
-                        {coach.is_active ? "Hoạt động" : "Không hoạt động"}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="btn-group" role="group">
-                        <button
-                          className="btn btn-sm btn-outline-primary"
-                          onClick={() => handleEdit(coach)}
+                {filteredCoaches.map((coach) => {
+                  // Debug: Log từng coach để kiểm tra
+                  if (process.env.NODE_ENV === "development") {
+                    console.log("[CoachesPage] Rendering coach:", {
+                      id: coach.id,
+                      name: coach.name,
+                      coach_code: coach.coach_code,
+                      club: coach.club,
+                      belt_level: coach.belt_level,
+                    });
+                  }
+
+                  return (
+                    <tr key={coach.id}>
+                      <td>{coach.id}</td>
+                      <td>
+                        {coach.coach_code && coach.coach_code.trim() ? (
+                          <span className="badge bg-secondary">
+                            {coach.coach_code}
+                          </span>
+                        ) : (
+                          <span className="text-muted">-</span>
+                        )}
+                      </td>
+                      <td>
+                        <strong>
+                          {coach.name ||
+                            (coach as any).full_name ||
+                            (coach as any).username ||
+                            `HLV #${coach.id}`}
+                        </strong>
+                      </td>
+                      <td>{coach.email || "-"}</td>
+                      <td>{coach.phone || "-"}</td>
+                      <td>
+                        {coach.club && coach.club.name ? (
+                          <span className="badge bg-info">
+                            {coach.club.name}
+                          </span>
+                        ) : (
+                          <span className="badge bg-secondary">
+                            Chưa phân công
+                          </span>
+                        )}
+                      </td>
+                      <td>
+                        <span
+                          className={`badge ${getRoleBadgeClass(
+                            coach.role || "assistant"
+                          )}`}
                         >
-                          <i className="fas fa-edit"></i>
-                        </button>
-                        <button className="btn btn-sm btn-outline-danger">
-                          <i className="fas fa-trash"></i>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                          {getRoleDisplayName(coach.role || "assistant")}
+                        </span>
+                      </td>
+                      <td>
+                        {coach.belt_level && coach.belt_level.name ? (
+                          <span className="badge bg-primary">
+                            {coach.belt_level.name}
+                          </span>
+                        ) : (
+                          <span className="badge bg-danger">Chưa có</span>
+                        )}
+                      </td>
+                      <td>
+                        <span
+                          className={`badge ${
+                            coach.is_active !== false
+                              ? "bg-success"
+                              : "bg-warning"
+                          }`}
+                        >
+                          {coach.is_active !== false
+                            ? "Hoạt động"
+                            : "Không hoạt động"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="btn-group" role="group">
+                          <button
+                            className="btn btn-sm btn-outline-primary"
+                            onClick={() => handleEdit(coach)}
+                          >
+                            <i className="fas fa-edit"></i>
+                          </button>
+                          <button
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={() => handleDelete(coach.id)}
+                          >
+                            <i className="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -419,6 +563,25 @@ export default function CoachesPage() {
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
+                        <label className="form-label">Cấp đai ID</label>
+                        <input
+                          type="number"
+                          className="form-control"
+                          value={formData.belt_level_id}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              belt_level_id: parseInt(e.target.value) || 0,
+                            })
+                          }
+                          min="0"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-md-6">
+                      <div className="mb-3">
                         <label className="form-label">Kinh nghiệm (năm)</label>
                         <input
                           type="number"
@@ -434,15 +597,37 @@ export default function CoachesPage() {
                         />
                       </div>
                     </div>
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <label className="form-label">Chuyên môn</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={formData.specialization}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              specialization: e.target.value,
+                            })
+                          }
+                          placeholder="VD: Taekwondo, Karate..."
+                        />
+                      </div>
+                    </div>
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Chuyên môn</label>
-                    <input
-                      type="text"
+                    <label className="form-label">Tiểu sử</label>
+                    <textarea
                       className="form-control"
-                      value="Taekwondo"
-                      disabled
-                      style={{ backgroundColor: "#f8f9fa" }}
+                      rows={3}
+                      value={formData.bio}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          bio: e.target.value,
+                        })
+                      }
+                      placeholder="Mô tả về huấn luyện viên..."
                     />
                   </div>
                   <div className="mb-3">

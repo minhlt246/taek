@@ -22,46 +22,65 @@ export class StudentEvaluationsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() input: CreateStudentEvaluationDto) {
-    return this.studentEvaluationsService.create(input);
+  async create(@Body() input: CreateStudentEvaluationDto) {
+    const evaluation = await this.studentEvaluationsService.create(input);
+    return {
+      success: true,
+      message: 'Student evaluation created successfully',
+      data: evaluation,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.studentEvaluationsService.findAll();
+  async findAll() {
+    const evaluations = await this.studentEvaluationsService.findAll();
+    return evaluations; // Return array directly for frontend compatibility
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.studentEvaluationsService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const evaluation = await this.studentEvaluationsService.findOne(id);
+    return evaluation; // Return object directly for frontend compatibility
   }
 
   @Get('user/:user_id')
-  findByUser(@Param('user_id', ParseIntPipe) user_id: number) {
-    return this.studentEvaluationsService.findByUser(user_id);
+  async findByUser(@Param('user_id', ParseIntPipe) user_id: number) {
+    const evaluations = await this.studentEvaluationsService.findByUser(user_id);
+    return evaluations; // Return array directly for frontend compatibility
   }
 
   @Get('coach/:coach_id')
-  findByCoach(@Param('coach_id', ParseIntPipe) coach_id: number) {
-    return this.studentEvaluationsService.findByCoach(coach_id);
+  async findByCoach(@Param('coach_id', ParseIntPipe) coach_id: number) {
+    const evaluations = await this.studentEvaluationsService.findByCoach(coach_id);
+    return evaluations; // Return array directly for frontend compatibility
   }
 
   @Get('course/:course_id')
-  findByCourse(@Param('course_id', ParseIntPipe) course_id: number) {
-    return this.studentEvaluationsService.findByCourse(course_id);
+  async findByCourse(@Param('course_id', ParseIntPipe) course_id: number) {
+    const evaluations = await this.studentEvaluationsService.findByCourse(course_id);
+    return evaluations; // Return array directly for frontend compatibility
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() input: UpdateStudentEvaluationDto,
   ) {
-    return this.studentEvaluationsService.update(id, input);
+    const evaluation = await this.studentEvaluationsService.update(id, input);
+    return {
+      success: true,
+      message: 'Student evaluation updated successfully',
+      data: evaluation,
+    };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.studentEvaluationsService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.studentEvaluationsService.remove(id);
+    return {
+      success: true,
+      message: 'Student evaluation deleted successfully',
+    };
   }
 }

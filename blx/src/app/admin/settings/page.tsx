@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { settingsApi } from "@/services/adminApi";
+import { settingsApi } from "@/services/api/settings";
 
 interface SystemSettings {
   general: {
@@ -38,7 +38,7 @@ interface SystemSettings {
 export default function SettingsPage() {
   const [settings, setSettings] = useState<SystemSettings>({
     general: {
-      siteName: "Taekwondo Club Management",
+      siteName: "Taekwondo Đồng Phú Management",
       siteDescription: "Professional Taekwondo club management system",
       adminEmail: "admin@taekwondo.com",
       timezone: "Asia/Ho_Chi_Minh",
@@ -173,8 +173,7 @@ export default function SettingsPage() {
 
   return (
     <div className="settings-page">
-      <div className="page-header">
-        <h2>Cài đặt hệ thống</h2>
+      <div>
         <div className="btn-group">
           <button
             className="btn btn-primary"

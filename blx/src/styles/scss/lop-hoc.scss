@@ -1,0 +1,1285 @@
+@use "./breakpoint" as breakpoint;
+
+.lop-hoc-page {
+  .intro-section {
+    padding: 3rem 0 2rem;
+    background: #fafbfc;
+
+    @include breakpoint.sm {
+      padding: 2rem 0 1.5rem;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 0;
+
+      .intro-section-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1f2020;
+        margin-bottom: 0.75rem;
+
+        @include breakpoint.md {
+          font-size: 1.75rem;
+        }
+
+        @include breakpoint.sm {
+          font-size: 1.5rem;
+        }
+      }
+
+      .intro-section-description {
+        font-size: 0.875rem;
+        color: #707070;
+        max-width: 700px;
+        margin: 0 auto;
+      }
+    }
+  }
+
+  .section-subtitle {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1f2020;
+    text-align: center;
+    margin-bottom: 2.5rem;
+
+    @include breakpoint.md {
+      font-size: 1.5rem;
+    }
+
+    @include breakpoint.sm {
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+    }
+  }
+
+  .training-programs-section {
+    padding: 3rem 0;
+    background: #ffffff;
+
+    @include breakpoint.sm {
+      padding: 2rem 0;
+    }
+
+    .program-card {
+      text-align: center;
+      padding: 2rem 1.5rem;
+      background: #fafbfc;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      height: 100%;
+
+      @include breakpoint.sm {
+        padding: 1.5rem 1rem;
+        margin-bottom: 1rem;
+      }
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        background: #ffffff;
+      }
+
+      .program-icon {
+        width: 60px;
+        height: 60px;
+        background: #e41f07;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        color: #ffffff;
+        font-size: 1.5rem;
+      }
+
+      .program-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2020;
+        margin-bottom: 0.75rem;
+      }
+
+      .program-description {
+        font-size: 0.875rem;
+        color: #707070;
+        line-height: 1.6;
+        margin: 0;
+      }
+    }
+  }
+
+  .benefits-section {
+    padding: 3rem 0;
+    background: #fafbfc;
+
+    @include breakpoint.sm {
+      padding: 2rem 0;
+    }
+
+    .benefit-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      height: 100%;
+
+      @include breakpoint.sm {
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+      }
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .benefit-icon {
+        width: 70px;
+        height: 70px;
+        background: rgba(228, 31, 7, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: #e41f07;
+        font-size: 2rem;
+      }
+
+      .benefit-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2020;
+        margin-bottom: 0.75rem;
+      }
+
+      .benefit-description {
+        font-size: 0.875rem;
+        color: #707070;
+        line-height: 1.6;
+        margin: 0;
+      }
+    }
+  }
+
+  .courses-section {
+    padding: 3rem 0;
+    background: #ffffff;
+
+    @include breakpoint.sm {
+      padding: 2rem 0;
+    }
+
+    .course-card {
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      margin-bottom: 2rem;
+      height: 100%;
+      border: 1px solid #e8e8e8;
+      display: flex;
+      flex-direction: column;
+
+      @include breakpoint.sm {
+        margin-bottom: 1.5rem;
+      }
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .course-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+
+        @include breakpoint.sm {
+          height: 180px;
+        }
+      }
+
+      .course-image-placeholder {
+        width: 100%;
+        height: 200px;
+        background: linear-gradient(135deg, #fafbfc 0%, #f0f0f0 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #e41f07;
+        font-size: 3rem;
+
+        @include breakpoint.sm {
+          height: 180px;
+          font-size: 2.5rem;
+        }
+      }
+
+      .course-content {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+
+        @include breakpoint.sm {
+          padding: 1.25rem;
+        }
+
+        .course-level {
+          margin-bottom: 0.75rem;
+
+          .level-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: #e41f07;
+            color: #ffffff;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+          }
+        }
+
+        .course-title {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: #1f2020;
+          margin-bottom: 0.75rem;
+          line-height: 1.3;
+
+          @include breakpoint.sm {
+            font-size: 1.125rem;
+          }
+        }
+
+        .course-description {
+          font-size: 0.875rem;
+          line-height: 1.5;
+          color: #707070;
+          margin-bottom: 1rem;
+          flex: 1;
+        }
+
+        .course-info {
+          margin-bottom: 1rem;
+          padding: 0.875rem;
+          background: #fafbfc;
+          border-radius: 8px;
+
+          .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.8125rem;
+            color: #707070;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            i {
+              color: #e41f07;
+              margin-right: 0.5rem;
+              width: 18px;
+              font-size: 1rem;
+            }
+
+            span {
+              flex: 1;
+            }
+          }
+        }
+
+        .course-btn {
+          width: 100%;
+          padding: 0.625rem;
+          font-weight: 600;
+          font-size: 0.875rem;
+          border-radius: 8px;
+          margin-top: auto;
+        }
+      }
+    }
+  }
+
+  .detailed-courses-section {
+    padding: 3rem 0;
+    background: #fafbfc;
+
+    @include breakpoint.sm {
+      padding: 2rem 0;
+    }
+
+    .course-tabs {
+      max-width: 900px;
+      margin: 0 auto;
+
+      .tab-buttons {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        justify-content: center;
+
+        @include breakpoint.sm {
+          gap: 0.25rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .tab-button {
+          padding: 0.75rem 1.5rem;
+          background: #ffffff;
+          border: 2px solid #e8e8e8;
+          border-radius: 8px;
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: #707070;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          @include breakpoint.sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.8125rem;
+          }
+
+          &:hover {
+            border-color: #e41f07;
+            color: #e41f07;
+          }
+
+          &.active {
+            background: #e41f07;
+            border-color: #e41f07;
+            color: #ffffff;
+          }
+        }
+      }
+
+      .tab-content {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+
+        @include breakpoint.sm {
+          padding: 1.5rem;
+        }
+
+        .course-detail {
+          .course-detail-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2020;
+            margin-bottom: 1rem;
+
+            @include breakpoint.sm {
+              font-size: 1.25rem;
+            }
+          }
+
+          .course-detail-description {
+            font-size: 0.875rem;
+            color: #707070;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+          }
+
+          .detail-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+
+            @include breakpoint.sm {
+              grid-template-columns: 1fr;
+            }
+
+            .detail-item {
+              padding: 1rem;
+              background: #fafbfc;
+              border-radius: 8px;
+              font-size: 0.875rem;
+
+              strong {
+                color: #1f2020;
+                display: block;
+                margin-bottom: 0.25rem;
+              }
+
+              span {
+                color: #707070;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .branches-section {
+    padding: 3rem 0;
+    background: #fafbfc;
+
+    @include breakpoint.sm {
+      padding: 2rem 0;
+    }
+
+    .branch-card {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+      overflow: hidden;
+      border: 1px solid #e8e8e8;
+      height: 100%;
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      }
+
+      .branch-header {
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #e41f07 0%, #c41a06 100%);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+
+        @include breakpoint.sm {
+          padding: 1.25rem;
+        }
+
+        .branch-title-wrapper {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          flex: 1;
+
+          i {
+            font-size: 1.5rem;
+            color: #ffffff;
+          }
+
+          .branch-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0;
+
+            @include breakpoint.sm {
+              font-size: 1.125rem;
+            }
+          }
+        }
+
+        .badge {
+          padding: 0.5rem 1rem;
+          font-size: 0.75rem;
+          font-weight: 600;
+          border-radius: 20px;
+        }
+      }
+
+      &.main-branch {
+        .branch-header {
+          background: linear-gradient(135deg, #1f2020 0%, #3a3a3a 100%);
+          padding: 1.5rem;
+
+          @include breakpoint.sm {
+            padding: 1.25rem;
+          }
+
+          .branch-title-wrapper {
+            i {
+              font-size: 1.5rem;
+
+              @include breakpoint.sm {
+                font-size: 1.25rem;
+              }
+            }
+
+            .branch-title {
+              font-size: 1.25rem;
+
+              @include breakpoint.sm {
+                font-size: 1.125rem;
+              }
+            }
+          }
+        }
+
+        .branch-body {
+          padding: 1.5rem;
+
+          @include breakpoint.sm {
+            padding: 1.25rem;
+          }
+
+          .branch-stats {
+            padding: 1.25rem;
+            gap: 1.5rem;
+
+            @include breakpoint.sm {
+              padding: 1rem;
+              gap: 1rem;
+            }
+
+            .stat-item {
+              .stat-value {
+                font-size: 1.75rem;
+
+                @include breakpoint.sm {
+                  font-size: 1.5rem;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .branch-body {
+        padding: 2rem;
+
+        @include breakpoint.sm {
+          padding: 1.5rem;
+        }
+
+        .branch-description {
+          font-size: 0.9375rem;
+          line-height: 1.6;
+          color: #707070;
+          margin-bottom: 1.5rem;
+        }
+
+        .branch-details {
+          margin-bottom: 1.5rem;
+
+          .branch-detail-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            font-size: 0.875rem;
+            color: #707070;
+            border-bottom: 1px solid #f0f0f0;
+
+            &:last-child {
+              border-bottom: none;
+            }
+
+            i {
+              color: #e41f07;
+              font-size: 1.125rem;
+              margin-top: 0.125rem;
+              min-width: 20px;
+            }
+
+            span {
+              flex: 1;
+              line-height: 1.5;
+            }
+          }
+        }
+
+        .branch-stats {
+          display: flex;
+          gap: 2rem;
+          padding: 1.5rem;
+          background: linear-gradient(135deg, #fafbfc 0%, #f0f0f0 100%);
+          border-radius: 12px;
+          margin-top: 1.5rem;
+
+          @include breakpoint.sm {
+            gap: 1.5rem;
+            padding: 1.25rem;
+          }
+
+          .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+
+            .stat-value {
+              font-size: 2rem;
+              font-weight: 700;
+              color: #e41f07;
+              line-height: 1;
+              margin-bottom: 0.5rem;
+
+              @include breakpoint.sm {
+                font-size: 1.75rem;
+              }
+            }
+
+            .stat-label {
+              font-size: 0.875rem;
+              color: #707070;
+              font-weight: 500;
+            }
+          }
+        }
+
+        .btn {
+          border-radius: 8px;
+          font-weight: 600;
+          padding: 0.625rem 1.25rem;
+          transition: all 0.3s ease;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(228, 31, 7, 0.2);
+          }
+        }
+      }
+    }
+  }
+
+  .faq-section {
+    padding: 3rem 0;
+    background: #ffffff;
+
+    @include breakpoint.sm {
+      padding: 2rem 0;
+    }
+  }
+}
+
+// Course Detail Page Styles
+.course-detail-page {
+  .course-detail-section {
+    padding: 3rem 0;
+    background: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+
+    @include breakpoint.sm {
+      padding: 2rem 0;
+    }
+
+    .course-detail-card {
+      background: #ffffff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e8e8e8;
+      transition: all 0.3s ease;
+
+      &:hover {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+      }
+
+      .course-detail-image {
+        width: 100%;
+        height: 450px;
+        object-fit: cover;
+        position: relative;
+
+        @include breakpoint.md {
+          height: 400px;
+        }
+
+        @include breakpoint.sm {
+          height: 300px;
+        }
+
+        &::after {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 100px;
+          background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+        }
+      }
+
+      .course-detail-image-placeholder {
+        width: 100%;
+        height: 450px;
+        background: linear-gradient(135deg, #e41f07 0%, #c41a06 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        font-size: 5rem;
+        position: relative;
+
+        @include breakpoint.md {
+          height: 400px;
+          font-size: 4.5rem;
+        }
+
+        @include breakpoint.sm {
+          height: 300px;
+          font-size: 4rem;
+        }
+
+        &::after {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 100px;
+          background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+        }
+      }
+
+      .course-detail-content {
+        padding: 3rem;
+
+        @include breakpoint.md {
+          padding: 2.5rem;
+        }
+
+        @include breakpoint.sm {
+          padding: 2rem 1.5rem;
+        }
+
+        .course-detail-header {
+          margin-bottom: 2.5rem;
+          padding-bottom: 2rem;
+          border-bottom: 2px solid #f0f0f0;
+
+          .course-level-badge {
+            margin-bottom: 1rem;
+
+            .level-badge {
+              display: inline-block;
+              padding: 0.5rem 1.25rem;
+              background: linear-gradient(135deg, #e41f07 0%, #c41a06 100%);
+              color: #ffffff;
+              border-radius: 20px;
+              font-size: 0.875rem;
+              font-weight: 700;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              box-shadow: 0 2px 8px rgba(228, 31, 7, 0.3);
+            }
+          }
+
+          .course-detail-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1f2020;
+            margin-bottom: 1.25rem;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+
+            @include breakpoint.md {
+              font-size: 2rem;
+            }
+
+            @include breakpoint.sm {
+              font-size: 1.75rem;
+            }
+          }
+
+          .course-detail-description {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: #707070;
+            margin: 0;
+
+            @include breakpoint.sm {
+              font-size: 1rem;
+            }
+          }
+        }
+
+        .course-detail-info {
+          margin-bottom: 2.5rem;
+
+          .info-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
+            margin-bottom: 1.25rem;
+
+            @include breakpoint.sm {
+              grid-template-columns: 1fr;
+              gap: 1rem;
+            }
+
+            .info-col {
+              .info-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 1.25rem;
+                padding: 1.5rem;
+                background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+                border-radius: 16px;
+                border: 2px solid #f0f0f0;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+
+                &::before {
+                  content: "";
+                  position: absolute;
+                  top: 0;
+                  left: 0;
+                  width: 5px;
+                  height: 100%;
+                  background: linear-gradient(180deg, #e41f07 0%, #c41a06 100%);
+                  transition: width 0.3s ease;
+                }
+
+                &:hover {
+                  background: #ffffff;
+                  box-shadow: 0 4px 16px rgba(228, 31, 7, 0.15);
+                  border-color: #e41f07;
+                  transform: translateY(-2px);
+
+                  &::before {
+                    width: 100%;
+                    opacity: 0.05;
+                  }
+                }
+
+                i {
+                  color: #ffffff;
+                  font-size: 1.75rem;
+                  width: 56px;
+                  height: 56px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  background: linear-gradient(135deg, #e41f07 0%, #c41a06 100%);
+                  border-radius: 14px;
+                  flex-shrink: 0;
+                  box-shadow: 0 4px 12px rgba(228, 31, 7, 0.3);
+                }
+
+                div {
+                  flex: 1;
+                  position: relative;
+                  z-index: 1;
+
+                  strong {
+                    display: block;
+                    font-size: 0.8125rem;
+                    font-weight: 700;
+                    color: #707070;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    margin-bottom: 0.75rem;
+                  }
+
+                  span {
+                    display: block;
+                    font-size: 1.125rem;
+                    font-weight: 600;
+                    color: #1f2020;
+                    line-height: 1.4;
+                  }
+                }
+              }
+            }
+          }
+
+          .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.25rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+            border-radius: 16px;
+            border: 2px solid #f0f0f0;
+            margin-bottom: 1.25rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+
+            &::before {
+              content: "";
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 5px;
+              height: 100%;
+              background: linear-gradient(180deg, #e41f07 0%, #c41a06 100%);
+              transition: width 0.3s ease;
+            }
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            &:hover {
+              background: #ffffff;
+              box-shadow: 0 4px 16px rgba(228, 31, 7, 0.15);
+              border-color: #e41f07;
+              transform: translateY(-2px);
+
+              &::before {
+                width: 100%;
+                opacity: 0.05;
+              }
+            }
+
+            i {
+              color: #ffffff;
+              font-size: 1.75rem;
+              width: 56px;
+              height: 56px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background: linear-gradient(135deg, #e41f07 0%, #c41a06 100%);
+              border-radius: 14px;
+              flex-shrink: 0;
+              box-shadow: 0 4px 12px rgba(228, 31, 7, 0.3);
+            }
+
+            div {
+              flex: 1;
+              position: relative;
+              z-index: 1;
+
+              strong {
+                display: block;
+                font-size: 0.8125rem;
+                font-weight: 700;
+                color: #707070;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 0.75rem;
+              }
+
+              span {
+                display: block;
+                font-size: 1.125rem;
+                font-weight: 600;
+                color: #1f2020;
+                line-height: 1.4;
+
+                .badge {
+                  display: inline-block;
+                  margin-left: 0.75rem;
+                  padding: 0.375rem 0.875rem;
+                  font-size: 0.75rem;
+                  font-weight: 700;
+                  border-radius: 12px;
+                  background: linear-gradient(135deg, #e41f07 0%, #c41a06 100%);
+                  color: #ffffff;
+                  vertical-align: middle;
+                }
+              }
+            }
+          }
+        }
+
+        .schedule-section {
+          margin-top: 2.5rem;
+          padding: 2.5rem;
+          background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+          border-radius: 20px;
+          border: 2px solid #f0f0f0;
+
+          @include breakpoint.sm {
+            padding: 2rem 1.5rem;
+          }
+
+          .schedule-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #1f2020;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e8e8e8;
+
+            @include breakpoint.sm {
+              font-size: 1.5rem;
+              margin-bottom: 1.5rem;
+            }
+
+            &::before {
+              content: "";
+              width: 6px;
+              height: 32px;
+              background: linear-gradient(180deg, #e41f07 0%, #c41a06 100%);
+              border-radius: 3px;
+              box-shadow: 0 2px 8px rgba(228, 31, 7, 0.3);
+            }
+
+            &::after {
+              content: "📅";
+              font-size: 1.5rem;
+              margin-left: auto;
+            }
+          }
+
+          .schedule-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.25rem;
+
+            @include breakpoint.sm {
+              grid-template-columns: 1fr;
+              gap: 1rem;
+            }
+
+            .schedule-item {
+              background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+              padding: 1.5rem;
+              border-radius: 16px;
+              box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+              transition: all 0.3s ease;
+              border: 2px solid #e8e8e8;
+              position: relative;
+              overflow: hidden;
+
+              &::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 4px;
+                background: linear-gradient(90deg, #e41f07 0%, #c41a06 100%);
+                transform: scaleX(0);
+                transition: transform 0.3s ease;
+              }
+
+              &:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 20px rgba(228, 31, 7, 0.2);
+                border-color: #e41f07;
+                background: #ffffff;
+
+                &::before {
+                  transform: scaleX(1);
+                }
+              }
+
+              .schedule-day {
+                font-size: 1.125rem;
+                font-weight: 800;
+                color: #1f2020;
+                margin-bottom: 0.75rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+
+                &::before {
+                  content: "📆";
+                  font-size: 1.25rem;
+                }
+              }
+
+              .schedule-time {
+                font-size: 1rem;
+                font-weight: 600;
+                color: #e41f07;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+
+                &::before {
+                  content: "🕐";
+                  font-size: 1.125rem;
+                }
+              }
+            }
+          }
+        }
+
+        .course-actions {
+          display: flex;
+          gap: 1.25rem;
+          margin-top: 3rem;
+          padding-top: 2.5rem;
+          border-top: 2px solid #f0f0f0;
+
+          @include breakpoint.sm {
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+          }
+
+          .btn {
+            flex: 1;
+            padding: 1rem 2.5rem;
+            font-weight: 700;
+            font-size: 1.125rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+
+            @include breakpoint.sm {
+              width: 100%;
+              padding: 0.875rem 2rem;
+              font-size: 1rem;
+            }
+
+            &::before {
+              content: "";
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              width: 0;
+              height: 0;
+              border-radius: 50%;
+              background: rgba(255, 255, 255, 0.3);
+              transform: translate(-50%, -50%);
+              transition: width 0.6s, height 0.6s;
+            }
+
+            &:hover {
+              transform: translateY(-3px);
+              box-shadow: 0 8px 20px rgba(228, 31, 7, 0.4);
+
+              &::before {
+                width: 300px;
+                height: 300px;
+              }
+            }
+
+            &.btn-primary {
+              background: linear-gradient(135deg, #e41f07 0%, #c41a06 100%);
+              border: none;
+              box-shadow: 0 4px 15px rgba(228, 31, 7, 0.3);
+            }
+
+            &.btn-outline-secondary {
+              border: 2px solid #e8e8e8;
+              background: #ffffff;
+              color: #707070;
+
+              &:hover {
+                border-color: #e41f07;
+                color: #e41f07;
+                background: #ffffff;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .course-sidebar {
+      position: sticky;
+      top: 2rem;
+
+      @include breakpoint.lg {
+        margin-top: 2rem;
+        position: relative;
+        top: 0;
+      }
+
+      .sidebar-card {
+        background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 2px solid #f0f0f0;
+        transition: all 0.3s ease;
+
+        &:hover {
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        @include breakpoint.sm {
+          padding: 2rem 1.5rem;
+        }
+
+        .sidebar-title {
+          font-size: 1.75rem;
+          font-weight: 800;
+          color: #1f2020;
+          margin-bottom: 2rem;
+          padding-bottom: 1.25rem;
+          border-bottom: 3px solid #e8e8e8;
+          position: relative;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+
+          @include breakpoint.sm {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+          }
+
+          &::before {
+            content: "";
+            width: 6px;
+            height: 32px;
+            background: linear-gradient(180deg, #e41f07 0%, #c41a06 100%);
+            border-radius: 3px;
+            box-shadow: 0 2px 8px rgba(228, 31, 7, 0.3);
+          }
+        }
+
+        .sidebar-info {
+          .sidebar-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.25rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            background: #ffffff;
+            border-radius: 14px;
+            border: 2px solid #f0f0f0;
+            transition: all 0.3s ease;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            &:hover {
+              border-color: #e41f07;
+              box-shadow: 0 4px 12px rgba(228, 31, 7, 0.15);
+              transform: translateX(5px);
+            }
+
+            i {
+              color: #ffffff;
+              font-size: 1.5rem;
+              width: 48px;
+              height: 48px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background: linear-gradient(135deg, #e41f07 0%, #c41a06 100%);
+              border-radius: 12px;
+              flex-shrink: 0;
+              box-shadow: 0 4px 10px rgba(228, 31, 7, 0.3);
+            }
+
+            div {
+              flex: 1;
+
+              .sidebar-label {
+                font-size: 0.75rem;
+                font-weight: 700;
+                color: #707070;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 0.5rem;
+              }
+
+              .sidebar-value {
+                font-size: 1.125rem;
+                font-weight: 700;
+                color: #1f2020;
+                line-height: 1.4;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

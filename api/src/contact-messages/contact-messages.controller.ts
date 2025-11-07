@@ -21,36 +21,53 @@ export class ContactMessagesController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createContactMessageDto: CreateContactMessageDto) {
-    return this.contactMessagesService.create(createContactMessageDto);
+  async create(@Body() createContactMessageDto: CreateContactMessageDto) {
+    const message = await this.contactMessagesService.create(createContactMessageDto);
+    return {
+      success: true,
+      message: 'Contact message created successfully',
+      data: message,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.contactMessagesService.findAll();
+  async findAll() {
+    const messages = await this.contactMessagesService.findAll();
+    return messages; // Return array directly for frontend compatibility
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.contactMessagesService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const message = await this.contactMessagesService.findOne(id);
+    return message; // Return object directly for frontend compatibility
   }
 
   @Get('status/:status')
-  findByStatus(@Param('status') status: string) {
-    return this.contactMessagesService.findByStatus(status);
+  async findByStatus(@Param('status') status: string) {
+    const messages = await this.contactMessagesService.findByStatus(status);
+    return messages; // Return array directly for frontend compatibility
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateContactMessageDto: UpdateContactMessageDto,
   ) {
-    return this.contactMessagesService.update(id, updateContactMessageDto);
+    const message = await this.contactMessagesService.update(id, updateContactMessageDto);
+    return {
+      success: true,
+      message: 'Contact message updated successfully',
+      data: message,
+    };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.contactMessagesService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.contactMessagesService.remove(id);
+    return {
+      success: true,
+      message: 'Contact message deleted successfully',
+    };
   }
 }

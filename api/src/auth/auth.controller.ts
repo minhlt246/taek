@@ -15,7 +15,7 @@ export class RegisterDto {
   email: string;
   password: string;
   phone?: string;
-  role?: 'admin' | 'student' | 'HLV';
+  role?: 'admin' | 'student' | 'HLV' | 'parent';
 }
 
 export class AuthResponseDto {

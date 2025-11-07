@@ -32,6 +32,9 @@ export class News {
   @Column({ length: 255, nullable: true })
   featured_image_url: string;
 
+  @Column({ type: 'text', nullable: true })
+  images: string;
+
   @Column({ default: false })
   is_published: boolean;
 

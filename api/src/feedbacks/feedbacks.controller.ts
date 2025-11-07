@@ -20,46 +20,65 @@ export class FeedbacksController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() input: CreateFeedbackDto) {
-    return this.feedbacksService.create(input);
+  async create(@Body() input: CreateFeedbackDto) {
+    const feedback = await this.feedbacksService.create(input);
+    return {
+      success: true,
+      message: 'Feedback created successfully',
+      data: feedback,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.feedbacksService.findAll();
+  async findAll() {
+    const feedbacks = await this.feedbacksService.findAll();
+    return feedbacks; // Return array directly for frontend compatibility
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.feedbacksService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const feedback = await this.feedbacksService.findOne(id);
+    return feedback; // Return object directly for frontend compatibility
   }
 
   @Get('user/:user_id')
-  findByUser(@Param('user_id', ParseIntPipe) user_id: number) {
-    return this.feedbacksService.findByUser(user_id);
+  async findByUser(@Param('user_id', ParseIntPipe) user_id: number) {
+    const feedbacks = await this.feedbacksService.findByUser(user_id);
+    return feedbacks; // Return array directly for frontend compatibility
   }
 
   @Get('course/:course_id')
-  findByCourse(@Param('course_id', ParseIntPipe) course_id: number) {
-    return this.feedbacksService.findByCourse(course_id);
+  async findByCourse(@Param('course_id', ParseIntPipe) course_id: number) {
+    const feedbacks = await this.feedbacksService.findByCourse(course_id);
+    return feedbacks; // Return array directly for frontend compatibility
   }
 
   @Get('coach/:coach_id')
-  findByCoach(@Param('coach_id', ParseIntPipe) coach_id: number) {
-    return this.feedbacksService.findByCoach(coach_id);
+  async findByCoach(@Param('coach_id', ParseIntPipe) coach_id: number) {
+    const feedbacks = await this.feedbacksService.findByCoach(coach_id);
+    return feedbacks; // Return array directly for frontend compatibility
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() input: UpdateFeedbackDto,
   ) {
-    return this.feedbacksService.update(id, input);
+    const feedback = await this.feedbacksService.update(id, input);
+    return {
+      success: true,
+      message: 'Feedback updated successfully',
+      data: feedback,
+    };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.feedbacksService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.feedbacksService.remove(id);
+    return {
+      success: true,
+      message: 'Feedback deleted successfully',
+    };
   }
 }

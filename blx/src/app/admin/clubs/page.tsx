@@ -2,6 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useAccountStore } from "@/stores/account";
+import {
+  clubsApi,
+  Club as ApiClub,
+  Branch as ApiBranch,
+} from "@/services/api/clubs";
+import { branchesApi } from "@/services/api/branches";
 
 interface Branch {
   id: number;
@@ -54,62 +60,101 @@ export default function ClubsPage() {
     status: "active" as "active" | "inactive",
   });
 
+  /**
+   * Lấy lại danh sách clubs từ API với đầy đủ branches
+   * Gọi getOverview cho mỗi club để đảm bảo lấy hết tất cả chi nhánh
+   */
+  const refetchClubs = async () => {
+    try {
+      // Lấy danh sách tất cả clubs
+      const clubsList = await clubsApi.getAll();
+
+      // Lấy đầy đủ thông tin (bao gồm branches) cho mỗi club
+      const clubsWithBranches = await Promise.all(
+        clubsList.map(async (apiClub: ApiClub) => {
+          try {
+            // Gọi getOverview để lấy đầy đủ branches
+            const overview = await clubsApi.getOverview(apiClub.id);
+
+            // Map dữ liệu từ API về format của page
+            const mappedBranches: Branch[] = (overview?.branches || []).map(
+              (apiBranch: any) => {
+                // Lấy tên manager từ relations (nếu có)
+                // Backend load relations: ['managers', 'managers.manager']
+                const managerName =
+                  apiBranch?.managers?.[0]?.manager?.full_name ||
+                  apiBranch?.managers?.[0]?.manager?.name ||
+                  apiBranch?.managers?.[0]?.manager?.username ||
+                  "Chưa có quản lý";
+
+                return {
+                  id: apiBranch.id,
+                  name: apiBranch.name,
+                  address: apiBranch.address || "",
+                  phone: apiBranch.phone || "",
+                  email: apiBranch.email || "",
+                  manager: managerName,
+                  status: apiBranch.is_active ? "active" : "inactive",
+                  created_at: apiBranch.created_at
+                    ? new Date(apiBranch.created_at).toISOString()
+                    : new Date().toISOString(),
+                };
+              }
+            );
+
+            return {
+              id: apiClub.id,
+              name: apiClub.name,
+              address: apiClub.address || "",
+              phone: apiClub.phone || "",
+              email: apiClub.email || "",
+              description: apiClub.description || "",
+              is_active: true, // Mặc định true nếu không có field
+              created_at: apiClub.created_at
+                ? new Date(apiClub.created_at).toISOString()
+                : new Date().toISOString(),
+              branches: mappedBranches,
+            };
+          } catch (error) {
+            console.error(
+              `Lỗi khi lấy thông tin chi tiết cho club ${apiClub.id}:`,
+              error
+            );
+            // Trả về club không có branches nếu lỗi
+            return {
+              id: apiClub.id,
+              name: apiClub.name,
+              address: apiClub.address || "",
+              phone: apiClub.phone || "",
+              email: apiClub.email || "",
+              description: apiClub.description || "",
+              is_active: true,
+              created_at: apiClub.created_at
+                ? new Date(apiClub.created_at).toISOString()
+                : new Date().toISOString(),
+              branches: [],
+            };
+          }
+        })
+      );
+
+      setClubs(clubsWithBranches);
+    } catch (error) {
+      console.error("Lỗi khi tải danh sách câu lạc bộ:", error);
+      throw error;
+    }
+  };
+
   useEffect(() => {
-    // Lấy danh sách câu lạc bộ từ API
+    /**
+     * Lấy danh sách câu lạc bộ và chi nhánh từ API khi component mount
+     */
     const fetchClubs = async () => {
       setLoading(true);
       try {
-        // TODO: Thay thế bằng API call thực tế
-        // const response = await api.get('/clubs');
-        // setClubs(response.data);
-
-        // Mock data với chi nhánh
-        setClubs([
-          {
-            id: 1,
-            name: "CLB Đồng Phú",
-            address: "Đồng Phú, Bình Phước",
-            phone: "0123456789",
-            email: "dongphu@taekwondo.com",
-            description: "CLB Taekwondo Đồng Phú - Thầy Tiến HLV trưởng",
-            is_active: true,
-            created_at: "2024-01-01T00:00:00Z",
-            branches: [
-              {
-                id: 1,
-                name: "CLB Giáo Xứ Tân Lập",
-                address: "Giáo Xứ Tân Lập, Đồng Phú",
-                phone: "0123456781",
-                email: "gxtn@dongphu.com",
-                manager: "Thầy Tân",
-                status: "active",
-                created_at: "2024-01-01T00:00:00Z",
-              },
-              {
-                id: 2,
-                name: "CLB Tiểu Học Tân Lập",
-                address: "Trường Tiểu Học Tân Lập, Đồng Phú",
-                phone: "0123456782",
-                email: "thtn@dongphu.com",
-                manager: "Thầy Tân",
-                status: "active",
-                created_at: "2024-01-01T00:00:00Z",
-              },
-              {
-                id: 3,
-                name: "CLB Tiểu Học Tân Tiến",
-                address: "Trường Tiểu Học Tân Tiến, Đồng Phú",
-                phone: "0123456783",
-                email: "thtt@dongphu.com",
-                manager: "Thầy Tân",
-                status: "active",
-                created_at: "2024-01-01T00:00:00Z",
-              },
-            ],
-          },
-        ]);
+        await refetchClubs();
       } catch (error) {
-        console.error("Lỗi khi tải danh sách câu lạc bộ:", error);
+        alert("Không thể tải danh sách câu lạc bộ. Vui lòng thử lại sau.");
       } finally {
         setLoading(false);
       }
@@ -143,22 +188,27 @@ export default function ClubsPage() {
     try {
       if (editingClub) {
         // Update existing club
-        setClubs(
-          clubs.map((club) =>
-            club.id === editingClub.id
-              ? { ...club, ...formData, updated_at: new Date().toISOString() }
-              : club
-          )
-        );
+        await clubsApi.update(editingClub.id, {
+          name: formData.name,
+          address: formData.address,
+          phone: formData.phone,
+          email: formData.email,
+          description: formData.description,
+        });
       } else {
         // Create new club
-        const newClub = {
-          id: Math.max(...clubs.map((c) => c.id)) + 1,
-          ...formData,
-          created_at: new Date().toISOString(),
-        };
-        setClubs([...clubs, newClub]);
+        await clubsApi.create({
+          name: formData.name,
+          address: formData.address,
+          phone: formData.phone,
+          email: formData.email,
+          description: formData.description,
+        });
       }
+
+      // Reload lại dữ liệu từ API
+      await refetchClubs();
+
       setShowModal(false);
       setEditingClub(null);
       resetForm();
@@ -216,47 +266,35 @@ export default function ClubsPage() {
   const handleBranchSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (selectedClubId) {
-        const club = clubs.find((c) => c.id === selectedClubId);
-        if (club) {
-          if (editingBranch) {
-            // Update existing branch
-            const updatedBranches =
-              club.branches?.map((branch) =>
-                branch.id === editingBranch.id
-                  ? {
-                      ...branch,
-                      ...branchFormData,
-                      updated_at: new Date().toISOString(),
-                    }
-                  : branch
-              ) || [];
-
-            setClubs(
-              clubs.map((c) =>
-                c.id === selectedClubId
-                  ? { ...c, branches: updatedBranches }
-                  : c
-              )
-            );
-          } else {
-            // Create new branch
-            const newBranch: Branch = {
-              id: Math.max(...(club.branches?.map((b) => b.id) || [0])) + 1,
-              ...branchFormData,
-              created_at: new Date().toISOString(),
-            };
-
-            setClubs(
-              clubs.map((c) =>
-                c.id === selectedClubId
-                  ? { ...c, branches: [...(c.branches || []), newBranch] }
-                  : c
-              )
-            );
-          }
-        }
+      if (!selectedClubId) {
+        alert("Vui lòng chọn câu lạc bộ.");
+        return;
       }
+
+      if (editingBranch) {
+        // Update existing branch
+        await branchesApi.update(editingBranch.id, {
+          name: branchFormData.name,
+          address: branchFormData.address,
+          phone: branchFormData.phone,
+          email: branchFormData.email,
+          is_active: branchFormData.status === "active",
+        });
+      } else {
+        // Create new branch
+        await branchesApi.create({
+          club_id: selectedClubId,
+          name: branchFormData.name,
+          address: branchFormData.address,
+          phone: branchFormData.phone,
+          email: branchFormData.email,
+          is_active: branchFormData.status === "active",
+        });
+      }
+
+      // Reload lại dữ liệu từ API để lấy đầy đủ branches
+      await refetchClubs();
+
       setShowBranchModal(false);
       resetBranchForm();
     } catch (error) {
@@ -265,18 +303,16 @@ export default function ClubsPage() {
     }
   };
 
-  const handleDeleteBranch = (branchId: number, clubId: number) => {
+  const handleDeleteBranch = async (branchId: number, clubId: number) => {
     if (confirm("Bạn có chắc chắn muốn xóa chi nhánh này?")) {
-      setClubs(
-        clubs.map((c) =>
-          c.id === clubId
-            ? {
-                ...c,
-                branches: c.branches?.filter((b) => b.id !== branchId) || [],
-              }
-            : c
-        )
-      );
+      try {
+        await branchesApi.delete(branchId);
+        // Reload lại dữ liệu từ API để đảm bảo đồng bộ
+        await refetchClubs();
+      } catch (error) {
+        console.error("Lỗi khi xóa chi nhánh:", error);
+        alert("Lỗi khi xóa chi nhánh. Vui lòng thử lại.");
+      }
     }
   };
 
@@ -299,11 +335,6 @@ export default function ClubsPage() {
 
   return (
     <div className="admin-page">
-      <div className="page-header">
-        <h2>Quản lý câu lạc bộ & chi nhánh</h2>
-        <p>Quản lý tất cả câu lạc bộ Taekwondo và các chi nhánh của chúng</p>
-      </div>
-
       {/* Filters and Actions */}
       <div className="card shadow mb-4">
         <div className="card-header py-3">

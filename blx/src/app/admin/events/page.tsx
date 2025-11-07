@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { eventsApi } from "@/services/adminApi";
+import { eventsApi } from "@/services/api/events";
 
 interface Event {
   id: number;
@@ -217,8 +217,7 @@ export default function EventsPage() {
 
   return (
     <div className="events-page">
-      <div className="page-header">
-        <h2>Quản lý sự kiện</h2>
+      <div>
         <button
           className="btn btn-primary"
           onClick={() => {

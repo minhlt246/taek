@@ -17,6 +17,11 @@
   "auth": {
     "accountInactive": "Account is not active",
     "accountLocked": "Your account is temporarily locked due to too many failed login attempts. Please try again after few minutes.",
+    "invalidCredentials": "Invalid email or password",
+    "loginFailed": "Login failed. Please try again.",
+    "networkError": "Network error. Please check your connection and try again.",
+    "configError": "Configuration error. Please contact support.",
+    "invalidResponse": "Invalid response from server. Please try again.",
     "register": {
       "success": "Registration successful. Please check your email to verify your account.",
       "error": "Unable to register",
@@ -73,6 +78,8 @@
       "maxDevices": "Maximum number of trusted devices reached",
       "error": "Unable to login",
       "wrongCredentials": "Wrong username or password",
+      "invalidCredentials": "Invalid email or password",
+      "loginFailed": "Login failed. Please try again.",
       "locked": "Your account is temporarily locked due to too many failed login attempts. Please try again in {minutes} minutes."
     },
     "verifyEmail": {

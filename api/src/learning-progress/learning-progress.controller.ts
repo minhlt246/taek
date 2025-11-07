@@ -22,41 +22,59 @@ export class LearningProgressController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() input: CreateLearningProgressDto) {
-    return this.learningProgressService.create(input);
+  async create(@Body() input: CreateLearningProgressDto) {
+    const progress = await this.learningProgressService.create(input);
+    return {
+      success: true,
+      message: 'Learning progress created successfully',
+      data: progress,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.learningProgressService.findAll();
+  async findAll() {
+    const progresses = await this.learningProgressService.findAll();
+    return progresses; // Return array directly for frontend compatibility
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.learningProgressService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const progress = await this.learningProgressService.findOne(id);
+    return progress; // Return object directly for frontend compatibility
   }
 
   @Get('user/:user_id')
-  findByUser(@Param('user_id', ParseIntPipe) user_id: number) {
-    return this.learningProgressService.findByUser(user_id);
+  async findByUser(@Param('user_id', ParseIntPipe) user_id: number) {
+    const progresses = await this.learningProgressService.findByUser(user_id);
+    return progresses; // Return array directly for frontend compatibility
   }
 
   @Get('course/:course_id')
-  findByCourse(@Param('course_id', ParseIntPipe) course_id: number) {
-    return this.learningProgressService.findByCourse(course_id);
+  async findByCourse(@Param('course_id', ParseIntPipe) course_id: number) {
+    const progresses = await this.learningProgressService.findByCourse(course_id);
+    return progresses; // Return array directly for frontend compatibility
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() input: UpdateLearningProgressDto,
   ) {
-    return this.learningProgressService.update(id, input);
+    const progress = await this.learningProgressService.update(id, input);
+    return {
+      success: true,
+      message: 'Learning progress updated successfully',
+      data: progress,
+    };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.learningProgressService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.learningProgressService.remove(id);
+    return {
+      success: true,
+      message: 'Learning progress deleted successfully',
+    };
   }
 }

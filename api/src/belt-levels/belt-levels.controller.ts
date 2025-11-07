@@ -19,36 +19,56 @@ export class BeltLevelsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createBeltLevelDto: CreateBeltLevelDto) {
-    return this.beltLevelsService.create(createBeltLevelDto);
+  async create(@Body() createBeltLevelDto: CreateBeltLevelDto) {
+    const beltLevel = await this.beltLevelsService.create(createBeltLevelDto);
+    return {
+      success: true,
+      message: 'Belt level created successfully',
+      data: beltLevel,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.beltLevelsService.findAll();
+  async findAll() {
+    const beltLevels = await this.beltLevelsService.findAll();
+    return beltLevels; // Return array directly for frontend compatibility
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.beltLevelsService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const beltLevel = await this.beltLevelsService.findOne(id);
+    return beltLevel; // Return object directly for frontend compatibility
   }
 
   @Get('name/:name')
-  findByName(@Param('name') name: string) {
-    return this.beltLevelsService.findByName(name);
+  async findByName(@Param('name') name: string) {
+    const beltLevel = await this.beltLevelsService.findByName(name);
+    return beltLevel; // Return object directly for frontend compatibility
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateBeltLevelDto: UpdateBeltLevelDto,
   ) {
-    return this.beltLevelsService.update(id, updateBeltLevelDto);
+    const beltLevel = await this.beltLevelsService.update(
+      id,
+      updateBeltLevelDto,
+    );
+    return {
+      success: true,
+      message: 'Belt level updated successfully',
+      data: beltLevel,
+    };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.beltLevelsService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.beltLevelsService.remove(id);
+    return {
+      success: true,
+      message: 'Belt level deleted successfully',
+    };
   }
 }

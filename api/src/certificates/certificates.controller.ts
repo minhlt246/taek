@@ -20,36 +20,53 @@ export class CertificatesController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() input: CreateCertificateDto) {
-    return this.certificatesService.create(input);
+  async create(@Body() input: CreateCertificateDto) {
+    const certificate = await this.certificatesService.create(input);
+    return {
+      success: true,
+      message: 'Certificate created successfully',
+      data: certificate,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.certificatesService.findAll();
+  async findAll() {
+    const certificates = await this.certificatesService.findAll();
+    return certificates; // Return array directly for frontend compatibility
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.certificatesService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const certificate = await this.certificatesService.findOne(id);
+    return certificate; // Return object directly for frontend compatibility
   }
 
   @Get('user/:user_id')
-  findByUser(@Param('user_id', ParseIntPipe) user_id: number) {
-    return this.certificatesService.findByUser(user_id);
+  async findByUser(@Param('user_id', ParseIntPipe) user_id: number) {
+    const certificates = await this.certificatesService.findByUser(user_id);
+    return certificates; // Return array directly for frontend compatibility
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() input: UpdateCertificateDto,
   ) {
-    return this.certificatesService.update(id, input);
+    const certificate = await this.certificatesService.update(id, input);
+    return {
+      success: true,
+      message: 'Certificate updated successfully',
+      data: certificate,
+    };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.certificatesService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.certificatesService.remove(id);
+    return {
+      success: true,
+      message: 'Certificate deleted successfully',
+    };
   }
 }

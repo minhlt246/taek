@@ -22,7 +22,7 @@ export class Coach {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 20, unique: true })
+  @Column({ length: 20, nullable: true })
   coach_code: string;
 
   @Column({ length: 100 })
@@ -31,10 +31,13 @@ export class Coach {
   @Column({ length: 255, nullable: true })
   photo_url: string;
 
+  @Column({ type: 'text', nullable: true })
+  images: string;
+
   @Column({ length: 15, nullable: true })
   phone: string;
 
-  @Column({ length: 100, nullable: true })
+  @Column({ length: 100, unique: true, nullable: true })
   email: string;
 
   @Column({ length: 255, nullable: true })

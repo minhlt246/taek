@@ -19,36 +19,53 @@ export class ParentsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createParentDto: CreateParentDto) {
-    return this.parentsService.create(createParentDto);
+  async create(@Body() createParentDto: CreateParentDto) {
+    const parent = await this.parentsService.create(createParentDto);
+    return {
+      success: true,
+      message: 'Parent created successfully',
+      data: parent,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.parentsService.findAll();
+  async findAll() {
+    const parents = await this.parentsService.findAll();
+    return parents; // Return array directly for frontend compatibility
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.parentsService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const parent = await this.parentsService.findOne(id);
+    return parent; // Return object directly for frontend compatibility
   }
 
   @Get('relationship/:relationship')
-  findByRelationship(@Param('relationship') relationship: string) {
-    return this.parentsService.findByRelationship(relationship);
+  async findByRelationship(@Param('relationship') relationship: string) {
+    const parents = await this.parentsService.findByRelationship(relationship);
+    return parents; // Return array directly for frontend compatibility
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateParentDto: UpdateParentDto,
   ) {
-    return this.parentsService.update(id, updateParentDto);
+    const parent = await this.parentsService.update(id, updateParentDto);
+    return {
+      success: true,
+      message: 'Parent updated successfully',
+      data: parent,
+    };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.parentsService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.parentsService.remove(id);
+    return {
+      success: true,
+      message: 'Parent deleted successfully',
+    };
   }
 }

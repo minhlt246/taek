@@ -105,10 +105,6 @@ export default function PaymentsPage() {
 
   return (
     <div className="admin-page">
-      <div className="page-header">
-        <h2>Quản lý thanh toán</h2>
-        <p>Quản lý tất cả giao dịch thanh toán</p>
-      </div>
 
       {/* Summary Cards */}
       <div className="row mb-4">

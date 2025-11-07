@@ -5,9 +5,7 @@
 -- Drop existing tables if they exist (for fresh installation)
 SET FOREIGN_KEY_CHECKS = 0;
 
--- =====================================================
--- CORE TABLES (Original tables)
--- =====================================================
+
 
 -- Tạo bảng câu lạc bộ (CLB)
 CREATE TABLE cau_lac_bo (
@@ -20,6 +18,7 @@ CREATE TABLE cau_lac_bo (
     head_coach_id INT,
     description TEXT,
     logo_url VARCHAR(255),
+    images TEXT COMMENT 'Danh sách ảnh (JSON array), đường dẫn bắt đầu từ client/images',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (head_coach_id) REFERENCES huan_luyen_vien(id)
@@ -34,6 +33,7 @@ CREATE TABLE cap_dai (
     required_poomsae_code VARCHAR(20) COMMENT 'Mã bài quyền bắt buộc cho cấp đai này',
     required_poomsae_name VARCHAR(100) COMMENT 'Tên bài quyền bắt buộc',
     description TEXT,
+    images TEXT COMMENT 'Danh sách ảnh (JSON array), đường dẫn bắt đầu từ client/images',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -96,6 +96,8 @@ CREATE TABLE vo_sinh (
     emergency_contact_phone VARCHAR(15),
     active_status BOOLEAN DEFAULT TRUE,
     profile_image_url VARCHAR(255),
+    images TEXT COMMENT 'Danh sách ảnh (JSON array), đường dẫn bắt đầu từ client/images',
+    password VARCHAR(255) NULL COMMENT 'Mật khẩu đăng nhập cho võ sinh',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (cap_dai_id) REFERENCES cap_dai(id)
@@ -126,6 +128,7 @@ CREATE TABLE huan_luyen_vien (
     cap_dai_id INT NOT NULL COMMENT 'Cấp đai hiện tại',
     gioi_tinh ENUM('Nam', 'Nữ') NOT NULL COMMENT 'Giới tính',
     photo_url VARCHAR(255),
+    images TEXT COMMENT 'Danh sách ảnh (JSON array), đường dẫn bắt đầu từ client/images',
     phone VARCHAR(15),
     email VARCHAR(100),
     password VARCHAR(255),
@@ -200,11 +203,31 @@ CREATE TABLE tin_tuc (
     excerpt TEXT,
     author_id INT,
     featured_image_url VARCHAR(255),
+    images TEXT COMMENT 'Danh sách ảnh (JSON array), đường dẫn bắt đầu từ client/images',
     is_published BOOLEAN DEFAULT FALSE,
     published_at DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (author_id) REFERENCES admin(id)
+);
+
+-- Tạo bảng thư viện (ảnh và video)
+CREATE TABLE thu_vien (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(200) NOT NULL,
+    description TEXT,
+    file_url VARCHAR(500) NOT NULL,
+    file_type ENUM('image', 'video') DEFAULT 'image',
+    mime_type VARCHAR(100),
+    file_size BIGINT COMMENT 'File size in bytes',
+    club_id INT,
+    branch_id INT,
+    created_by INT COMMENT 'User ID who uploaded the media',
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (club_id) REFERENCES cau_lac_bo(id),
+    FOREIGN KEY (branch_id) REFERENCES chi_nhanh(id)
 );
 
 -- Tạo bảng liên hệ / phản hồi
@@ -675,14 +698,14 @@ INSERT INTO cap_dai (name, color, order_sequence, required_poomsae_code, require
 -- Insert sample poomsae (bài quyền) theo chuẩn liên đoàn Taekwondo
 INSERT INTO bai_quyen (ten_bai_quyen_vietnamese, ten_bai_quyen_english, ten_bai_quyen_korean, cap_do, mo_ta, so_dong_tac, thoi_gian_thuc_hien, khoi_luong_ly_thuyet) VALUES
 -- Taeguek Poomsae (Thái cực) - Cơ bản
-('Thái cực 1 Jang', 'Taeguek 1 Jang', '태극 1장', 'Cơ bản', 'Bài quyền cơ bản đầu tiên, tượng trưng cho Trời', 20, 45, 'Lý thuyết về tư thế cơ bản và kỹ thuật đấm đá'),
-('Thái cực 2 Jang', 'Taeguek 2 Jang', '태극 2장', 'Cơ bản', 'Bài quyền cơ bản thứ hai, tượng trưng cho Đất', 20, 45, 'Lý thuyết về di chuyển và phòng thủ'),
-('Thái cực 3 Jang', 'Taeguek 3 Jang', '태극 3장', 'Cơ bản', 'Bài quyền cơ bản thứ ba, tượng trưng cho Lửa', 20, 45, 'Lý thuyết về tấn công và phản công'),
-('Thái cực 4 Jang', 'Taeguek 4 Jang', '태극 4장', 'Cơ bản', 'Bài quyền cơ bản thứ tư, tượng trưng cho Gió', 20, 45, 'Lý thuyết về tốc độ và linh hoạt'),
-('Thái cực 5 Jang', 'Taeguek 5 Jang', '태극 5장', 'Cơ bản', 'Bài quyền cơ bản thứ năm, tượng trưng cho Nước', 20, 45, 'Lý thuyết về sự mềm mại và uyển chuyển'),
-('Thái cực 6 Jang', 'Taeguek 6 Jang', '태극 6장', 'Cơ bản', 'Bài quyền cơ bản thứ sáu, tượng trưng cho Sơn', 20, 45, 'Lý thuyết về sự vững chắc và ổn định'),
-('Thái cực 7 Jang', 'Taeguek 7 Jang', '태극 7장', 'Cơ bản', 'Bài quyền cơ bản thứ bảy, tượng trưng cho Lôi', 20, 45, 'Lý thuyết về sức mạnh và bùng nổ'),
-('Thái cực 8 Jang', 'Taeguek 8 Jang', '태극 8장', 'Cơ bản', 'Bài quyền cơ bản thứ tám, tượng trưng cho Phong', 20, 45, 'Lý thuyết về sự nhẹ nhàng và bay bổng'),
+('Thái cực 1 Jang', 'Taegeuk Il-jang', '태극 1장', 'Cơ bản', 'Bài quyền cơ bản đầu tiên, tượng trưng cho Trời', 20, 45, 'Lý thuyết về tư thế cơ bản và kỹ thuật đấm đá'),
+('Thái cực 2 Jang', 'Taegeuk Ee-jang', '태극 2장', 'Cơ bản', 'Bài quyền cơ bản thứ hai, tượng trưng cho Đất', 20, 45, 'Lý thuyết về di chuyển và phòng thủ'),
+('Thái cực 3 Jang', 'Taegeuk Sam-jang', '태극 3장', 'Cơ bản', 'Bài quyền cơ bản thứ ba, tượng trưng cho Lửa', 20, 45, 'Lý thuyết về tấn công và phản công'),
+('Thái cực 4 Jang', 'Taegeuk Sa-jang', '태극 4장', 'Cơ bản', 'Bài quyền cơ bản thứ tư, tượng trưng cho Gió', 20, 45, 'Lý thuyết về tốc độ và linh hoạt'),
+('Thái cực 5 Jang', 'Taegeuk Oh-jang ', '태극 5장', 'Cơ bản', 'Bài quyền cơ bản thứ năm, tượng trưng cho Nước', 20, 45, 'Lý thuyết về sự mềm mại và uyển chuyển'),
+('Thái cực 6 Jang', 'Taegeuk Yook-jang', '태극 6장', 'Cơ bản', 'Bài quyền cơ bản thứ sáu, tượng trưng cho Sơn', 20, 45, 'Lý thuyết về sự vững chắc và ổn định'),
+('Thái cực 7 Jang', 'Taegeuk Chil-jang', '태극 7장', 'Cơ bản', 'Bài quyền cơ bản thứ bảy, tượng trưng cho Lôi', 20, 45, 'Lý thuyết về sức mạnh và bùng nổ'),
+('Thái cực 8 Jang', 'Taegeuk Pal-jang', '태극 8장', 'Cơ bản', 'Bài quyền cơ bản thứ tám, tượng trưng cho Phong', 20, 45, 'Lý thuyết về sự nhẹ nhàng và bay bổng'),
 
 -- Black Belt Poomsae (Đai đen)
 ('Koryo', 'Koryo', '고려', 'Trung cấp', 'Bài quyền đai đen đầu tiên, tên của triều đại Koryo', 30, 60, 'Lý thuyết về lịch sử và truyền thống'),
@@ -737,8 +760,9 @@ INSERT INTO cau_lac_bo (club_code, name, address, phone, email, head_coach_id, d
 ('_00468', 'CLB Đồng Phú', 'Đồng Phú, Bình Phước', '0123456789', 'dongphu@taekwondo.com', 2, 'CLB Taekwondo Đồng Phú - Thầy Tiến HLV trưởng');
 
 -- Insert sample admin user
+-- Password: 123456 (hashed with bcrypt)
 INSERT INTO admin (name, email, password, role, phone, active_status) VALUES
-('Admin Master', 'admin@taekwondomaster.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', '0123456789', TRUE);
+('Admin Master', 'admin@taekwondomaster.com', '$2b$10$IvCQT4mOjWTykB1OcUC5UutJpF9ijE6wN6daJWA/c7OMYhlklST2G', 'admin', '0123456789', TRUE);
 
 -- Insert sample võ sinh data with generated member codes
 INSERT INTO vo_sinh (ho_va_ten, ngay_thang_nam_sinh, ma_hoi_vien, ma_clb, ma_don_vi, quyen_so, cap_dai_id, gioi_tinh, email, phone) VALUES

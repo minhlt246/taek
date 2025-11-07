@@ -15,18 +15,35 @@ async function bootstrap() {
     }),
   );
 
+  // CORS configuration
+  const allowedOrigins = process.env.NODE_ENV === 'production'
+    ? (process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'])
+    : ['http://localhost:3000', 'http://localhost:4000', 'http://127.0.0.1:3000'];
+
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:4000'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, Postman, or server-side requests)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        if (process.env.NODE_ENV !== 'production') {
+          console.warn(`[CORS] Blocked origin: ${origin}. Allowed origins:`, allowedOrigins);
+        }
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: [
       'Content-Type',
       'X-Requested-With',
       'Accept',
       'Authorization',
       'X-Custom-Header',
+      'Origin',
     ],
     exposedHeaders: ['Authorization'],
     credentials: true,
+    maxAge: 86400, // 24 hours
   });
 
   const swaggerConfig = new DocumentBuilder()

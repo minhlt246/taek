@@ -20,59 +20,78 @@ export class EventsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createEventDto: CreateEventDto) {
-    return this.eventsService.create(createEventDto);
+  async create(@Body() createEventDto: CreateEventDto) {
+    const event = await this.eventsService.create(createEventDto);
+    return {
+      success: true,
+      message: 'Event created successfully',
+      data: event,
+    };
   }
 
   @Get()
-  findAll(
+  async findAll(
     @Query('type') type?: string,
     @Query('status') status?: string,
     @Query('club_id') club_id?: string,
   ) {
+    let events;
     if (type) {
-      return this.eventsService.findByType(type);
+      events = await this.eventsService.findByType(type);
+    } else if (status) {
+      events = await this.eventsService.findByStatus(status);
+    } else if (club_id) {
+      events = await this.eventsService.findByClub(parseInt(club_id));
+    } else {
+      events = await this.eventsService.findAll();
     }
-    if (status) {
-      return this.eventsService.findByStatus(status);
-    }
-    if (club_id) {
-      return this.eventsService.findByClub(parseInt(club_id));
-    }
-    return this.eventsService.findAll();
+    return events; // Return array directly for frontend compatibility
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.eventsService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const event = await this.eventsService.findOne(id);
+    return event; // Return object directly for frontend compatibility
   }
 
   @Get('club/:club_id')
-  findByClub(@Param('club_id', ParseIntPipe) club_id: number) {
-    return this.eventsService.findByClub(club_id);
+  async findByClub(@Param('club_id', ParseIntPipe) club_id: number) {
+    const events = await this.eventsService.findByClub(club_id);
+    return events; // Return array directly for frontend compatibility
   }
 
   @Get('type/:event_type')
-  findByType(@Param('event_type') event_type: string) {
-    return this.eventsService.findByType(event_type);
+  async findByType(@Param('event_type') event_type: string) {
+    const events = await this.eventsService.findByType(event_type);
+    return events; // Return array directly for frontend compatibility
   }
 
   @Get('status/:status')
-  findByStatus(@Param('status') status: string) {
-    return this.eventsService.findByStatus(status);
+  async findByStatus(@Param('status') status: string) {
+    const events = await this.eventsService.findByStatus(status);
+    return events; // Return array directly for frontend compatibility
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateEventDto: UpdateEventDto,
   ) {
-    return this.eventsService.update(id, updateEventDto);
+    const event = await this.eventsService.update(id, updateEventDto);
+    return {
+      success: true,
+      message: 'Event updated successfully',
+      data: event,
+    };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.eventsService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.eventsService.remove(id);
+    return {
+      success: true,
+      message: 'Event deleted successfully',
+    };
   }
 }

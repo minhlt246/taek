@@ -18,7 +18,11 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "create-admin": "ts-node -r tsconfig-paths/register scripts/create-admin.ts",
+    "check-users": "ts-node -r tsconfig-paths/register scripts/check-users.ts",
+    "reset-password": "ts-node -r tsconfig-paths/register scripts/reset-password.ts",
+    "test-login": "ts-node -r tsconfig-paths/register scripts/test-login.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

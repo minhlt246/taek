@@ -20,36 +20,53 @@ export class PaymentDetailsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() input: CreatePaymentDetailDto) {
-    return this.paymentDetailsService.create(input);
+  async create(@Body() input: CreatePaymentDetailDto) {
+    const detail = await this.paymentDetailsService.create(input);
+    return {
+      success: true,
+      message: 'Payment detail created successfully',
+      data: detail,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.paymentDetailsService.findAll();
+  async findAll() {
+    const details = await this.paymentDetailsService.findAll();
+    return details; // Return array directly for frontend compatibility
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.paymentDetailsService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const detail = await this.paymentDetailsService.findOne(id);
+    return detail; // Return object directly for frontend compatibility
   }
 
   @Get('payment/:payment_id')
-  findByPayment(@Param('payment_id', ParseIntPipe) payment_id: number) {
-    return this.paymentDetailsService.findByPayment(payment_id);
+  async findByPayment(@Param('payment_id', ParseIntPipe) payment_id: number) {
+    const details = await this.paymentDetailsService.findByPayment(payment_id);
+    return details; // Return array directly for frontend compatibility
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() input: UpdatePaymentDetailDto,
   ) {
-    return this.paymentDetailsService.update(id, input);
+    const detail = await this.paymentDetailsService.update(id, input);
+    return {
+      success: true,
+      message: 'Payment detail updated successfully',
+      data: detail,
+    };
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.paymentDetailsService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.paymentDetailsService.remove(id);
+    return {
+      success: true,
+      message: 'Payment detail deleted successfully',
+    };
   }
 }
