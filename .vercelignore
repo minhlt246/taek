@@ -1,0 +1,17 @@
+# Ignore API folder (backend không deploy lên Vercel)
+api/
+
+# Ignore embedded git repository
+CRMS-Template-coppy/
+
+# Ignore database files
+*.sql
+*.sqlite
+*.db
+
+# Ignore scripts
+api/scripts/
+
+# Ignore init files
+init/
+
