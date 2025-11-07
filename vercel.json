@@ -1,7 +1,5 @@
 {
   "buildCommand": "cd blx && npm install && npm run build",
-  "outputDirectory": "blx/.next",
-  "installCommand": "cd blx && npm install",
-  "framework": "nextjs"
+  "outputDirectory": "blx/.next"
 }
 
