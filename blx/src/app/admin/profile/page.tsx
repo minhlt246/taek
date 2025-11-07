@@ -354,28 +354,27 @@ export default function ProfilePage() {
 
   return (
     <div className="profile-page">
-      <div>
-          {!editing ? (
-            <button
-              className="btn btn-primary"
-              onClick={() => setEditing(true)}
-            >
-              <i className="fas fa-edit mr-2"></i>
-              Chỉnh sửa hồ sơ
+      <div className="mb-3">
+        {!editing ? (
+          <button
+            className="btn btn-primary"
+            onClick={() => setEditing(true)}
+          >
+            <i className="fas fa-edit mr-2"></i>
+            Chỉnh sửa hồ sơ
+          </button>
+        ) : (
+          <div className="btn-group">
+            <button className="btn btn-success" onClick={handleSubmit}>
+              <i className="fas fa-save mr-2"></i>
+              Lưu thay đổi
             </button>
-          ) : (
-            <div className="btn-group">
-              <button className="btn btn-success" onClick={handleSubmit}>
-                <i className="fas fa-save mr-2"></i>
-                Lưu thay đổi
-              </button>
-              <button className="btn btn-secondary" onClick={handleCancel}>
-                <i className="fas fa-times mr-2"></i>
-                Hủy
-              </button>
-            </div>
-          )}
-        </div>
+            <button className="btn btn-secondary" onClick={handleCancel}>
+              <i className="fas fa-times mr-2"></i>
+              Hủy
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="row">

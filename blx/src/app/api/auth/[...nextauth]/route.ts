@@ -108,65 +108,6 @@ const providers = [
       }
     },
   }),
-
-  CredentialsProvider({
-    id: "login-by-2fa",
-    name: "TwoFactor",
-    credentials: {
-      token: { label: "Code", type: "text" },
-      sessionId: { label: "Session", type: "text" },
-    },
-    async authorize(credentials) {
-      const token = credentials?.token;
-      const sessionId = credentials?.sessionId;
-      if (!token || !sessionId) throw new Error("auth.2fa.missingParams");
-
-      try {
-        // TODO: Implement 2FA verification in authApi if backend supports it
-        // For now, using direct fetch as authApi doesn't have 2FA method yet
-        const http = (await import("@/services/http")).default;
-        const response = await http.post("/auth/2fa/verify", { token, sessionId });
-        const data = response.data;
-
-        if (!data?.success || !data?.data?.user) {
-          const message = data?.message || "auth.2fa.error";
-          throw new Error(message);
-        }
-
-        const user = {
-          ...data.data.user,
-          accessToken: data.data.token || "",
-        } as any;
-        return user;
-      } catch (err: any) {
-        // Handle axios errors
-        if (err?.response) {
-          const status = err.response.status;
-          const backendMessage = err.response?.data?.message || "";
-          const errorMessage =
-            backendMessage ||
-            (status === 401 ? "auth.2fa.failed" : "auth.2fa.error");
-          throw new Error(errorMessage);
-        }
-
-        // Handle network errors
-        if (
-          err?.code === "ECONNREFUSED" ||
-          err?.code === "ENOTFOUND" ||
-          err?.code === "ETIMEDOUT" ||
-          err?.message?.includes("Network Error") ||
-          err?.message?.includes("ECONNREFUSED")
-        ) {
-          console.error("[NextAuth] 2FA Network error:", err.message);
-          throw new Error("auth.networkError");
-        }
-
-        const msg =
-          typeof err?.message === "string" ? err.message : "auth.2fa.error";
-        throw new Error(msg);
-      }
-    },
-  }),
 ];
 
 // Add Google provider only if env is set to prevent runtime errors
