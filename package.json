@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "line": "^0.1.8"
+    "next": "^14.0.0"
   }
 }
