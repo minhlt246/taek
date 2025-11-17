@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useAccountStore } from "@/stores/account";
 import { coachesApi, CoachResponse } from "@/services/api/coaches";
 import { clubsApi } from "@/services/api/clubs";
+import { beltLevelsApi } from "@/services/api/belt-levels";
 import http from "@/services/http";
 
 // Sử dụng CoachResponse từ API service thay vì interface local
@@ -43,11 +44,11 @@ export default function CoachesPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Load clubs và coaches data
-      // Gọi API trực tiếp để lấy raw data với đầy đủ relations
-      const [clubsData, coachesResponse] = await Promise.all([
+      // Load clubs, coaches và belt_levels data
+      const [clubsData, coachesResponse, beltLevelsData] = await Promise.all([
         clubsApi.getAll(),
         http.get<CoachResponse[]>("/coaches"),
+        beltLevelsApi.getAll(),
       ]);
 
       setClubs(Array.isArray(clubsData) ? clubsData : []);
@@ -57,23 +58,33 @@ export default function CoachesPage() {
         ? coachesResponse.data
         : [];
 
-      // Debug: Log dữ liệu để kiểm tra
-      console.log("[CoachesPage] Raw coaches data:", coachesData);
-      if (coachesData.length > 0) {
-        const firstCoach = coachesData[0];
-        console.log(
-          "[CoachesPage] First coach sample - ALL FIELDS:",
-          firstCoach
-        );
-        console.log("[CoachesPage] First coach - name field:", {
-          name: firstCoach.name,
-          full_name: (firstCoach as any).full_name,
-          username: (firstCoach as any).username,
-          allKeys: Object.keys(firstCoach),
+      // Tạo map belt_levels để map vào coaches
+      const beltLevelMap = new Map();
+      if (Array.isArray(beltLevelsData)) {
+        beltLevelsData.forEach((belt) => {
+          beltLevelMap.set(belt.id, belt);
         });
       }
 
-      setCoaches(coachesData);
+      // Map belt_level vào coaches nếu có belt_level_id
+      const coachesWithBeltLevel = coachesData.map((coach) => {
+        if (coach.belt_level_id && !coach.belt_level) {
+          const beltLevel = beltLevelMap.get(coach.belt_level_id);
+          if (beltLevel) {
+            return {
+              ...coach,
+              belt_level: {
+                id: beltLevel.id,
+                name: beltLevel.name,
+                color: beltLevel.color,
+              },
+            };
+          }
+        }
+        return coach;
+      });
+
+      setCoaches(coachesWithBeltLevel);
     } catch (error) {
       console.error("Lỗi khi tải dữ liệu:", error);
       setCoaches([]);
@@ -88,9 +99,11 @@ export default function CoachesPage() {
   }, []);
 
   const filteredCoaches = coaches.filter((coach) => {
+    const coachName = coach.ho_va_ten || coach.name || "";
+    const coachCode = coach.ma_hoi_vien || (coach as any).coach_code || "";
     const matchesSearch =
-      coach.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      coach.coach_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (coachName && coachName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (coachCode && coachCode.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (coach.email &&
         coach.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (coach.club?.name &&
@@ -98,18 +111,19 @@ export default function CoachesPage() {
     return matchesSearch;
   });
 
-  const getRoleBadgeClass = (role: string) => {
+  // Helper function để lấy màu text cho vai trò (không có background)
+  const getRoleTextColor = (role: string): string => {
     switch (role) {
       case "head_coach":
-        return "bg-danger";
+        return "#dc3545"; // danger red
       case "main_manager":
-        return "bg-warning";
+        return "#ffc107"; // warning yellow
       case "assistant_manager":
-        return "bg-info";
+        return "#0dcaf0"; // info cyan
       case "assistant":
-        return "bg-secondary";
+        return "#6c757d"; // secondary gray
       default:
-        return "bg-secondary";
+        return "#6c757d"; // secondary gray
     }
   };
 
@@ -131,8 +145,8 @@ export default function CoachesPage() {
   const handleEdit = (coach: Coach) => {
     setEditingCoach(coach);
     setFormData({
-      coach_code: coach.coach_code || "",
-      name: coach.name,
+      coach_code: coach.ma_hoi_vien || (coach as any).coach_code || "",
+      name: coach.ho_va_ten || coach.name || "",
       email: coach.email || "",
       phone: coach.phone || "",
       role: coach.role || "assistant",
@@ -151,9 +165,10 @@ export default function CoachesPage() {
     e.preventDefault();
     try {
       // Clean up form data: remove empty strings and convert 0 to undefined for optional fields
+      // Map frontend fields to backend fields: coach_code -> ma_hoi_vien, name -> ho_va_ten
       const cleanData: any = {
-        name: formData.name.trim(),
-        coach_code: formData.coach_code.trim() || undefined,
+        ho_va_ten: formData.name.trim(),
+        ma_hoi_vien: formData.coach_code.trim() || undefined,
         email: formData.email.trim() || undefined,
         phone: formData.phone.trim() || undefined,
         role: formData.role || undefined,
@@ -356,9 +371,10 @@ export default function CoachesPage() {
                     <tr key={coach.id}>
                       <td>{coach.id}</td>
                       <td>
-                        {coach.coach_code && coach.coach_code.trim() ? (
-                          <span className="badge bg-secondary">
-                            {coach.coach_code}
+                        {(coach.ma_hoi_vien || (coach as any).coach_code) && 
+                         (coach.ma_hoi_vien || (coach as any).coach_code).trim() ? (
+                          <span style={{ color: "#6c757d" }}>
+                            {coach.ma_hoi_vien || (coach as any).coach_code}
                           </span>
                         ) : (
                           <span className="text-muted">-</span>
@@ -366,7 +382,8 @@ export default function CoachesPage() {
                       </td>
                       <td>
                         <strong>
-                          {coach.name ||
+                          {coach.ho_va_ten ||
+                            coach.name ||
                             (coach as any).full_name ||
                             (coach as any).username ||
                             `HLV #${coach.id}`}
@@ -375,41 +392,35 @@ export default function CoachesPage() {
                       <td>{coach.email || "-"}</td>
                       <td>{coach.phone || "-"}</td>
                       <td>
-                        {coach.club && coach.club.name ? (
-                          <span className="badge bg-info">
-                            {coach.club.name}
+                        {coach.ma_clb && coach.ma_clb.trim() ? (
+                          <span style={{ color: "#ffc107" }}>
+                            {coach.ma_clb}
                           </span>
                         ) : (
-                          <span className="badge bg-secondary">
-                            Chưa phân công
-                          </span>
+                          <span className="text-muted">-</span>
                         )}
                       </td>
                       <td>
-                        <span
-                          className={`badge ${getRoleBadgeClass(
-                            coach.role || "assistant"
-                          )}`}
-                        >
+                        <span style={{ color: getRoleTextColor(coach.role || "assistant") }}>
                           {getRoleDisplayName(coach.role || "assistant")}
                         </span>
                       </td>
                       <td>
                         {coach.belt_level && coach.belt_level.name ? (
-                          <span className="badge bg-primary">
+                          <span style={{ color: coach.belt_level.color || "#000" }}>
                             {coach.belt_level.name}
                           </span>
                         ) : (
-                          <span className="badge bg-danger">Chưa có</span>
+                          <span className="text-muted">-</span>
                         )}
                       </td>
                       <td>
                         <span
-                          className={`badge ${
-                            coach.is_active !== false
-                              ? "bg-success"
-                              : "bg-warning"
-                          }`}
+                          style={{
+                            color: coach.is_active !== false
+                              ? "#198754" // success green
+                              : "#ffc107" // warning yellow
+                          }}
                         >
                           {coach.is_active !== false
                             ? "Hoạt động"

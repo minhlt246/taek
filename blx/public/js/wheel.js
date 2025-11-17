@@ -43,7 +43,7 @@ let theWheel = new Winwheel({
 });
 
 // Loads the tick audio sound in to an audio object.
-let audio = new Audio('client/images/tick.mp3');
+let audio = new Audio('/client/images/tick.mp3');
 
 // This function is called when the sound is to be played.
 function playSound()
@@ -71,7 +71,7 @@ function powerSelected(powerLevel)
         wheelPower = powerLevel;
 
         // Light up the spin button by changing it's source image and adding a clickable class to it.
-        document.getElementById('spin_button').src = "client/images/spin.png";
+        document.getElementById('spin_button').src = "/client/images/spin.png";
         document.getElementById('spin_button').className = "";
     }
 }
@@ -88,7 +88,7 @@ function startSpin()
         theWheel.animation.spins = 3;
 
         // Disable the spin button so can't click again while wheel is spinning.
-        document.getElementById('spin_button').src       = "client/images/spin.png";
+        document.getElementById('spin_button').src       = "/client/images/spin.png";
         document.getElementById('spin_button').className = "";
 
         // Begin the spin animation by calling startAnimation on the wheel object.

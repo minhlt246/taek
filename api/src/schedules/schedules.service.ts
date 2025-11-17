@@ -19,15 +19,15 @@ export class SchedulesService implements IScheduleService {
 
   async findAll(): Promise<Schedule[]> {
     return await this.scheduleRepository.find({
-      relations: ['club', 'branch'],
-      order: { day_of_week: 'ASC', start_time: 'ASC' },
+      relations: ['course'],
+      order: { dayOfWeek: 'ASC', startTime: 'ASC' },
     });
   }
 
   async findOne(id: number): Promise<Schedule> {
     const schedule = await this.scheduleRepository.findOne({
       where: { id },
-      relations: ['club', 'branch'],
+      relations: ['course'],
     });
 
     if (!schedule) {
@@ -37,27 +37,19 @@ export class SchedulesService implements IScheduleService {
     return schedule;
   }
 
-  async findByClub(club_id: number): Promise<Schedule[]> {
+  async findByCourse(courseId: number): Promise<Schedule[]> {
     return await this.scheduleRepository.find({
-      where: { club_id },
-      relations: ['club', 'branch'],
-      order: { day_of_week: 'ASC', start_time: 'ASC' },
+      where: { courseId },
+      relations: ['course'],
+      order: { dayOfWeek: 'ASC', startTime: 'ASC' },
     });
   }
 
-  async findByBranch(branch_id: number): Promise<Schedule[]> {
+  async findByDay(dayOfWeek: string): Promise<Schedule[]> {
     return await this.scheduleRepository.find({
-      where: { branch_id },
-      relations: ['club', 'branch'],
-      order: { day_of_week: 'ASC', start_time: 'ASC' },
-    });
-  }
-
-  async findByDay(day_of_week: string): Promise<Schedule[]> {
-    return await this.scheduleRepository.find({
-      where: { day_of_week: day_of_week as any },
-      relations: ['club', 'branch'],
-      order: { start_time: 'ASC' },
+      where: { dayOfWeek },
+      relations: ['course'],
+      order: { startTime: 'ASC' },
     });
   }
 

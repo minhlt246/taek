@@ -23,10 +23,31 @@ export class BeltPromotionsService {
   }
 
   async findAll(): Promise<BeltPromotion[]> {
-    return await this.beltPromotionRepository.find({
-      relations: { user: true, from_belt: true, to_belt: true, coach: true },
-      order: { created_at: 'DESC' },
-    });
+    try {
+      // Try to load with all relations first
+      return await this.beltPromotionRepository.find({
+        relations: { user: true, from_belt: true, to_belt: true, coach: true },
+        order: { created_at: 'DESC' },
+      });
+    } catch (error: any) {
+      console.error('[BeltPromotionsService] Error in findAll with relations:', error);
+      console.error('[BeltPromotionsService] Error message:', error?.message);
+      console.error('[BeltPromotionsService] Error stack:', error?.stack);
+      
+      // Fallback to simple find without relations if query fails
+      try {
+        console.log('[BeltPromotionsService] Attempting fallback query without relations');
+        const promotions = await this.beltPromotionRepository.find({
+          order: { created_at: 'DESC' },
+        });
+        console.log('[BeltPromotionsService] Fallback query succeeded, returned', promotions.length, 'promotions');
+        return promotions;
+      } catch (fallbackError: any) {
+        console.error('[BeltPromotionsService] Fallback also failed:', fallbackError);
+        console.error('[BeltPromotionsService] Fallback error message:', fallbackError?.message);
+        throw fallbackError;
+      }
+    }
   }
 
   async findOne(id: number): Promise<BeltPromotion> {

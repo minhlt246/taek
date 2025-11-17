@@ -10,7 +10,6 @@ import {
 } from 'typeorm';
 import { Club } from '../../clubs/entities/club.entity';
 import { User } from '../../users/entities/user.entity';
-import { Coach } from '../../coaches/entities/coach.entity';
 import { Course } from '../../courses/entities/course.entity';
 import { BranchManager } from './branch-manager.entity';
 import { BranchAssistant } from './branch-assistant.entity';
@@ -55,8 +54,9 @@ export class Branch {
   @OneToMany(() => User, (user) => user.chi_nhanh)
   users: User[];
 
-  @OneToMany(() => Coach, (coach) => coach.branch)
-  coaches: Coach[];
+  // Note: Coach không có foreign key trực tiếp với Branch
+  // Quan hệ được quản lý qua bảng trung gian quan_ly_chi_nhanh và tro_giang_chi_nhanh
+  // Không thể dùng @OneToMany relation vì không có branch_id trong bảng huan_luyen_vien
 
   @OneToMany(() => Course, (course) => course.branch)
   courses: Course[];

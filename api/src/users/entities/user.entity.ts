@@ -76,7 +76,7 @@ export class User {
   @Column({ length: 255, nullable: true })
   profile_image_url: string;
 
-  @Column({ length: 255, nullable: true, comment: 'Mật khẩu đăng nhập cho võ sinh' })
+  @Column({ length: 255, nullable: false, comment: 'Mật khẩu đăng nhập cho võ sinh' })
   password: string;
 
   @CreateDateColumn()

@@ -35,7 +35,7 @@ export default function GioiThieuPage() {
             <div className="col-lg-6">
               <div className="about-image">
                 <img
-                  src="/styles/assets/img/blogs/blog-1.jpg"
+                  src="/client/images/blogs/blog-1.jpg"
                   alt="Câu lạc bộ Taekwondo"
                   onError={(e) => {
                     e.currentTarget.src = "/styles/images/logo.png";

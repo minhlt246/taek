@@ -27,8 +27,6 @@ export default function HuanLuyenVienPage() {
           coachesApi.getAll(),
         ]);
 
-        console.log("[HuanLuyenVienPage] Head coach data:", headCoachData);
-        console.log("[HuanLuyenVienPage] All coaches data:", coachesData);
 
         setHeadCoach(headCoachData);
 
@@ -37,7 +35,6 @@ export default function HuanLuyenVienPage() {
           ? coachesData.filter((coach) => coach.id !== headCoachData.id)
           : coachesData;
 
-        console.log("[HuanLuyenVienPage] Filtered coaches:", filteredCoaches);
         setCoaches(filteredCoaches);
       } catch (err) {
         console.error("Error loading coaches data:", err);
@@ -105,18 +102,15 @@ export default function HuanLuyenVienPage() {
             <div className="row align-items-center">
               <div className="col-lg-5 mb-4 mb-lg-0">
                 <div className="head-coach-photo">
-                  {headCoach.image ? (
-                    <img
-                      src={headCoach.image}
-                      alt={headCoach.name}
-                      className="head-coach-image"
-                    />
-                  ) : (
-                    <>
-                      <i className="ti ti-user"></i>
-                      <span>[Head Coach Photo]</span>
-                    </>
-                  )}
+                  <img
+                    src={headCoach.image || "/client/images/users/user-40.jpg"}
+                    alt={headCoach.name}
+                    className="head-coach-image"
+                    onError={(e) => {
+                      // Fallback về ảnh mặc định nếu ảnh không load được
+                      e.currentTarget.src = "/client/images/users/user-40.jpg";
+                    }}
+                  />
                 </div>
               </div>
               <div className="col-lg-7">
@@ -172,31 +166,19 @@ export default function HuanLuyenVienPage() {
           <div className="row">
             {coaches.length > 0 ? (
               coaches.map((coach) => {
-                console.log("[HuanLuyenVienPage] Rendering coach:", coach);
                 return (
                   <div key={coach.id} className="col-lg-3 col-md-6 mb-4">
                     <div className="coach-card-grid border border-2 rounded p-2">
                       <div className="coach-image-placeholder">
-                        {coach.image ? (
-                          <img
-                            src={coach.image}
-                            alt={coach.name}
-                            className="coach-image"
-                            onError={(e) => {
-                              e.currentTarget.style.display = "none";
-                              e.currentTarget.nextElementSibling?.classList.remove(
-                                "d-none"
-                              );
-                            }}
-                          />
-                        ) : null}
-                        <div
-                          className={`coach-image-fallback ${
-                            coach.image ? "d-none" : ""
-                          }`}
-                        >
-                          <i className="ti ti-user"></i>
-                        </div>
+                        <img
+                          src={coach.image || "/client/images/users/user-40.jpg"}
+                          alt={coach.name}
+                          className="coach-image"
+                          onError={(e) => {
+                            // Fallback về ảnh mặc định nếu ảnh không load được
+                            e.currentTarget.src = "/client/images/users/user-40.jpg";
+                          }}
+                        />
                       </div>
                       <div className="coach-info-grid p-2 border-top">
                         <h3 className="coach-name">{coach.name}</h3>

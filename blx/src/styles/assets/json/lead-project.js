@@ -11,7 +11,7 @@ $(document).ready(function () {
 					"lead" : "Collins",
 					"lead_name" : "NovaWave LLC",
 					"lead_city" : "Newyork, USA",
-					"lead_img" : "assets/img/icons/company-icon-01.svg",
+					"lead_img" : "client/images/icons/company-icon-01.svg",
 					"phone" : "+1 875455453",
 					"status" : "1"
 				},
@@ -20,7 +20,7 @@ $(document).ready(function () {
 					"lead" : "Konopelski",
 					"lead_name" : "BlueSky Industries",
 					"lead_city" : "Winchester, KY",
-					"lead_img" : "assets/img/icons/company-icon-02.svg",
+					"lead_img" : "client/images/icons/company-icon-02.svg",
 					"phone" : "+1 989757485",
 					"status" : "1"
 				},
@@ -29,7 +29,7 @@ $(document).ready(function () {
 					"lead" : "Adams",
 					"lead_name" : "Silver Hawk",
 					"lead_city" : "Jametown, NY",
-					"lead_img" : "assets/img/icons/company-icon-03.svg",
+					"lead_img" : "client/images/icons/company-icon-03.svg",
 					"phone" : "+1 546555455",
 					"status" : "1"
 				},
@@ -38,7 +38,7 @@ $(document).ready(function () {
 					"lead" : "Schumm",
 					"lead_name" : "Summit Peak",
 					"lead_city" : "Compton, RI",
-					"lead_img" : "assets/img/icons/company-icon-04.svg",
+					"lead_img" : "client/images/icons/company-icon-04.svg",
 					"phone" : "+1 454478787",
 					"status" : "2"
 				},
@@ -47,7 +47,7 @@ $(document).ready(function () {
 					"lead" : "Wisozk",
 					"lead_name" : "RiverStone Ltd",
 					"lead_city" : "Compton, RI",
-					"lead_img" : "assets/img/icons/company-icon-05.svg",
+					"lead_img" : "client/images/icons/company-icon-05.svg",
 					"phone" : "+1 1245427875",
 					"status" : "1"
 				}

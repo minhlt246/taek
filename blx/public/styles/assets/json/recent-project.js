@@ -9,45 +9,45 @@ $(document).ready(function () {
 				{
 					"id" : 1,
 					"priority_name" : "Truelysell",
-					"priority_img" : "assets/img/priority/truellysel.svg",
+					"priority_img" : "client/images/priority/truellysel.svg",
 					"recent_name" : "NovaWave LLC",
-					"recent_img" : "assets/img/icons/company-icon-01.svg",
+					"recent_img" : "client/images/icons/company-icon-01.svg",
 					"client" : "1",
 					"due_date" : "23 Nov 2025"
 				},
 				{
 					"id" : 2,
 					"priority_name" : "Dreamschat",
-					"priority_img" : "assets/img/priority/dreamchat.svg",
+					"priority_img" : "client/images/priority/dreamchat.svg",
 					"recent_name" : "BlueSky",
-					"recent_img" : "assets/img/icons/company-icon-02.svg",
+					"recent_img" : "client/images/icons/company-icon-02.svg",
 					"client" : "2",
 					"due_date" : "07 Nov 2025"
 				},
 				{
 					"id" : 3,
 					"priority_name" : "DreamGigs",
-					"priority_img" : "assets/img/priority/truellysell.svg",
+					"priority_img" : "client/images/priority/truellysell.svg",
 					"recent_name" : "Silve Hawk",
-					"recent_img" : "assets/img/icons/company-icon-03.svg",
+					"recent_img" : "client/images/icons/company-icon-03.svg",
 					"client" : "",
 					"due_date" : "15 Oct 2025"
 				},
 				{
 					"id" : 4,
 					"priority_name" : "Servbook",
-					"priority_img" : "assets/img/priority/servbook.svg",
+					"priority_img" : "client/images/priority/servbook.svg",
 					"recent_name" : "Summit Peak",
-					"recent_img" : "assets/img/icons/company-icon-04.svg",
+					"recent_img" : "client/images/icons/company-icon-04.svg",
 					"client" : "1",
 					"due_date" : "29 Sep 2025"
 				},
 				{
 					"id" : 5,
 					"priority_name" : "DreamPOS",
-					"priority_img" : "assets/img/priority/dream-pos.svg",
+					"priority_img" : "client/images/priority/dream-pos.svg",
 					"recent_name" : "RiverStone Ltd",
-					"recent_img" : "assets/img/icons/company-icon-05.svg",
+					"recent_img" : "client/images/icons/company-icon-05.svg",
 					"client" : "2",
 					"due_date" : "25 Sep 2025"
 				}

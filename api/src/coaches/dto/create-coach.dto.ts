@@ -12,13 +12,42 @@ import {
 export class CreateCoachDto {
   @IsOptional()
   @IsString()
-  @MaxLength(20)
-  coach_code?: string;
+  @MinLength(2)
+  @MaxLength(100)
+  name?: string;
 
+  @IsOptional()
   @IsString()
   @MinLength(2)
   @MaxLength(100)
-  name: string;
+  ho_va_ten?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  ma_hoi_vien?: string;
+
+  @IsOptional()
+  @IsString()
+  ngay_thang_nam_sinh?: string; // Date format: YYYY-MM-DD
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  ma_clb?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  ma_don_vi?: string;
+
+  @IsOptional()
+  @IsNumber()
+  quyen_so?: number;
+
+  @IsOptional()
+  @IsEnum(['Nam', 'Nữ'])
+  gioi_tinh?: 'Nam' | 'Nữ';
 
   @IsOptional()
   @IsString()
@@ -41,8 +70,8 @@ export class CreateCoachDto {
   password?: string;
 
   @IsOptional()
-  @IsEnum(['head_coach', 'main_manager', 'assistant_manager', 'assistant'])
-  role?: 'head_coach' | 'main_manager' | 'assistant_manager' | 'assistant';
+  @IsEnum(['owner', 'admin'])
+  role?: 'owner' | 'admin';
 
   @IsOptional()
   @IsNumber()
@@ -62,12 +91,18 @@ export class CreateCoachDto {
   bio?: string;
 
   @IsOptional()
-  @IsNumber()
-  club_id?: number;
+  @IsString()
+  address?: string;
 
   @IsOptional()
-  @IsNumber()
-  branch_id?: number;
+  @IsString()
+  @MaxLength(100)
+  emergency_contact_name?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(15)
+  emergency_contact_phone?: string;
 
   @IsOptional()
   @IsBoolean()

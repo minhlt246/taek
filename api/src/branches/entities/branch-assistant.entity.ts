@@ -29,11 +29,15 @@ export class BranchAssistant {
   assigned_at: Date;
 
   // Relations
-  @ManyToOne(() => Branch, (branch) => branch.assistants)
+  @ManyToOne(() => Branch, (branch) => branch.assistants, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'branch_id' })
   branch: Branch;
 
-  @ManyToOne(() => Coach, (coach) => coach.id)
+  @ManyToOne(() => Coach, (coach) => coach.id, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'assistant_id' })
   assistant: Coach;
 }

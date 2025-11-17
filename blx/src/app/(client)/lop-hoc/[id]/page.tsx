@@ -1,19 +1,28 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import PageHeader from "@/components/ui/crm/PageHeader";
 import { coursesApi, getCourseLevelLabel } from "@/services/api/courses";
+import { enrollmentsApi } from "@/services/api/enrollments";
+import { useAccountStore } from "@/stores/account";
+import { useToast } from "@/utils/toast";
 
 export default function CourseDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const courseId = params?.id ? Number(params.id) : null;
 
   const [courseDetail, setCourseDetail] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [isEnrolling, setIsEnrolling] = useState(false);
+  const [isCheckingEnrollment, setIsCheckingEnrollment] = useState(true);
+
+  const { loginSuccess, isAuthenticated } = useAccountStore();
 
   useEffect(() => {
     if (!courseId) {
@@ -32,16 +41,42 @@ export default function CourseDetailPage() {
         } else {
           setError("Không tìm thấy lớp học.");
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Error loading course detail:", err);
-        setError("Không thể tải dữ liệu. Vui lòng thử lại sau.");
+        const errorMessage =
+          err.response?.data?.message ||
+          err.message ||
+          "Không thể tải dữ liệu. Vui lòng thử lại sau.";
+        setError(errorMessage);
+        
+        // If course not found, show specific message
+        if (err.response?.status === 404) {
+          setError("Không tìm thấy lớp học.");
+        }
       } finally {
         setLoading(false);
       }
     };
 
+    const checkEnrollment = async () => {
+      if (loginSuccess || isAuthenticated) {
+        try {
+          setIsCheckingEnrollment(true);
+          const enrolled = await enrollmentsApi.isEnrolled(courseId);
+          setIsEnrolled(enrolled);
+        } catch (err) {
+          console.error("Error checking enrollment:", err);
+        } finally {
+          setIsCheckingEnrollment(false);
+        }
+      } else {
+        setIsCheckingEnrollment(false);
+      }
+    };
+
     fetchCourseDetail();
-  }, [courseId]);
+    checkEnrollment();
+  }, [courseId, loginSuccess, isAuthenticated]);
 
   const formatDate = (dateString?: string): string => {
     if (!dateString) return "Đang cập nhật";
@@ -53,6 +88,41 @@ export default function CourseDetailPage() {
       });
     } catch {
       return "Đang cập nhật";
+    }
+  };
+
+  /**
+   * Handle course enrollment
+   */
+  const handleEnroll = async () => {
+    // Check if user is authenticated
+    if (!loginSuccess && !isAuthenticated) {
+      // Redirect to login with return URL
+      const currentPath = `/lop-hoc/${courseId}`;
+      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+      return;
+    }
+
+    if (!courseId) {
+      useToast.error("Không tìm thấy lớp học.");
+      return;
+    }
+
+    try {
+      setIsEnrolling(true);
+      await enrollmentsApi.enroll(courseId);
+      setIsEnrolled(true);
+      useToast.success("Đăng ký lớp học thành công!");
+      // Redirect to my courses page
+      router.push("/user-center/my-courses");
+    } catch (error: any) {
+      console.error("Error enrolling in course:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        "Không thể đăng ký lớp học. Vui lòng thử lại sau.";
+      useToast.error(errorMessage);
+    } finally {
+      setIsEnrolling(false);
     }
   };
 
@@ -220,48 +290,80 @@ export default function CourseDetailPage() {
                     )}
                   </div>
 
-                  {courseDetail.schedules &&
-                    courseDetail.schedules.length > 0 && (
-                      <div className="schedule-section mt-4">
-                        <h3 className="schedule-title">Lịch tập</h3>
-                        <div className="schedule-list">
-                          {courseDetail.schedules.map(
-                            (schedule: any, index: number) => (
-                              <div key={index} className="schedule-item">
-                                <div className="schedule-day">
-                                  {schedule.day_of_week === "monday" && "Thứ 2"}
-                                  {schedule.day_of_week === "tuesday" &&
-                                    "Thứ 3"}
-                                  {schedule.day_of_week === "wednesday" &&
-                                    "Thứ 4"}
-                                  {schedule.day_of_week === "thursday" &&
-                                    "Thứ 5"}
-                                  {schedule.day_of_week === "friday" && "Thứ 6"}
-                                  {schedule.day_of_week === "saturday" &&
-                                    "Thứ 7"}
-                                  {schedule.day_of_week === "sunday" &&
-                                    "Chủ nhật"}
-                                </div>
-                                <div className="schedule-time">
-                                  {schedule.start_time} - {schedule.end_time}
-                                </div>
-                              </div>
-                            )
-                          )}
-                        </div>
+                  {(courseDetail.training_time || courseDetail.training_days) && (
+                    <div className="schedule-section mt-4">
+                      <h3 className="schedule-title">Lịch tập</h3>
+                      <div className="schedule-info">
+                        {courseDetail.training_days && (
+                          <div className="info-item">
+                            <i className="ti ti-calendar me-2"></i>
+                            <strong>Buổi tập:</strong>
+                            <span>{courseDetail.training_days}</span>
+                          </div>
+                        )}
+                        {courseDetail.training_time && (
+                          <div className="info-item">
+                            <i className="ti ti-clock me-2"></i>
+                            <strong>Giờ tập:</strong>
+                            <span>{courseDetail.training_time}</span>
+                          </div>
+                        )}
                       </div>
-                    )}
+                    </div>
+                  )}
 
                   <div className="course-actions mt-4">
-                    <Link href="/register" className="btn btn-primary btn-lg">
-                      Đăng ký ngay
-                    </Link>
-                    <Link
-                      href="/lop-hoc"
-                      className="btn btn-outline-secondary btn-lg ms-2"
-                    >
-                      Quay lại danh sách
-                    </Link>
+                    {isCheckingEnrollment ? (
+                      <button
+                        className="btn btn-primary btn-lg"
+                        disabled
+                      >
+                        <span className="spinner-border spinner-border-sm me-2"></span>
+                        Đang kiểm tra...
+                      </button>
+                    ) : isEnrolled ? (
+                      <>
+                        <Link
+                          href="/user-center/my-courses"
+                          className="btn btn-success btn-lg"
+                        >
+                          <i className="ti ti-check me-2"></i>
+                          Đã đăng ký - Xem lớp của tôi
+                        </Link>
+                        <Link
+                          href="/lop-hoc"
+                          className="btn btn-outline-secondary btn-lg ms-2"
+                        >
+                          Quay lại danh sách
+                        </Link>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={handleEnroll}
+                          className="btn btn-primary btn-lg"
+                          disabled={isEnrolling}
+                        >
+                          {isEnrolling ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm me-2"></span>
+                              Đang đăng ký...
+                            </>
+                          ) : (
+                            <>
+                              <i className="ti ti-user-plus me-2"></i>
+                              Đăng ký lớp học
+                            </>
+                          )}
+                        </button>
+                        <Link
+                          href="/lop-hoc"
+                          className="btn btn-outline-secondary btn-lg ms-2"
+                        >
+                          Quay lại danh sách
+                        </Link>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>

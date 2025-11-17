@@ -31,19 +31,43 @@ export class CoachesController {
   @Get()
   async findAll() {
     const coaches = await this.coachesService.findAll();
-    return coaches; // Return array directly for frontend compatibility
+    // Format response to ensure all required fields are present
+    return coaches.map((coach) => ({
+      id: coach.id,
+      ma_hoi_vien: coach.ma_hoi_vien || null,
+      ho_va_ten: coach.ho_va_ten || null,
+      name: coach.ho_va_ten || null, // Alias for frontend compatibility
+      email: coach.email || null,
+      phone: coach.phone || null,
+      ma_clb: coach.ma_clb || null,
+      role: coach.role || 'admin',
+      belt_level_id: coach.belt_level_id || null,
+      belt_level: coach.belt_level
+        ? {
+            id: coach.belt_level.id,
+            name: coach.belt_level.name,
+            color: coach.belt_level.color || null,
+          }
+        : null,
+      is_active: coach.is_active !== false,
+      created_at: coach.created_at ? coach.created_at.toISOString() : null,
+      updated_at: coach.updated_at ? coach.updated_at.toISOString() : null,
+    }));
   }
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    const coach = await this.coachesService.findOne(id);
-    return coach; // Return object directly for frontend compatibility
-  }
-
-  @Get('code/:coach_code')
-  async findByCode(@Param('coach_code') coach_code: string) {
-    const coach = await this.coachesService.findByCode(coach_code);
-    return coach; // Return object directly for frontend compatibility
+    try {
+      const coach = await this.coachesService.findOne(id);
+      return coach; // Return object directly for frontend compatibility
+    } catch (error) {
+      console.error('[Coaches Controller] Error in findOne:', {
+        id,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      throw error;
+    }
   }
 
   @Get('club/:club_id')
@@ -78,17 +102,6 @@ export class CoachesController {
     return {
       success: true,
       message: 'Coach deleted successfully',
-    };
-  }
-
-  @Post('cleanup/duplicate-codes')
-  @HttpCode(HttpStatus.OK)
-  async cleanupDuplicateCodes() {
-    const result = await this.coachesService.cleanupDuplicateCoachCodes();
-    return {
-      success: true,
-      message: 'Duplicate codes cleaned up successfully',
-      data: result,
     };
   }
 }

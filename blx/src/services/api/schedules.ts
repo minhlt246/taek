@@ -114,6 +114,10 @@ const getLevelLabel = (level?: string): string => {
  * Map backend ScheduleResponse to frontend Schedule
  */
 const mapScheduleResponse = (response: ScheduleResponse): Schedule => {
+  // Schedule entity doesn't have course relation, only club and branch
+  // Use club name as className for now, or location
+  const className = response.club?.name || response.location || "Lớp học";
+  
   return {
     id: response.id,
     day: getDayName(response.day_of_week),
@@ -121,11 +125,10 @@ const mapScheduleResponse = (response: ScheduleResponse): Schedule => {
     time: formatTimeRange(response.start_time, response.end_time),
     startTime: formatTime(response.start_time),
     endTime: formatTime(response.end_time),
-    className: response.course?.title || "Lớp học",
-    level: getLevelLabel(response.course?.level),
-    instructor: response.course?.coach?.name || "HLV",
-    location: response.location,
-    courseId: response.course_id,
+    className: className,
+    level: "Tất cả", // Schedule doesn't have course level
+    instructor: "HLV", // Schedule doesn't have coach relation
+    location: response.location || response.branch?.name || "",
   };
 };
 
@@ -190,11 +193,6 @@ export const schedulesApi = {
         "/schedules"
       );
 
-      // Debug logging
-      if (process.env.NODE_ENV === "development") {
-        console.log("[Schedules API] Raw response:", response.data);
-      }
-
       // Handle different response formats
       let schedulesData: ScheduleResponse[] = [];
       if (Array.isArray(response.data)) {
@@ -209,20 +207,9 @@ export const schedulesApi = {
       // Group by day
       const grouped = groupSchedulesByDay(mappedSchedules);
 
-      if (process.env.NODE_ENV === "development") {
-        console.log("[Schedules API] Mapped and grouped schedules:", grouped);
-      }
-
       return grouped;
     } catch (error: any) {
-      if (error.code === "ECONNREFUSED" || error.message === "Network Error") {
-        console.warn(
-          "API server is not running. Please start the backend server."
-        );
-      } else {
-        console.error("Error fetching schedules:", error);
-        console.error("Error details:", error.response?.data || error.message);
-      }
+      // http.ts đã log lỗi 500+ và connection errors rồi, không cần log lại ở đây
       return [];
     }
   },

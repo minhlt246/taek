@@ -12,7 +12,6 @@ interface Course {
   level: string;
   duration: number; // in weeks
   price: number;
-  maxStudents: number;
   currentStudents: number;
   instructor: string;
   trainingTime?: string; // Giờ tập
@@ -48,7 +47,6 @@ export default function CoursesPage() {
     level: "beginner" as "beginner" | "intermediate" | "advanced",
     duration: "" as number | string,
     price: "" as number | string,
-    maxStudents: "" as number | string,
     instructor: "",
     trainingTime: "",
     trainingDays: "",
@@ -85,12 +83,6 @@ export default function CoursesPage() {
     const price =
       course.price !== undefined && course.price !== null ? course.price : 0;
 
-    // Lấy số học viên tối đa từ entity
-    const maxStudents =
-      course.max_students !== undefined && course.max_students !== null
-        ? course.max_students
-        : 20;
-
     // Lấy số học viên hiện tại
     const currentStudents =
       course.current_students !== undefined && course.current_students !== null
@@ -104,7 +96,6 @@ export default function CoursesPage() {
       level: course.level || "beginner",
       duration: duration,
       price: price,
-      maxStudents: maxStudents,
       currentStudents: currentStudents,
       instructor: instructorName,
       trainingTime: course.training_time || "",
@@ -136,7 +127,6 @@ export default function CoursesPage() {
           coach: data[0].coach,
           current_students: data[0].current_students,
           price: (data[0] as any).price,
-          max_students: (data[0] as any).max_students,
           allKeys: Object.keys(data[0]),
         });
       }
@@ -193,6 +183,65 @@ export default function CoursesPage() {
     }
   };
 
+  /**
+   * Calculate duration in weeks from start date and end date
+   */
+  const calculateDuration = (startDate: string, endDate: string): number => {
+    if (!startDate || !endDate) return 0;
+
+    try {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      // Check if dates are valid
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) return 0;
+
+      // Calculate difference in milliseconds
+      const diffTime = Math.abs(end.getTime() - start.getTime());
+
+      // Convert to days
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      // Convert to weeks (round up)
+      const weeks = Math.ceil(diffDays / 7);
+
+      return weeks > 0 ? weeks : 0;
+    } catch (error) {
+      console.error("Error calculating duration:", error);
+      return 0;
+    }
+  };
+
+  /**
+   * Handle start date change and auto-calculate duration
+   */
+  const handleStartDateChange = (date: string) => {
+    const newFormData = {
+      ...formData,
+      startDate: date,
+    };
+    // Auto-calculate duration if end date exists
+    if (newFormData.endDate) {
+      newFormData.duration = calculateDuration(date, newFormData.endDate);
+    }
+    setFormData(newFormData);
+  };
+
+  /**
+   * Handle end date change and auto-calculate duration
+   */
+  const handleEndDateChange = (date: string) => {
+    const newFormData = {
+      ...formData,
+      endDate: date,
+    };
+    // Auto-calculate duration if start date exists
+    if (newFormData.startDate) {
+      newFormData.duration = calculateDuration(newFormData.startDate, date);
+    }
+    setFormData(newFormData);
+  };
+
   useEffect(() => {
     fetchCourses();
     fetchClubs();
@@ -242,15 +291,7 @@ export default function CoursesPage() {
         }
       }
 
-      if (formData.maxStudents && formData.maxStudents !== "") {
-        const maxStudents =
-          typeof formData.maxStudents === "number"
-            ? formData.maxStudents
-            : parseInt(String(formData.maxStudents));
-        if (!isNaN(maxStudents) && maxStudents > 0) {
-          courseData.max_students = maxStudents;
-        }
-      }
+      // max_students removed - không cần số học viên tối đa
 
       // Thêm instructor_name nếu có
       if (formData.instructor && formData.instructor.trim()) {
@@ -365,10 +406,6 @@ export default function CoursesPage() {
           : "",
       price:
         course.price !== undefined && course.price !== null ? course.price : "",
-      maxStudents:
-        course.maxStudents !== undefined && course.maxStudents !== null
-          ? course.maxStudents
-          : "",
       instructor: course.instructor || "",
       trainingTime: course.trainingTime || "",
       trainingDays: course.trainingDays || "",
@@ -417,7 +454,6 @@ export default function CoursesPage() {
       level: "beginner",
       duration: "",
       price: "",
-      maxStudents: "",
       instructor: "",
       trainingTime: "",
       trainingDays: "",
@@ -522,28 +558,9 @@ export default function CoursesPage() {
                           : "0 đ"}
                       </td>
                       <td>
-                        {course.currentStudents !== undefined &&
-                        course.maxStudents !== undefined
-                          ? `${course.currentStudents}/${course.maxStudents}`
-                          : "0/20"}
-                        {course.maxStudents > 0 && (
-                          <div
-                            className="progress mt-1"
-                            style={{ height: "5px" }}
-                          >
-                            <div
-                              className="progress-bar"
-                              style={{
-                                width: `${Math.min(
-                                  ((course.currentStudents || 0) /
-                                    course.maxStudents) *
-                                    100,
-                                  100
-                                )}%`,
-                              }}
-                            ></div>
-                          </div>
-                        )}
+                        {course.currentStudents !== undefined
+                          ? course.currentStudents
+                          : 0}
                       </td>
                       <td>
                         {course.club?.name ? (
@@ -671,7 +688,7 @@ export default function CoursesPage() {
                           className="form-select"
                           value={formData.level}
                           onChange={(e) =>
-                            setFormData({ ...formData, level: e.target.value })
+                            setFormData({ ...formData, name: e.target.value })
                           }
                           required
                         >
@@ -701,23 +718,21 @@ export default function CoursesPage() {
                   <div className="row">
                     <div className="col-md-4">
                       <div className="mb-3">
-                        <label className="form-label">Thời gian (tuần)</label>
+                        <label className="form-label">
+                          Thời gian (tuần){" "}
+                          
+                        </label>
                         <input
                           type="number"
                           className="form-control"
-                          value={formData.duration}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              duration:
-                                e.target.value === ""
-                                  ? ""
-                                  : parseInt(e.target.value) || "",
-                            })
-                          }
+                          value={formData.duration || ""}
                           min="1"
-                          placeholder="Nhập số tuần"
-                          required
+                          placeholder="Tự động tính từ ngày bắt đầu và kết thúc"
+                          readOnly
+                          style={{
+                            backgroundColor: "#f8f9fa",
+                            cursor: "not-allowed",
+                          }}
                         />
                       </div>
                     </div>
@@ -739,28 +754,6 @@ export default function CoursesPage() {
                           }
                           min="0"
                           placeholder="Nhập giá"
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="col-md-4">
-                      <div className="mb-3">
-                        <label className="form-label">Số học viên tối đa</label>
-                        <input
-                          type="number"
-                          className="form-control"
-                          value={formData.maxStudents}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              maxStudents:
-                                e.target.value === ""
-                                  ? ""
-                                  : parseInt(e.target.value) || "",
-                            })
-                          }
-                          min="1"
-                          placeholder="Nhập số học viên"
                           required
                         />
                       </div>
@@ -884,10 +877,7 @@ export default function CoursesPage() {
                           className="form-control"
                           value={formData.startDate}
                           onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              startDate: e.target.value,
-                            })
+                            handleStartDateChange(e.target.value)
                           }
                           required
                         />
@@ -900,12 +890,7 @@ export default function CoursesPage() {
                           type="date"
                           className="form-control"
                           value={formData.endDate}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              endDate: e.target.value,
-                            })
-                          }
+                          onChange={(e) => handleEndDateChange(e.target.value)}
                           required
                         />
                       </div>

@@ -115,7 +115,7 @@ export const clubsApi = {
       const response = await http.get<ClubOverview>(`/clubs/${id}/overview`);
       return response.data || null;
     } catch (error: any) {
-      console.error(`Error fetching club overview ${id}:`, error);
+      // http.ts đã log lỗi 500+ rồi, không cần log lại ở đây
       return null;
     }
   },
@@ -128,7 +128,6 @@ export const clubsApi = {
   create: async (data: any): Promise<Club> => {
     try {
       const response = await http.post<Club | { success: boolean; message: string; data: Club }>("/clubs", data);
-      console.log("[ClubsApi] Create response:", response.data);
       // Handle response format: { success, message, data } or direct Club
       if (response.data && "id" in response.data && !("success" in response.data)) {
         return response.data as Club;
@@ -149,7 +148,6 @@ export const clubsApi = {
   update: async (id: number, data: any): Promise<Club> => {
     try {
       const response = await http.patch<Club | { success: boolean; message: string; data: Club }>(`/clubs/${id}`, data);
-      console.log("[ClubsApi] Update response:", response.data);
       // Handle response format: { success, message, data } or direct Club
       if (response.data && "id" in response.data && !("success" in response.data)) {
         return response.data as Club;

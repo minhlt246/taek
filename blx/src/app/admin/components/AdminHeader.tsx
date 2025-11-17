@@ -3,15 +3,31 @@
 import { useAccountStore } from "@/stores/account";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
+import { useState, useEffect } from "react";
+import { useAvatar } from "@/hooks/useAvatar";
 
 const AdminHeader = () => {
   const { account, logout } = useAccountStore();
   const router = useRouter();
+  const avatarUrl = useAvatar(account?.id);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showNotificationDropdown, setShowNotificationDropdown] =
     useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
+
+  // Fallback avatar URL nếu không load được từ API
+  const defaultAvatarUrl = "/client/images/users/user-40.jpg";
+  const displayAvatarUrl =
+    avatarError || !avatarUrl ? defaultAvatarUrl : avatarUrl;
+
+  // Reset error khi avatarUrl thay đổi
+  useEffect(() => {
+    if (avatarUrl) {
+      setAvatarError(false);
+    }
+  }, [avatarUrl]);
 
   useEffect(() => {
     // Check for saved theme preference or default to light mode
@@ -268,11 +284,17 @@ const AdminHeader = () => {
               type="button"
               aria-label="User menu"
             >
-              <img
-                src="/styles/assets/img/users/user-40.jpg"
-                width="38"
+              <Image
+                src={displayAvatarUrl}
+                width={38}
+                height={38}
                 className="rounded-1 d-flex"
                 alt="user-image"
+                unoptimized={displayAvatarUrl.startsWith("http")}
+                onError={() => {
+                  // Fallback về ảnh mặc định nếu ảnh không load được
+                  setAvatarError(true);
+                }}
               />
               <span className="online text-success">
                 <i className="ti ti-circle-filled d-flex bg-white rounded-circle border border-1 border-white"></i>
@@ -288,16 +310,23 @@ const AdminHeader = () => {
                   top: "100%",
                   right: 0,
                   left: "auto",
+                  border: "none",
+                  boxShadow: "0 0.125rem 0.25rem rgba(0, 0, 0, 0.075)",
                 }}
                 onMouseDown={(e) => e.stopPropagation()}
               >
                 <div className="d-flex align-items-center bg-light rounded-3 p-2 mb-2">
-                  <img
-                    src="/styles/assets/img/users/user-40.jpg"
+                  <Image
+                    src={displayAvatarUrl}
                     className="rounded-circle"
-                    width="42"
-                    height="42"
-                    alt="Img"
+                    width={42}
+                    height={42}
+                    alt="User avatar"
+                    unoptimized={displayAvatarUrl.startsWith("http")}
+                    onError={() => {
+                      // Fallback về ảnh mặc định nếu ảnh không load được
+                      setAvatarError(true);
+                    }}
                   />
                   <div className="ms-2">
                     <p className="fw-medium text-dark mb-0">

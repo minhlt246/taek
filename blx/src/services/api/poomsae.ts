@@ -5,7 +5,16 @@ import http from "@/services/http";
  */
 export interface Poomsae {
   id: number;
-  name: string;
+  tenBaiQuyenVietnamese?: string;
+  tenBaiQuyenEnglish?: string;
+  tenBaiQuyenKorean?: string;
+  capDo?: string;
+  moTa?: string;
+  soDongTac?: number;
+  thoiGianThucHien?: number;
+  khoiLuongLyThuyet?: string;
+  // Legacy fields for backward compatibility
+  name?: string;
   description?: string;
   video_url?: string;
   belt_level_id?: number;
@@ -16,6 +25,8 @@ export interface Poomsae {
   };
   created_at?: string;
   updated_at?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 /**
@@ -41,7 +52,7 @@ export const poomsaeApi = {
    */
   getAll: async (): Promise<Poomsae[]> => {
     try {
-      const response = await http.get("/poomsae");
+      const response = await http.get<Poomsae[] | { data: Poomsae[] }>("/poomsae");
       return handleResponse<Poomsae[]>(response.data);
     } catch (error: any) {
       console.error("Error fetching poomsae:", error);
@@ -56,7 +67,7 @@ export const poomsaeApi = {
    */
   getById: async (id: number): Promise<Poomsae | null> => {
     try {
-      const response = await http.get(`/poomsae/${id}`);
+      const response = await http.get<Poomsae | { data: Poomsae }>(`/poomsae/${id}`);
       return handleResponse<Poomsae>(response.data);
     } catch (error: any) {
       console.error(`Error fetching poomsae ${id}:`, error);
@@ -125,8 +136,11 @@ export const poomsaeApi = {
    */
   getByBeltLevel: async (beltLevelId: number): Promise<Poomsae[]> => {
     try {
-      const response = await http.get(`/poomsae/belt-level/${beltLevelId}`);
-      return handleResponse<Poomsae[]>(response.data);
+      const response = await http.get<Poomsae[] | { data: Poomsae[] }>(`/poomsae/belt-level/${beltLevelId}`);
+      console.log(`[PoomsaeApi] Raw response for belt level ${beltLevelId}:`, response.data);
+      const result = handleResponse<Poomsae[]>(response.data);
+      console.log(`[PoomsaeApi] Processed result for belt level ${beltLevelId}:`, result);
+      return result;
     } catch (error: any) {
       console.error(`Error fetching poomsae for belt level ${beltLevelId}:`, error);
       return [];

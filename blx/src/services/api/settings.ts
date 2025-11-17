@@ -51,7 +51,6 @@ export const settingsApi = {
   update: async (data: any): Promise<Setting[]> => {
     try {
       const response = await http.patch<Setting[] | { success: boolean; message: string; data: Setting[] }>("/settings", data);
-      console.log("[SettingsApi] Update response:", response.data);
       if (Array.isArray(response.data)) {
         return response.data;
       }

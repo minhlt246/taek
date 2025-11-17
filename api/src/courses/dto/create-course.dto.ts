@@ -55,28 +55,9 @@ export class CreateCourseDto {
   @IsNumber()
   current_students?: number;
 
-  @IsOptional()
-  @IsNumber()
-  max_students?: number;
-
-  @IsOptional()
-  @IsNumber()
-  price?: number;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(255)
-  instructor_name?: string;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(100)
-  training_time?: string; // Giờ tập (ví dụ: "18:00-19:30")
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(255)
-  training_days?: string; // Buổi tập (ví dụ: "Thứ 2, 4, 6")
+  // Note: max_students, price, instructor_name, training_time, training_days
+  // are not in the database schema, so they are removed from the DTO.
+  // If needed, add these columns to the database first.
 
   @IsOptional()
   @IsString()

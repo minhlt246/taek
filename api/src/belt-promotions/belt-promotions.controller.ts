@@ -31,8 +31,13 @@ export class BeltPromotionsController {
 
   @Get()
   async findAll() {
-    const promotions = await this.beltPromotionsService.findAll();
-    return promotions; // Return array directly for frontend compatibility
+    try {
+      const promotions = await this.beltPromotionsService.findAll();
+      return promotions; // Return array directly for frontend compatibility
+    } catch (error) {
+      console.error('[BeltPromotionsController] Error in findAll:', error);
+      throw error;
+    }
   }
 
   @Get(':id')

@@ -1,46 +1,33 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DeepPartial } from 'typeorm';
 import { Coach } from './entities/coach.entity';
 import { CreateCoachDto, UpdateCoachDto } from './dto';
 import { ICoachService } from './interfaces';
+import { BeltLevel } from '../belt-levels/entities/belt-level.entity';
+import { Club } from '../clubs/entities/club.entity';
 
 @Injectable()
 export class CoachesService implements ICoachService {
   constructor(
     @InjectRepository(Coach)
     private readonly coachRepository: Repository<Coach>,
+    @InjectRepository(Club)
+    private readonly clubRepository: Repository<Club>,
+    @InjectRepository(BeltLevel)
+    private readonly beltLevelRepository: Repository<BeltLevel>,
   ) {}
 
   async create(createCoachDto: CreateCoachDto): Promise<Coach> {
-    // Convert empty string to undefined for coach_code to avoid unique constraint violation
-    // Process coach_code: remove whitespace and convert empty string to undefined
-    let processedCoachCode: string | undefined = undefined;
-    if (createCoachDto.coach_code !== undefined && createCoachDto.coach_code !== null) {
-      const trimmed = createCoachDto.coach_code.trim();
-      processedCoachCode = trimmed !== '' ? trimmed : undefined;
-    }
-
-    // Check if coach_code already exists (only if not undefined/empty)
-    if (processedCoachCode) {
-    const existingCoach = await this.coachRepository.findOne({
-        where: { coach_code: processedCoachCode },
-    });
-
-    if (existingCoach) {
-      throw new ConflictException('Coach code already exists');
-    }
-    }
-
-    // Create coach data with processed coach_code
+    // Map name to ho_va_ten if name is provided but ho_va_ten is not
     const coachData: DeepPartial<Coach> = {
       ...createCoachDto,
-      coach_code: processedCoachCode,
+      ho_va_ten: createCoachDto.ho_va_ten || createCoachDto.name,
     };
+    // Remove name property if it exists to avoid confusion
+    if ('name' in coachData) {
+      delete (coachData as any).name;
+    }
 
     // Create and save coach
     const coach = this.coachRepository.create(coachData);
@@ -48,79 +35,147 @@ export class CoachesService implements ICoachService {
   }
 
   async findAll(): Promise<Coach[]> {
-    return await this.coachRepository.find({
-      relations: ['club', 'branch', 'belt_level'],
-      order: { role: 'ASC', name: 'ASC' },
-    });
+    try {
+      // Load belt_level relation để có đầy đủ thông tin
+      const coaches = await this.coachRepository.find({
+        relations: ['belt_level'],
+        order: { role: 'ASC', ho_va_ten: 'ASC' },
+      });
+
+      // Map coaches để đảm bảo có đầy đủ thông tin cho frontend
+      return coaches.map((coach) => {
+        const coachData: any = { ...coach };
+        
+        // Đảm bảo có belt_level object nếu có belt_level_id
+        if (coach.belt_level_id && !coach.belt_level) {
+          // Nếu không load được relation, sẽ được xử lý ở controller
+        }
+        
+        return coachData;
+      });
+    } catch (error) {
+      console.error('[Coaches Service] Error in findAll:', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      throw error;
+    }
   }
 
   async findOne(id: number): Promise<Coach> {
-    const coach = await this.coachRepository.findOne({
-      where: { id },
-      relations: ['club', 'branch', 'belt_level'],
-    });
+    try {
+      // Không load relation club và branch vì không có foreign key trực tiếp
+      const coach = await this.coachRepository.findOne({
+        where: { id },
+      });
 
-    if (!coach) {
-      throw new NotFoundException(`Coach with ID ${id} not found`);
+      if (!coach) {
+        throw new NotFoundException(`Coach with ID ${id} not found`);
+      }
+
+      // Nếu có cap_dai_id, load belt_level riêng bằng cách query trực tiếp
+      if (coach.belt_level_id) {
+        try {
+          const beltLevel = await this.beltLevelRepository.findOne({
+            where: { id: coach.belt_level_id },
+          });
+          if (beltLevel) {
+            (coach as any).belt_level = beltLevel;
+          }
+        } catch (beltLevelError) {
+          console.warn(
+            '[Coaches Service] Could not load belt_level:',
+            beltLevelError,
+          );
+          // Không throw error, chỉ log warning
+        }
+      }
+
+      return coach;
+    } catch (error) {
+      console.error('[Coaches Service] Error in findOne:', {
+        id,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      throw error;
     }
-
-    return coach;
-  }
-
-  async findByCode(coach_code: string): Promise<Coach> {
-    const coach = await this.coachRepository.findOne({
-      where: { coach_code },
-      relations: ['club', 'branch', 'belt_level'],
-    });
-
-    if (!coach) {
-      throw new NotFoundException(`Coach with code ${coach_code} not found`);
-    }
-
-    return coach;
   }
 
   async findByClub(club_id: number): Promise<Coach[]> {
-    return await this.coachRepository.find({
-      where: { club_id },
-      relations: ['club', 'branch', 'belt_level'],
-      order: { role: 'ASC', name: 'ASC' },
-    });
+    try {
+      // Tìm club để lấy club_code
+      const club = await this.clubRepository.findOne({
+        where: { id: club_id },
+      });
+
+      if (!club) {
+        throw new NotFoundException(`Club with ID ${club_id} not found`);
+      }
+
+      // Tìm coaches theo ma_clb (mã câu lạc bộ)
+      // Format có thể là: CLB_00468 hoặc _00468
+      // Cần tìm theo cả hai format để đảm bảo tìm được
+      const clubCode = club.club_code;
+      const clubCodeWithPrefix = `CLB${clubCode}`; // Nếu club_code là _00468 thì sẽ thành CLB_00468
+
+      // Tìm coaches với ma_clb khớp với club_code hoặc format CLB_xxx
+      const coaches = await this.coachRepository
+        .createQueryBuilder('coach')
+        .where(
+          'coach.ma_clb = :clubCode OR coach.ma_clb = :clubCodeWithPrefix',
+          {
+            clubCode,
+            clubCodeWithPrefix,
+          },
+        )
+        .orderBy('coach.role', 'ASC')
+        .addOrderBy('coach.ho_va_ten', 'ASC')
+        .getMany();
+
+      return coaches;
+    } catch (error) {
+      console.error('[Coaches Service] Error in findByClub:', {
+        club_id,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
+    }
   }
 
-  async findHeadCoach(): Promise<Coach | null> {
-    const headCoach = await this.coachRepository.findOne({
-      where: { role: 'head_coach' },
-      relations: ['club', 'branch', 'belt_level'],
-    });
+  async findOwner(): Promise<Coach | null> {
+    try {
+      // Không load relation club và branch vì không có foreign key trực tiếp
+      const owner = await this.coachRepository.findOne({
+        where: { role: 'owner' },
+      });
 
-    return headCoach || null;
+      return owner || null;
+    } catch (error) {
+      console.error('[Coaches Service] Error in findOwner:', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
+    }
+  }
+
+  // Deprecated: Use findOwner() instead
+  async findHeadCoach(): Promise<Coach | null> {
+    return this.findOwner();
   }
 
   async update(id: number, updateCoachDto: UpdateCoachDto): Promise<Coach> {
     const coach = await this.findOne(id);
 
-    // Convert empty string to undefined for coach_code to avoid unique constraint violation
     const updateData: DeepPartial<Coach> = { ...updateCoachDto };
-    
-    // Process coach_code: remove whitespace and convert empty string to undefined
-    if (updateCoachDto.coach_code !== undefined && updateCoachDto.coach_code !== null) {
-      const trimmed = updateCoachDto.coach_code.trim();
-      updateData.coach_code = trimmed !== '' ? trimmed : undefined;
+
+    // Map name to ho_va_ten if name is provided but ho_va_ten is not
+    if (updateCoachDto.name && !updateCoachDto.ho_va_ten) {
+      updateData.ho_va_ten = updateCoachDto.name;
     }
-
-    // Check if coach_code already exists (if being updated and not undefined/empty)
-    if (
-      updateData.coach_code &&
-      updateData.coach_code !== coach.coach_code
-    ) {
-      const existingCoach = await this.coachRepository.findOne({
-        where: { coach_code: updateData.coach_code },
-      });
-
-      if (existingCoach) {
-        throw new ConflictException('Coach code already exists');
-      }
+    // Remove name property if it exists to avoid confusion
+    if ('name' in updateData) {
+      delete (updateData as any).name;
     }
 
     // Update coach
@@ -131,23 +186,5 @@ export class CoachesService implements ICoachService {
   async remove(id: number): Promise<void> {
     const coach = await this.findOne(id);
     await this.coachRepository.remove(coach);
-  }
-
-  /**
-   * Clean up duplicate coach_code entries
-   * Converts empty strings to NULL to avoid unique constraint violations
-   * @returns Promise<{ updated: number }>
-   */
-  async cleanupDuplicateCoachCodes(): Promise<{ updated: number }> {
-    // Update all empty strings and whitespace-only strings to NULL
-    const result = await this.coachRepository
-      .createQueryBuilder()
-      .update(Coach)
-      .set({ coach_code: null as any })
-      .where('coach_code = :empty', { empty: '' })
-      .orWhere('TRIM(COALESCE(coach_code, "")) = :empty', { empty: '' })
-      .execute();
-
-    return { updated: result.affected || 0 };
   }
 }

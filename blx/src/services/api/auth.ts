@@ -14,7 +14,7 @@ export interface RegisterRequest {
   email: string;
   password: string;
   phone?: string;
-  role?: 'admin' | 'student' | 'HLV' | 'parent';
+  role?: "admin" | "student" | "HLV" | "parent";
 }
 
 export const authApi = {
@@ -23,9 +23,7 @@ export const authApi = {
     return response.data;
   },
 
-  async login(
-    credentials: LoginRequest
-  ): Promise<{
+  async login(credentials: LoginRequest): Promise<{
     success: boolean;
     message: string;
     data: { user: any; token: string };
@@ -34,9 +32,7 @@ export const authApi = {
     return response.data;
   },
 
-  async register(
-    userData: RegisterRequest
-  ): Promise<{
+  async register(userData: RegisterRequest): Promise<{
     success: boolean;
     message: string;
     data: { user: any };
@@ -79,15 +75,6 @@ export const authApi = {
     return response.data;
   },
 
-  async createKYC(kycData: any): Promise<void> {
-    const response = await http.post("/auth/kyc", kycData);
-    return response.data;
-  },
-
-  async getKYCDetail(): Promise<any> {
-    const response = await http.get("/auth/kyc");
-    return response.data;
-  },
 
   async uploadImage(file: File): Promise<{ url: string }> {
     const formData = new FormData();

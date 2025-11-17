@@ -25,7 +25,7 @@ export class Poomsae {
   @Column({ name: 'cap_do' })
   capDo: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ name: 'mo_ta', type: 'text', nullable: true })
   moTa?: string;
 
   @Column({ name: 'so_dong_tac', nullable: true })

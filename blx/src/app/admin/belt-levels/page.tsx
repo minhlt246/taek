@@ -1,22 +1,30 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { beltLevelsApi } from "@/services/api/belt-levels";
+import {
+  beltLevelsApi,
+  BeltLevel as ApiBeltLevel,
+} from "@/services/api/belt-levels";
+import { poomsaeApi } from "@/services/api/poomsae";
 
-interface BeltLevel {
-  id: number;
-  name: string;
-  color: string;
-  order_sequence: number;
-  description: string;
+interface BeltLevel extends ApiBeltLevel {
   required_poomsae_code?: string;
   required_poomsae_name?: string;
-  created_at: string;
-  updated_at: string;
+}
+
+interface Poomsae {
+  id: number;
+  tenBaiQuyenVietnamese?: string;
+  tenBaiQuyenEnglish?: string;
+  tenBaiQuyenKorean?: string;
+  capDo?: string;
+  name?: string; // Fallback field
+  description?: string;
 }
 
 export default function BeltLevelsPage() {
   const [beltLevels, setBeltLevels] = useState<BeltLevel[]>([]);
+  const [poomsaeMap, setPoomsaeMap] = useState<Record<number, Poomsae[]>>({});
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingBeltLevel, setEditingBeltLevel] = useState<BeltLevel | null>(
@@ -37,6 +45,32 @@ export default function BeltLevelsPage() {
         const beltLevelData = await beltLevelsApi.getAll();
         console.log("Dữ liệu cấp đai từ API:", beltLevelData);
         setBeltLevels(beltLevelData);
+
+        // Fetch poomsae for each belt level in parallel
+        const poomsaePromises = beltLevelData.map(async (beltLevel) => {
+          try {
+            const poomsaes = await poomsaeApi.getByBeltLevel(beltLevel.id);
+            console.log(
+              `Bài quyền cho cấp đai ${beltLevel.id} (${beltLevel.name}):`,
+              poomsaes
+            );
+            return { beltLevelId: beltLevel.id, poomsaes };
+          } catch (error) {
+            console.error(
+              `Lỗi khi tải bài quyền cho cấp đai ${beltLevel.id}:`,
+              error
+            );
+            return { beltLevelId: beltLevel.id, poomsaes: [] };
+          }
+        });
+
+        const poomsaeResults = await Promise.all(poomsaePromises);
+        const poomsaeDataMap: Record<number, Poomsae[]> = {};
+        poomsaeResults.forEach((result) => {
+          poomsaeDataMap[result.beltLevelId] = result.poomsaes;
+        });
+        console.log("Poomsae Map sau khi fetch:", poomsaeDataMap);
+        setPoomsaeMap(poomsaeDataMap);
       } catch (error) {
         console.error("Lỗi khi tải dữ liệu:", error);
         // Tạm thời sử dụng dữ liệu mẫu khi API không hoạt động
@@ -261,14 +295,16 @@ export default function BeltLevelsPage() {
         // Cập nhật state local
         setBeltLevels(
           beltLevels.map((beltLevel) =>
-            beltLevel.id === editingBeltLevel.id ? updatedBeltLevel : beltLevel
+            beltLevel.id === editingBeltLevel.id
+              ? ({ ...updatedBeltLevel } as BeltLevel)
+              : beltLevel
           )
         );
       } else {
         // Tạo cấp đai mới
         const newBeltLevel = await beltLevelsApi.create(formData);
         // Thêm vào state local
-        setBeltLevels([...beltLevels, newBeltLevel]);
+        setBeltLevels([...beltLevels, { ...newBeltLevel } as BeltLevel]);
       }
 
       setShowModal(false);
@@ -284,9 +320,9 @@ export default function BeltLevelsPage() {
     setEditingBeltLevel(beltLevel);
     setFormData({
       name: beltLevel.name,
-      color: beltLevel.color,
-      description: beltLevel.description,
-      order_sequence: beltLevel.order_sequence,
+      color: beltLevel.color || "",
+      description: beltLevel.description || "",
+      order_sequence: beltLevel.order_sequence || 1,
     });
     setShowModal(true);
   };
@@ -359,7 +395,9 @@ export default function BeltLevelsPage() {
               </thead>
               <tbody>
                 {beltLevels
-                  .sort((a, b) => a.order_sequence - b.order_sequence)
+                  .sort(
+                    (a, b) => (a.order_sequence || 0) - (b.order_sequence || 0)
+                  )
                   .map((beltLevel) => (
                     <tr key={beltLevel.id}>
                       <td>
@@ -385,18 +423,66 @@ export default function BeltLevelsPage() {
                         <span className="ms-2">{beltLevel.color}</span>
                       </td>
                       <td>
-                        {beltLevel.required_poomsae_name ? (
+                        {poomsaeMap[beltLevel.id] &&
+                        poomsaeMap[beltLevel.id].length > 0 ? (
                           <div>
-                            <span className="badge bg-info me-1">
-                              {beltLevel.required_poomsae_code}
-                            </span>
-                            <br />
+                            {poomsaeMap[beltLevel.id].map((poomsae, index) => {
+                              // Debug log để kiểm tra dữ liệu
+                              if (index === 0) {
+                                console.log(
+                                  `Poomsae data for belt level ${beltLevel.id} (${beltLevel.name}):`,
+                                  poomsae
+                                );
+                              }
+                              // Hiển thị tên bài quyền: ưu tiên tiếng Hàn, sau đó tiếng Việt, rồi tiếng Anh
+                              const displayName =
+                                poomsae.tenBaiQuyenKorean ||
+                                poomsae.tenBaiQuyenVietnamese ||
+                                poomsae.tenBaiQuyenEnglish ||
+                                poomsae.name ||
+                                "Bài quyền";
+                              return (
+                                <div key={poomsae.id || index} className="mb-1">
+                                  <strong className="text-primary">
+                                    {displayName}
+                                  </strong>
+                                  {poomsae.tenBaiQuyenKorean &&
+                                    (poomsae.tenBaiQuyenVietnamese ||
+                                      poomsae.tenBaiQuyenEnglish) && (
+                                      <>
+                                        <br />
+                                        <small className="text-muted">
+                                          {poomsae.tenBaiQuyenVietnamese ||
+                                            poomsae.tenBaiQuyenEnglish}
+                                        </small>
+                                      </>
+                                    )}
+                                  {index <
+                                    poomsaeMap[beltLevel.id].length - 1 && (
+                                    <hr className="my-1" />
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : beltLevel.required_poomsae_name ? (
+                          <div>
                             <strong className="text-primary">
                               {beltLevel.required_poomsae_name}
                             </strong>
+                            {beltLevel.required_poomsae_code && (
+                              <>
+                                <br />
+                                <span className="badge bg-info me-1 small">
+                                  {beltLevel.required_poomsae_code}
+                                </span>
+                              </>
+                            )}
                           </div>
                         ) : (
-                          <span className="text-muted">-</span>
+                          <span className="text-muted small">
+                            Chưa có bài quyền
+                          </span>
                         )}
                       </td>
                       <td>

@@ -18,7 +18,7 @@ export default function TinTucDetailPage() {
     title: "Lễ Trao Đai Đen Kỳ 20 - Chúc Mừng 12 Võ Sinh Xuất Sắc",
     description:
       "Trong không khí trang trọng và đầy xúc động, câu lạc bộ Taekwondo đã tổ chức lễ trao đai đen kỳ thứ 20 cho 12 võ sinh xuất sắc. Đây là kết quả của hành trình rèn luyện không ngừng, sự kiên trì và nỗ lực vượt bậc của các võ sinh trong suốt thời gian qua.",
-    image: "/styles/assets/img/news/featured-1.jpg",
+    image: "/client/images/news/featured-1.jpg",
     content: `
       <p>Trong không khí trang trọng và đầy xúc động, câu lạc bộ Taekwondo đã tổ chức lễ trao đai đen kỳ thứ 20 cho 12 võ sinh xuất sắc. Đây là kết quả của hành trình rèn luyện không ngừng, sự kiên trì và nỗ lực vượt bậc của các võ sinh trong suốt thời gian qua.</p>
       

@@ -5,7 +5,42 @@
 -- Drop existing tables if they exist (for fresh installation)
 SET FOREIGN_KEY_CHECKS = 0;
 
+-- Drop all tables in reverse order of dependencies (child tables first, parent tables last)
+DROP TABLE IF EXISTS lich_su_thi_thang_cap_dai;
+DROP TABLE IF EXISTS cap_dai_bai_quyen;
+DROP TABLE IF EXISTS bai_quyen;
+DROP TABLE IF EXISTS danh_gia_phan_hoi;
+DROP TABLE IF EXISTS chung_chi;
+DROP TABLE IF EXISTS dang_ky_thi;
+DROP TABLE IF EXISTS ky_thi_thang_cap;
+DROP TABLE IF EXISTS hoc_vien_phu_huynh;
+DROP TABLE IF EXISTS phu_huynh;
+DROP TABLE IF EXISTS tien_trinh_hoc_tap;
+DROP TABLE IF EXISTS chi_tiet_thanh_toan;
+DROP TABLE IF EXISTS thanh_toan;
+DROP TABLE IF EXISTS goi_hoc_phi;
+DROP TABLE IF EXISTS thong_bao;
+DROP TABLE IF EXISTS su_kien;
+DROP TABLE IF EXISTS danh_gia_hoc_vien;
+DROP TABLE IF EXISTS diem_danh;
+DROP TABLE IF EXISTS thang_cap_dai;
+DROP TABLE IF EXISTS tin_nhan_lien_he;
+DROP TABLE IF EXISTS thu_vien;
+DROP TABLE IF EXISTS tin_tuc;
+DROP TABLE IF EXISTS lich_hoc;
+DROP TABLE IF EXISTS dang_ky_hoc;
+DROP TABLE IF EXISTS khoa_hoc;
+DROP TABLE IF EXISTS tro_giang_chi_nhanh;
+DROP TABLE IF EXISTS quan_ly_chi_nhanh;
+DROP TABLE IF EXISTS chi_nhanh;
+DROP TABLE IF EXISTS vo_sinh;
+DROP TABLE IF EXISTS huan_luyen_vien;
+DROP TABLE IF EXISTS cau_lac_bo;
+DROP TABLE IF EXISTS cap_dai;
 
+-- =====================================================
+-- CREATE TABLES
+-- =====================================================
 
 -- Tạo bảng câu lạc bộ (CLB)
 CREATE TABLE cau_lac_bo (
@@ -97,23 +132,10 @@ CREATE TABLE vo_sinh (
     active_status BOOLEAN DEFAULT TRUE,
     profile_image_url VARCHAR(255),
     images TEXT COMMENT 'Danh sách ảnh (JSON array), đường dẫn bắt đầu từ client/images',
-    password VARCHAR(255) NULL COMMENT 'Mật khẩu đăng nhập cho võ sinh',
+    password VARCHAR(255) NOT NULL COMMENT 'Mật khẩu đăng nhập cho võ sinh',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (cap_dai_id) REFERENCES cap_dai(id)
-);
-
--- Tạo bảng admin (tách riêng khỏi võ sinh)
-CREATE TABLE admin (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    role ENUM('admin', 'super_admin') DEFAULT 'admin',
-    phone VARCHAR(15),
-    active_status BOOLEAN DEFAULT TRUE,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- Tạo bảng huấn luyện viên (HLV)
@@ -132,7 +154,7 @@ CREATE TABLE huan_luyen_vien (
     phone VARCHAR(15),
     email VARCHAR(100),
     password VARCHAR(255),
-    role ENUM('head_coach', 'main_manager', 'assistant_manager', 'assistant') DEFAULT 'assistant',
+    role ENUM('owner', 'admin') DEFAULT 'admin' COMMENT 'Owner: quyền hạn cao nhất, có thể cấp/đổi/xóa admin, phân quyền cho admin. Admin: được owner quản lý',
     experience_years INT,
     specialization VARCHAR(100),
     bio TEXT,
@@ -201,14 +223,14 @@ CREATE TABLE tin_tuc (
     slug VARCHAR(200) UNIQUE NOT NULL,
     content TEXT,
     excerpt TEXT,
-    author_id INT,
+    author_id INT COMMENT 'ID của huấn luyện viên viết bài',
     featured_image_url VARCHAR(255),
     images TEXT COMMENT 'Danh sách ảnh (JSON array), đường dẫn bắt đầu từ client/images',
     is_published BOOLEAN DEFAULT FALSE,
     published_at DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (author_id) REFERENCES admin(id)
+    FOREIGN KEY (author_id) REFERENCES huan_luyen_vien(id)
 );
 
 -- Tạo bảng thư viện (ảnh và video)
@@ -333,7 +355,7 @@ CREATE TABLE thong_bao (
     title VARCHAR(200) NOT NULL,
     content TEXT,
     type ENUM('general', 'payment', 'event', 'course', 'promotion'),
-    target_audience ENUM('all', 'students', 'coaches', 'admins', 'HLV'),
+    target_audience ENUM('all', 'students', 'coaches', 'HLV'),
     club_id INT,
     is_urgent BOOLEAN DEFAULT FALSE,
     published_at DATETIME,
@@ -488,6 +510,9 @@ CREATE TABLE danh_gia_phan_hoi (
 -- FUNCTIONS FOR CODE GENERATION
 -- =====================================================
 
+-- Drop function if exists before creating
+DROP FUNCTION IF EXISTS generate_member_code;
+
 -- Function to generate member code (mã hội viên)
 DELIMITER //
 CREATE FUNCTION generate_member_code(
@@ -507,8 +532,12 @@ BEGIN
     DECLARE result_code VARCHAR(100);
     DECLARE initials VARCHAR(10);
     
-    -- Remove extra spaces and split name
-    SET full_name = TRIM(REGEXP_REPLACE(full_name, '\\s+', ' '));
+    -- Remove extra spaces and normalize name (remove multiple spaces)
+    SET full_name = TRIM(full_name);
+    -- Remove multiple spaces by replacing double spaces with single space
+    WHILE full_name LIKE '%  %' DO
+        SET full_name = REPLACE(full_name, '  ', ' ');
+    END WHILE;
     SET name_parts = full_name;
     
     -- Count number of name parts
@@ -554,11 +583,6 @@ CREATE INDEX idx_vo_sinh_ma_clb ON vo_sinh(ma_clb);
 CREATE INDEX idx_vo_sinh_cap_dai_id ON vo_sinh(cap_dai_id);
 CREATE INDEX idx_vo_sinh_active_status ON vo_sinh(active_status);
 CREATE INDEX idx_vo_sinh_gioi_tinh ON vo_sinh(gioi_tinh);
-
--- Indexes for admin table
-CREATE INDEX idx_admin_email ON admin(email);
-CREATE INDEX idx_admin_role ON admin(role);
-CREATE INDEX idx_admin_active_status ON admin(active_status);
 
 -- Indexes for huan_luyen_vien table
 CREATE INDEX idx_hlv_ma_hoi_vien ON huan_luyen_vien(ma_hoi_vien);
@@ -638,7 +662,7 @@ CREATE TABLE cap_dai_bai_quyen (
     id INT PRIMARY KEY AUTO_INCREMENT,
     cap_dai_id INT NOT NULL,
     bai_quyen_id INT NOT NULL,
-    loai_quyen ENUM('bat_buoc', 'tu_chon', 'bo_sung') DEFAULT 'bat_buoc',
+    loai_quyen ENUM('bat_buoc') DEFAULT 'bat_buoc',
     thu_tu_uu_tien INT DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (cap_dai_id) REFERENCES cap_dai(id) ON DELETE CASCADE,
@@ -647,7 +671,7 @@ CREATE TABLE cap_dai_bai_quyen (
 );
 
 -- Bảng lịch sử thi đấu bài quyền của võ sinh
-CREATE TABLE lich_su_thi_quyen (
+CREATE TABLE lich_su_thi_thang_cap_dai (
     id INT PRIMARY KEY AUTO_INCREMENT,
     vo_sinh_id INT NOT NULL,
     bai_quyen_id INT NOT NULL,
@@ -666,8 +690,10 @@ CREATE TABLE lich_su_thi_quyen (
 CREATE INDEX idx_bai_quyen_cap_do ON bai_quyen(cap_do);
 CREATE INDEX idx_cap_dai_bai_quyen_cap_dai ON cap_dai_bai_quyen(cap_dai_id);
 CREATE INDEX idx_cap_dai_bai_quyen_bai_quyen ON cap_dai_bai_quyen(bai_quyen_id);
-CREATE INDEX idx_lich_su_thi_quyen_vo_sinh ON lich_su_thi_quyen(vo_sinh_id);
-CREATE INDEX idx_lich_su_thi_quyen_ngay_thi ON lich_su_thi_quyen(ngay_thi);
+CREATE INDEX idx_lich_su_thi_thang_cap_dai_vo_sinh ON lich_su_thi_thang_cap_dai(vo_sinh_id);
+CREATE INDEX idx_lich_su_thi_thang_cap_dai_ngay_thi ON lich_su_thi_thang_cap_dai(ngay_thi);
+CREATE INDEX idx_lich_su_thi_thang_cap_dai_bai_quyen ON lich_su_thi_thang_cap_dai(bai_quyen_id);
+CREATE INDEX idx_lich_su_thi_thang_cap_dai_cap_dai ON lich_su_thi_thang_cap_dai(cap_dai_id);
 
 
 -- =====================================================
@@ -676,7 +702,9 @@ CREATE INDEX idx_lich_su_thi_quyen_ngay_thi ON lich_su_thi_quyen(ngay_thi);
 
 -- Insert sample belt levels
 INSERT INTO cap_dai (name, color, order_sequence, required_poomsae_code, required_poomsae_name, description) VALUES
-('Cấp 8', 'White', 1, 'TG1', 'Thái cực 1 Jang', 'Đai trắng cấp 8'),
+('Cấp 10', 'White', 1, 'KT1', 'kĩ Thuật 1 Jang', 'Đai trắng cấp 10'),
+('Cấp 9', 'organe', 9, 'KT2', 'Kĩ thuật 2', 'Đai cam cấp 9'),
+('Cấp 8', 'Violet', 1, 'TG1', 'Thái cực 1 Jang', 'Đai tím cấp 8'),
 ('Cấp 7', 'Yellow', 2, 'TG2', 'Thái cực 2 Jang', 'Đai vàng cấp 7'),
 ('Cấp 6', 'Green', 3, 'TG3', 'Thái cực 3 Jang', 'Đai xanh lá cấp 6'),
 ('Cấp 5', 'Blue', 4, 'TG4', 'Thái cực 4 Jang', 'Đai xanh dương cấp 5'),
@@ -759,49 +787,22 @@ INSERT INTO cap_dai_bai_quyen (cap_dai_id, bai_quyen_id, loai_quyen, thu_tu_uu_t
 INSERT INTO cau_lac_bo (club_code, name, address, phone, email, head_coach_id, description) VALUES
 ('_00468', 'CLB Đồng Phú', 'Đồng Phú, Bình Phước', '0123456789', 'dongphu@taekwondo.com', 2, 'CLB Taekwondo Đồng Phú - Thầy Tiến HLV trưởng');
 
--- Insert sample admin user
--- Password: 123456 (hashed with bcrypt)
-INSERT INTO admin (name, email, password, role, phone, active_status) VALUES
-('Admin Master', 'admin@taekwondomaster.com', '$2b$10$IvCQT4mOjWTykB1OcUC5UutJpF9ijE6wN6daJWA/c7OMYhlklST2G', 'admin', '0123456789', TRUE);
 
 -- Insert sample võ sinh data with generated member codes
-INSERT INTO vo_sinh (ho_va_ten, ngay_thang_nam_sinh, ma_hoi_vien, ma_clb, ma_don_vi, quyen_so, cap_dai_id, gioi_tinh, email, phone) VALUES
-('Hoàng Phạm Bảo Anh', '2016-02-28', generate_member_code('Hoàng Phạm Bảo Anh', '2016-02-28', 'HV'), 'CLB_00468', 'DNAI', 7, 1, 'Nữ', 'anhhpb@example.com', '0123456789'),
-('Nguyễn Thị Minh Châu', '2015-07-03', generate_member_code('Nguyễn Thị Minh Châu', '2015-07-03', 'HV'), 'CLB_00468', 'DNAI', 7, 1, 'Nữ', 'chauntm@example.com', '0123456790'),
-('Lục Minh Châu', '2010-05-10', generate_member_code('Lục Minh Châu', '2010-05-10', 'HV'), 'CLB_00468', 'DNAI', 7, 1, 'Nữ', 'chaulm@example.com', '0123456791'),
-('Nguyễn Minh Châu', '2014-08-15', generate_member_code('Nguyễn Minh Châu', '2014-08-15', 'HV'), 'CLB_00468', 'DNAI', 7, 1, 'Nữ', 'chaunm@example.com', '0123456792'),
-('Phạm Minh Châu', '2011-12-20', generate_member_code('Phạm Minh Châu', '2011-12-20', 'HV'), 'CLB_00468', 'DNAI', 7, 1, 'Nữ', 'chauphm@example.com', '0123456793'),
-('Đoàn Trần Thiên Phương', '2012-06-25', generate_member_code('Đoàn Trần Thiên Phương', '2012-06-25', 'HV'), 'CLB_00468', 'DNAI', 7, 1, 'Nữ', 'phuongdtt@example.com', '0123456794');
+INSERT INTO vo_sinh (ho_va_ten, ngay_thang_nam_sinh, ma_hoi_vien, ma_clb, ma_don_vi, quyen_so, cap_dai_id, gioi_tinh, email, phone, password, profile_image_url, images) VALUES
+('Hoàng Phạm Bảo Anh', '2016-02-28', generate_member_code('Hoàng Phạm Bảo Anh', '2016-02-28', 'HV'), 'CLB_00468', 'DNAI', 7, 1, 'Nữ', 'anhhpb@example.com', '0123456789', '123456@LV23', 'client/images/users/user-40.jpg', '["client/images/users/user-40.jpg"]'),
+('Nguyễn Thị Minh Châu', '2015-07-03', generate_member_code('Nguyễn Thị Minh Châu', '2015-07-03', 'HV'), 'CLB_00468', 'DNAI', 7, 1, 'Nữ', 'chauntm@example.com', '0123456790', '123456@LV23', 'client/images/users/user-40.jpg', '["client/images/users/user-40.jpg"]'),
+('Lục Minh Châu', '2010-05-10', generate_member_code('Lục Minh Châu', '2010-05-10', 'HV'), 'CLB_00468', 'DNAI', 7, 1, 'Nữ', 'chaulm@example.com', '0123456791', '123456@LV23', 'client/images/users/user-40.jpg', '["client/images/users/user-40.jpg"]'),
+('Nguyễn Minh Châu', '2014-08-15', generate_member_code('Nguyễn Minh Châu', '2014-08-15', 'HV'), 'CLB_00468', 'DNAI', 7, 1, 'Nữ', 'chaunm@example.com', '0123456792', '123456@LV23', 'client/images/users/user-40.jpg', '["client/images/users/user-40.jpg"]'),
+('Phạm Minh Châu', '2011-12-20', generate_member_code('Phạm Minh Châu', '2011-12-20', 'HV'), 'CLB_00468', 'DNAI', 7, 1, 'Nữ', 'chauphm@example.com', '0123456793', '123456@LV23', 'client/images/users/user-40.jpg', '["client/images/users/user-40.jpg"]'),
+('Đoàn Trần Thiên Phương', '2012-06-25', generate_member_code('Đoàn Trần Thiên Phương', '2012-06-25', 'HV'), 'CLB_00468', 'DNAI', 7, 1, 'Nữ', 'phuongdtt@example.com', '0123456794', '123456@LV23', 'client/images/users/user-40.jpg', '["client/images/users/user-40.jpg"]');
 
 -- Insert sample HLV data with generated member codes
-INSERT INTO huan_luyen_vien (ma_hoi_vien, ho_va_ten, ngay_thang_nam_sinh, ma_clb, ma_don_vi, quyen_so, cap_dai_id, gioi_tinh, email, password, role, phone, is_active) VALUES
-(generate_member_code('Nguyễn Văn Tiến', '1985-03-15', 'HLV'), 'Nguyễn Văn Tiến', '1985-03-15', 'CLB_00468', 'DNAI', 9, 12, 'Nam', 'thaytien@dongphu.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'head_coach', '0987654321', TRUE),
-(generate_member_code('Trần Thị Hương', '1990-07-22', 'HLV'), 'Trần Thị Hương', '1990-07-22', 'CLB_00468', 'DNAI', 8, 10, 'Nữ', 'huongtt@dongphu.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'assistant_manager', '0987654322', TRUE),
-(generate_member_code('Lê Minh Đức', '1988-12-10', 'HLV'), 'Lê Minh Đức', '1988-12-10', 'CLB_00468', 'DNAI', 7, 8, 'Nam', 'duclm@dongphu.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'assistant', '0987654323', TRUE);
-
--- Insert sample trợ giảng (Thầy Tân)
-INSERT INTO huan_luyen_vien (ma_hoi_vien, ho_va_ten, ngay_thang_nam_sinh, ma_clb, ma_don_vi, quyen_so, cap_dai_id, gioi_tinh, email, password, role, phone, is_active) VALUES
-(generate_member_code('Phạm Văn Tân', '1987-05-18', 'HLV'), 'Phạm Văn Tân', '1987-05-18', 'CLB_00468', 'DNAI', 8, 10, 'Nam', 'thaytan@dongphu.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'assistant', '0987654324', TRUE);
-
--- Insert sample lịch sử thi quyền cho võ sinh
-INSERT INTO lich_su_thi_quyen (vo_sinh_id, bai_quyen_id, cap_dai_id, diem_so, ket_qua, ngay_thi, ghi_chu) VALUES
--- Võ sinh 1 (Hoàng Phạm Bảo Anh) - Cấp 8, đã thi Thái cực 1 để lên cấp 7
-(1, 1, 1, 8.5, 'dat', '2024-01-15', 'Thi đạt bài Thái cực 1, chuẩn bị lên cấp 7'),
--- Võ sinh 2 (Nguyễn Thị Minh Châu) - Cấp 8, đã thi Thái cực 1 để lên cấp 7
-(2, 1, 1, 9.0, 'xuat_sac', '2024-01-20', 'Thi xuất sắc bài Thái cực 1, sẵn sàng lên cấp 7'),
--- Võ sinh 3 (Lục Minh Châu) - Cấp 8, đã thi Thái cực 1 để lên cấp 7
-(3, 1, 1, 8.0, 'dat', '2024-02-10', 'Thi đạt bài Thái cực 1, chuẩn bị lên cấp 7'),
--- Võ sinh 4 (Nguyễn Minh Châu) - Cấp 8, đã thi Thái cực 1 để lên cấp 7
-(4, 1, 1, 8.8, 'dat', '2024-02-15', 'Thi đạt bài Thái cực 1, chuẩn bị lên cấp 7'),
--- Võ sinh 5 (Phạm Minh Châu) - Cấp 8, đã thi Thái cực 1 để lên cấp 7
-(5, 1, 1, 7.5, 'dat', '2024-03-01', 'Thi đạt bài Thái cực 1, chuẩn bị lên cấp 7'),
--- Võ sinh 6 (Đoàn Trần Thiên Phương) - Cấp 8, đã thi Thái cực 1 để lên cấp 7
-(6, 1, 1, 9.2, 'xuat_sac', '2024-03-05', 'Thi xuất sắc bài Thái cực 1, sẵn sàng lên cấp 7');
-
--- Insert sample trợ giảng khác
-INSERT INTO huan_luyen_vien (ma_hoi_vien, ho_va_ten, ngay_thang_nam_sinh, ma_clb, ma_don_vi, quyen_so, cap_dai_id, gioi_tinh, email, password, role, phone, is_active) VALUES
-(generate_member_code('Nguyễn Văn Minh', '1989-09-12', 'HLV'), 'Nguyễn Văn Minh', '1989-09-12', 'CLB_00468', 'DNAI', 7, 8, 'Nam', 'thayminh@dongphu.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'assistant', '0987654325', TRUE),
-(generate_member_code('Lê Thị Lan', '1992-11-08', 'HLV'), 'Lê Thị Lan', '1992-11-08', 'CLB_00468', 'DNAI', 6, 7, 'Nữ', 'colan@dongphu.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'assistant', '0987654326', TRUE);
+INSERT INTO huan_luyen_vien (ma_hoi_vien, ho_va_ten, ngay_thang_nam_sinh, ma_clb, ma_don_vi, quyen_so, cap_dai_id, gioi_tinh, email, password, role, phone, photo_url, images, is_active) VALUES
+(generate_member_code('Trần Văn Tiến', '1985-03-15', 'HLV'), 'Trần Văn Tiến', '1985-03-15', 'CLB_00468', 'DNAI', 9, 12, 'Nam', 'thaytien@dongphu.com', '123456@LV23', 'owner', '0987654321', 'client/images/users/user-40.jpg', '["client/images/users/user-40.jpg"]', TRUE),
+(generate_member_code('Trần Thị Hương', '1990-07-22', 'HLV'), 'Trần Thị Hương', '1990-07-22', 'CLB_00468', 'DNAI', 8, 10, 'Nữ', 'huongtt@dongphu.com', '123456@LV23', 'admin', '0987654322', 'client/images/users/user-40.jpg', '["client/images/users/user-40.jpg"]', TRUE),
+(generate_member_code('Lê Minh Đức', '1988-12-10', 'HLV'), 'Lê Minh Đức', '1988-12-10', 'CLB_00468', 'DNAI', 7, 8, 'Nam', 'duclm@dongphu.com', '123456@LV23', 'admin', '0987654323', 'client/images/users/user-40.jpg', '["client/images/users/user-40.jpg"]', TRUE),
+(generate_member_code('Đoàn Tiến Tân', '1987-05-18', 'HLV'), 'Đoàn Tiến Tân', '1987-05-18', 'CLB_00468', 'DNAI', 8, 10, 'Nam', 'thaytan@dongphu.com', '123456@LV23', 'admin', '0987654324', 'client/images/users/user-40.jpg', '["client/images/users/user-40.jpg"]', TRUE);
 
 -- =====================================================
 -- SAMPLE QUERIES FOR TESTING
@@ -833,7 +834,7 @@ INSERT INTO huan_luyen_vien (ma_hoi_vien, ho_va_ten, ngay_thang_nam_sinh, ma_clb
 --     lstq.ket_qua,
 --     lstq.ngay_thi,
 --     lstq.ghi_chu
--- FROM lich_su_thi_quyen lstq
+-- FROM lich_su_thi_thang_cap_dai lstq
 -- JOIN vo_sinh vs ON lstq.vo_sinh_id = vs.id
 -- JOIN bai_quyen bq ON lstq.bai_quyen_id = bq.id
 -- ORDER BY vs.ho_va_ten, lstq.ngay_thi DESC;
@@ -847,7 +848,7 @@ INSERT INTO huan_luyen_vien (ma_hoi_vien, ho_va_ten, ngay_thang_nam_sinh, ma_clb
 --     AVG(lstq.diem_so) as diem_trung_binh,
 --     SUM(CASE WHEN lstq.ket_qua = 'dat' THEN 1 ELSE 0 END) as so_lan_dat,
 --     SUM(CASE WHEN lstq.ket_qua = 'xuat_sac' THEN 1 ELSE 0 END) as so_lan_xuat_sac
--- FROM lich_su_thi_quyen lstq
+-- FROM lich_su_thi_thang_cap_dai lstq
 -- JOIN cap_dai cd ON lstq.cap_dai_id = cd.id
 -- JOIN bai_quyen bq ON lstq.bai_quyen_id = bq.id
 -- GROUP BY cd.id, bq.id
@@ -863,7 +864,7 @@ INSERT INTO chi_nhanh (club_id, branch_code, name, address, phone, email) VALUES
 (1, 'THTT', 'CLB Tiểu Học Tân Tiến', 'Trường Tiểu Học Tân Tiến, Đồng Phú', '0123456783', 'thtt@dongphu.com'),
 (1, 'THDP', 'CLB Tiểu Học Đồng Phú', 'Trường Tiểu Học Đồng Phú', '0123456784', 'thdp@dongphu.com'),
 (1, 'THTP', 'CLB Tiểu Học Tân Phú', 'Trường Tiểu Học Tân Phú, Đồng Phú', '0123456785', 'thtp@dongphu.com'),
-(1, 'THTD', 'CLB Tiểu Học Tân Định', 'Trường Tiểu Học Tân Định, Đồng Phú', '0123456786', 'thtd@dongphu.com');
+(1, 'THTD', 'CLB Tiểu Học Tân Lập B', 'Trường Học Tân Lập B, Đồng Phú', '0123456786', 'thtd@dongphu.com');
 
 -- Insert sample quản lý chi nhánh (Thầy Tân quản lý nhiều chi nhánh)
 INSERT INTO quan_ly_chi_nhanh (branch_id, manager_id, role) VALUES

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAccountStore } from "@/stores/account";
 import { usersApi } from "@/services/api/users";
+import { beltLevelsApi } from "@/services/api/belt-levels";
 import http from "@/services/http";
 
 interface VoSinh {
@@ -14,6 +15,11 @@ interface VoSinh {
   ma_don_vi?: string | null;
   quyen_so: number;
   cap_dai_id: number;
+  belt_level?: {
+    id: number;
+    name: string;
+    color?: string;
+  };
   gioi_tinh: "Nam" | "Nữ";
   email?: string;
   phone?: string;
@@ -57,30 +63,46 @@ export default function UsersPage() {
   const fetchVoSinh = async () => {
     setLoading(true);
     try {
-      // Gọi API trực tiếp để lấy raw data với đầy đủ fields
-      const response = await http.get<VoSinh[]>("/users");
-      const data: VoSinh[] = Array.isArray(response.data) ? response.data : [];
+      // Fetch users và belt_levels để map cấp đai
+      const [usersResponse, beltLevelsData] = await Promise.all([
+        http.get<VoSinh[]>("/users"),
+        beltLevelsApi.getAll(),
+      ]);
 
-      // Debug: Log dữ liệu để kiểm tra
-      console.log("[UsersPage] Raw users data:", data);
-      if (data.length > 0) {
-        const firstUser = data[0];
-        console.log("[UsersPage] First user sample - ALL FIELDS:", firstUser);
-        console.log("[UsersPage] First user - specific fields:", {
-          id: firstUser.id,
-          ho_va_ten: firstUser.ho_va_ten,
-          ma_don_vi: firstUser.ma_don_vi,
-          ma_don_vi_type: typeof firstUser.ma_don_vi,
-          ma_don_vi_value: JSON.stringify(firstUser.ma_don_vi),
-          ma_clb: firstUser.ma_clb,
-          ma_clb_type: typeof firstUser.ma_clb,
-          ma_clb_value: JSON.stringify(firstUser.ma_clb),
-          ma_hoi_vien: firstUser.ma_hoi_vien,
-          allKeys: Object.keys(firstUser),
+      const data: VoSinh[] = Array.isArray(usersResponse.data) ? usersResponse.data : [];
+
+      // Tạo map belt_levels để map vào users
+      const beltLevelMap = new Map();
+      if (Array.isArray(beltLevelsData)) {
+        beltLevelsData.forEach((belt) => {
+          beltLevelMap.set(belt.id, belt);
         });
       }
 
-      setVoSinh(data);
+      // Backend đã trả về belt_level, nhưng vẫn có fallback nếu không có
+      const usersWithBeltLevel = data.map((user) => {
+        // Nếu backend đã trả về belt_level, sử dụng nó
+        if (user.belt_level) {
+          return user;
+        }
+        // Fallback: Map belt_level từ beltLevelMap nếu có cap_dai_id nhưng chưa có belt_level
+        if (user.cap_dai_id) {
+          const beltLevel = beltLevelMap.get(user.cap_dai_id);
+          if (beltLevel) {
+            return {
+              ...user,
+              belt_level: {
+                id: beltLevel.id,
+                name: beltLevel.name,
+                color: beltLevel.color,
+              },
+            };
+          }
+        }
+        return user;
+      });
+
+      setVoSinh(usersWithBeltLevel);
     } catch (error) {
       console.error("Lỗi khi tải danh sách võ sinh:", error);
       setVoSinh([]);
@@ -92,6 +114,73 @@ export default function UsersPage() {
   useEffect(() => {
     fetchVoSinh();
   }, []);
+
+  // Helper function to get belt level color with proper contrast
+  const getBeltLevelColor = (colorName?: string): string => {
+    if (!colorName) return '#000';
+    
+    const colorMap: Record<string, string> = {
+      'White': '#000', // Black text on white background
+      'Orange': '#ff8c00',
+      'Violet': '#8b00ff',
+      'Purple': '#8b00ff',
+      'Yellow': '#ff8c00', // Dark orange for better contrast
+      'Green': '#198754',
+      'Blue': '#0d6efd',
+      'Red': '#dc3545',
+      'Red-Black': '#000',
+      'Black': '#000',
+    };
+    
+    // Try exact match first
+    if (colorMap[colorName]) {
+      return colorMap[colorName];
+    }
+    
+    // Try case-insensitive match
+    const lowerColor = colorName.toLowerCase();
+    for (const [key, value] of Object.entries(colorMap)) {
+      if (key.toLowerCase() === lowerColor) {
+        return value;
+      }
+    }
+    
+    // Default to black for unknown colors
+    return '#000';
+  };
+
+  // Helper function to get belt level background color
+  const getBeltLevelBgColor = (colorName?: string): string => {
+    if (!colorName) return 'transparent';
+    
+    const bgColorMap: Record<string, string> = {
+      'White': '#f8f9fa', // Light gray background
+      'Orange': '#fff3cd',
+      'Violet': '#e7d5ff',
+      'Purple': '#e7d5ff',
+      'Yellow': '#fff3cd',
+      'Green': '#d1e7dd',
+      'Blue': '#cfe2ff',
+      'Red': '#f8d7da',
+      'Red-Black': '#212529',
+      'Black': '#212529',
+    };
+    
+    // Try exact match first
+    if (bgColorMap[colorName]) {
+      return bgColorMap[colorName];
+    }
+    
+    // Try case-insensitive match
+    const lowerColor = colorName.toLowerCase();
+    for (const [key, value] of Object.entries(bgColorMap)) {
+      if (key.toLowerCase() === lowerColor) {
+        return value;
+      }
+    }
+    
+    return 'transparent';
+  };
 
   const filteredVoSinh = voSinh.filter((voSinh) => {
     const matchesSearch =
@@ -338,7 +427,7 @@ export default function UsersPage() {
                           maDonVi.toLowerCase() !== "null"
                         ) {
                           return (
-                            <span className="badge bg-info">{maDonVi}</span>
+                            <span style={{ color: "#0dcaf0" }}>{maDonVi}</span>
                           );
                         }
                         return <span className="text-muted">Chưa có</span>;
@@ -355,7 +444,7 @@ export default function UsersPage() {
                           maClb.toLowerCase() !== "null"
                         ) {
                           return (
-                            <span className="badge bg-warning">{maClb}</span>
+                            <span style={{ color: "#ffc107" }}>{maClb}</span>
                           );
                         }
                         return <span className="text-muted">Chưa có</span>;
@@ -363,7 +452,7 @@ export default function UsersPage() {
                     </td>
                     <td>
                       {user.ma_hoi_vien && user.ma_hoi_vien.trim() ? (
-                        <span className="badge bg-primary">
+                        <span style={{ color: "#0d6efd" }}>
                           {user.ma_hoi_vien}
                         </span>
                       ) : (
@@ -371,12 +460,28 @@ export default function UsersPage() {
                       )}
                     </td>
                     <td>
-                      <span className="badge bg-success">
-                        {user.cap_dai_id ? `Đai ${user.cap_dai_id}` : "Chưa có"}
-                      </span>
+                      {user.belt_level && user.belt_level.name ? (
+                        <span
+                          style={{
+                            color: getBeltLevelColor(user.belt_level.color),
+                            backgroundColor: getBeltLevelBgColor(user.belt_level.color),
+                            padding: '2px 8px',
+                            borderRadius: '4px',
+                            fontWeight: '500',
+                          }}
+                        >
+                          {user.belt_level.name}
+                        </span>
+                      ) : user.cap_dai_id ? (
+                        <span style={{ color: "#198754" }}>
+                          Đai {user.cap_dai_id}
+                        </span>
+                      ) : (
+                        <span className="text-muted">Chưa có</span>
+                      )}
                     </td>
                     <td>
-                      <span className="badge bg-secondary">
+                      <span style={{ color: "#6c757d" }}>
                         Quyền {user.quyen_so}
                       </span>
                     </td>

@@ -28,7 +28,7 @@ $(document).ready(function () {
 						"title" : "Had conversation with Fred regarding task",
 						"due_date" : "29 Sep 2025, 04:12 pm",
 						"owner" : "Guilory Berggren",
-						"owner_image": "assets/img/profiles/avatar-06.jpg",
+						"owner_image": "client/images/profiles/avatar-06.jpg",
 						"created_date" : "27 Sep 2025, 03:26 pm",
 						"status" : "3",
 						"action": ""
@@ -39,7 +39,7 @@ $(document).ready(function () {
 						"title" : "Call John and discuss about project",
 						"due_date" : "12 Nov 2025, 10:20 pm",
 						"owner" : "Jami Carlile",
-						"owner_image": "assets/img/profiles/avatar-13.jpg",
+						"owner_image": "client/images/profiles/avatar-13.jpg",
 						"created_date" : "02 Nov 2025, 05:35 pm",
 						"status" : "3",
 						"action": ""
@@ -50,7 +50,7 @@ $(document).ready(function () {
 						"title" : "Discussed budget proposal with Edwin",
 						"due_date" : "08 Dec 2025, 04:35 pm",
 						"owner" : "Theresa Nelson",
-						"owner_image": "assets/img/profiles/avatar-17.jpg",
+						"owner_image": "client/images/profiles/avatar-17.jpg",
 						"created_date" : "01 Dec 2025, 10:45 am",
 						"status" : "3",
 						"action": ""
@@ -61,7 +61,7 @@ $(document).ready(function () {
 						"title" : "Discussed budget proposal with Edwin",
 						"due_date" : "26 Dec 2025, 08:30 am",
 						"owner" : "Smith Cooper",
-						"owner_image": "assets/img/profiles/avatar-14.jpg",
+						"owner_image": "client/images/profiles/avatar-14.jpg",
 						"created_date" : "18 Dec 2025, 05:00 pm",
 						"status" : "3",
 						"action": ""

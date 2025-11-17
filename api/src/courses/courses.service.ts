@@ -22,34 +22,40 @@ export class CoursesService implements ICourseService {
 
   async findAll(includeInactive: boolean = false): Promise<Course[]> {
     try {
-      // Use query builder to handle NULL relations gracefully
-      const queryBuilder = this.courseRepository.createQueryBuilder('course');
-      
-      // Add left joins to handle NULL foreign keys
-      queryBuilder.leftJoinAndSelect('course.club', 'club');
-      queryBuilder.leftJoinAndSelect('course.branch', 'branch');
-      queryBuilder.leftJoinAndSelect('course.coach', 'coach');
-      
-      // Add where condition if needed
-      if (!includeInactive) {
-        queryBuilder.where('course.is_active = :isActive', { isActive: true });
-      }
-      
-      // Add order by
-      queryBuilder.orderBy('course.created_at', 'DESC');
-      
-      return await queryBuilder.getMany();
-    } catch (error) {
-      console.error('[CoursesService] Error in findAll:', error);
-      // Fallback to simple find without relations if query builder fails
       const whereCondition: any = {};
       if (!includeInactive) {
         whereCondition.is_active = true;
       }
-      return await this.courseRepository.find({
+
+      const courses = await this.courseRepository.find({
         where: Object.keys(whereCondition).length > 0 ? whereCondition : undefined,
+        relations: ['club', 'branch', 'coach'],
         order: { created_at: 'DESC' },
       });
+
+      return courses;
+    } catch (error: any) {
+      console.error('[CoursesService] Error in findAll:', error);
+      console.error('[CoursesService] Error stack:', error?.stack);
+      console.error('[CoursesService] Error message:', error?.message);
+      
+      // Fallback to simple find without relations if query fails
+      try {
+        const whereCondition: any = {};
+        if (!includeInactive) {
+          whereCondition.is_active = true;
+        }
+        const courses = await this.courseRepository.find({
+          where: Object.keys(whereCondition).length > 0 ? whereCondition : undefined,
+          order: { created_at: 'DESC' },
+        });
+        return courses;
+      } catch (fallbackError: any) {
+        console.error('[CoursesService] Fallback also failed:', fallbackError);
+        console.error('[CoursesService] Fallback error message:', fallbackError?.message);
+        // If even fallback fails, return empty array to prevent 500 error
+        return [];
+      }
     }
   }
 
@@ -152,26 +158,42 @@ export class CoursesService implements ICourseService {
   }
 
   async getDetail(id: number): Promise<Course & { studentCount: number }> {
-    const course = await this.courseRepository.findOne({
-      where: { id },
-      relations: ['club', 'branch', 'coach', 'schedules'],
-    });
+    try {
+      // Load course with relations (schedules relation removed - schedules now reference club/branch)
+      const course = await this.courseRepository.findOne({
+        where: { id },
+        relations: ['club', 'branch', 'coach'],
+      });
 
-    if (!course) {
-      throw new NotFoundException(`Course with ID ${id} not found`);
+      if (!course) {
+        throw new NotFoundException(`Course with ID ${id} not found`);
+      }
+
+      // Count approved enrollments
+      let studentCount = 0;
+      try {
+        studentCount = await this.enrollmentRepository.count({
+          where: {
+            course_id: id,
+            status: 'approved',
+          },
+        });
+      } catch (enrollmentError) {
+        console.error('[CoursesService] Error counting enrollments:', enrollmentError);
+        // Use current_students as fallback if enrollment count fails
+        studentCount = course.current_students || 0;
+      }
+
+      return {
+        ...course,
+        studentCount,
+      };
+    } catch (error) {
+      console.error('[CoursesService] Error in getDetail:', error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new NotFoundException(`Failed to fetch course detail: ${error.message}`);
     }
-
-    // Count approved enrollments
-    const studentCount = await this.enrollmentRepository.count({
-      where: {
-        course_id: id,
-        status: 'approved',
-      },
-    });
-
-    return {
-      ...course,
-      studentCount,
-    };
   }
 }

@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { config } from 'dotenv';
 import { ValidationPipe } from '@nestjs/common';
+import * as path from 'path';
 
 config();
 
@@ -12,6 +13,11 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
+      whitelist: true, // Loại bỏ các properties không được định nghĩa trong DTO
+      forbidNonWhitelisted: false, // Cho phép các properties không được định nghĩa (để tránh lỗi khi frontend gửi thêm properties)
+      transformOptions: {
+        enableImplicitConversion: true, // Tự động convert types
+      },
     }),
   );
 
@@ -45,6 +51,14 @@ async function bootstrap() {
     credentials: true,
     maxAge: 86400, // 24 hours
   });
+
+  // Serve static files from uploads directory
+  const express = require('express');
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+  
+  // Serve static files from client/images directory (for avatar and media files)
+  // Đường dẫn này phù hợp với database schema: "đường dẫn bắt đầu từ client/images"
+  app.use('/client', express.static(path.join(process.cwd(), 'client')));
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Tên API')

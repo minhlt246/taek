@@ -32,6 +32,30 @@ const nextConfig = {
             },
         ];
     },
+    
+    // Suppress Next.js server logs for development
+    logging: {
+        fetches: {
+            fullUrl: false,
+        },
+    },
+
+    // Configure image domains for external images
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'http',
+                hostname: 'localhost',
+                port: '4000',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: '**',
+            },
+        ],
+        unoptimized: false,
+    },
 };
 
 export default nextConfig;

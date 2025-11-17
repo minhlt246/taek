@@ -22,7 +22,11 @@
     "create-admin": "ts-node -r tsconfig-paths/register scripts/create-admin.ts",
     "check-users": "ts-node -r tsconfig-paths/register scripts/check-users.ts",
     "reset-password": "ts-node -r tsconfig-paths/register scripts/reset-password.ts",
-    "test-login": "ts-node -r tsconfig-paths/register scripts/test-login.ts"
+    "test-login": "ts-node -r tsconfig-paths/register scripts/test-login.ts",
+    "set-default-password": "ts-node -r tsconfig-paths/register scripts/set-default-password.ts",
+    "check-db": "ts-node -r tsconfig-paths/register scripts/check-database-connection.ts",
+    "fix-orphan": "ts-node -r tsconfig-paths/register scripts/fix-orphan-assistants.ts",
+    "import-test-results": "ts-node -r tsconfig-paths/register scripts/import-test-results.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -41,7 +45,8 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^5.0.1",
-    "typeorm": "^0.3.27"
+    "typeorm": "^0.3.27",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -52,8 +57,10 @@
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
+    "@types/multer": "^2.0.0",
     "@types/node": "^22.10.7",
     "@types/supertest": "^6.0.2",
+    "@types/xlsx": "^0.0.35",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",

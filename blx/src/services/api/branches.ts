@@ -70,7 +70,6 @@ export const branchesApi = {
   create: async (data: any): Promise<Branch> => {
     try {
       const response = await http.post<Branch | { success: boolean; message: string; data: Branch }>("/branches", data);
-      console.log("[BranchesApi] Create response:", response.data);
       if (response.data && "id" in response.data && !("success" in response.data)) {
         return response.data as Branch;
       }
@@ -90,7 +89,6 @@ export const branchesApi = {
   update: async (id: number, data: any): Promise<Branch> => {
     try {
       const response = await http.patch<Branch | { success: boolean; message: string; data: Branch }>(`/branches/${id}`, data);
-      console.log("[BranchesApi] Update response:", response.data);
       if (response.data && "id" in response.data && !("success" in response.data)) {
         return response.data as Branch;
       }

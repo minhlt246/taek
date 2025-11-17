@@ -28,7 +28,7 @@ $(document).ready(function () {
 						"title" : "We scheduled a meeting for next week",
 						"due_date" : "25 Sep 2025, 12:12 pm",
 						"owner" : "Hendry Milner",
-						"owner_image": "assets/img/profiles/avatar-01.jpg",
+						"owner_image": "client/images/profiles/avatar-01.jpg",
 						"created_date" : "22 Sep 2025, 10:14 am",
 						"status" : "0",
 						"action": ""
@@ -39,7 +39,7 @@ $(document).ready(function () {
 						"title" : "Had conversation with Fred regarding task",
 						"due_date" : "29 Sep 2025, 04:12 pm",
 						"owner" : "Theresa Nelson",
-						"owner_image": "assets/img/profiles/avatar-26.jpg",
+						"owner_image": "client/images/profiles/avatar-26.jpg",
 						"created_date" : "27 Sep 2025, 03:26 pm",
 						"status" : "3",
 						"action": ""
@@ -50,7 +50,7 @@ $(document).ready(function () {
 						"title" : "Analysing latest time estimation for new project",
 						"due_date" : "11 Oct 2025, 05:00 pm",
 						"owner" : "Guilory Berggren",
-						"owner_image": "assets/img/profiles/avatar-06.jpg",
+						"owner_image": "client/images/profiles/avatar-06.jpg",
 						"created_date" : "03 Oct 2025, 03:53 pm",
 						"status" : "1",
 						"action": ""
@@ -61,7 +61,7 @@ $(document).ready(function () {
 						"title" : "Store and manage contact data",
 						"due_date" : "19 Oct 2025, 02:35 pm",
 						"owner" : "Jami Carlile",
-						"owner_image": "assets/img/profiles/avatar-13.jpg",
+						"owner_image": "client/images/profiles/avatar-13.jpg",
 						"created_date" : "14 Oct 2025, 01:25 pm",
 						"status" : "2",
 						"action": ""
@@ -72,7 +72,7 @@ $(document).ready(function () {
 						"title" : "Will have a meeting before project start",
 						"due_date" : "27 Oct 2025, 12:30 pm",
 						"owner" : "Theresa Nelson",
-						"owner_image": "assets/img/profiles/avatar-17.jpg",
+						"owner_image": "client/images/profiles/avatar-17.jpg",
 						"created_date" : "21 Oct 2025, 03:00 pm",
 						"status" : "0",
 						"action": ""
@@ -83,7 +83,7 @@ $(document).ready(function () {
 						"title" : "Call John and discuss about project",
 						"due_date" : "12 Nov 2025, 10:20 pm",
 						"owner" : "Smith Cooper",
-						"owner_image": "assets/img/profiles/avatar-14.jpg",
+						"owner_image": "client/images/profiles/avatar-14.jpg",
 						"created_date" : "02 Nov 2025, 05:35 pm",
 						"status" : "3",
 						"action": ""
@@ -94,7 +94,7 @@ $(document).ready(function () {
 						"title" : "Built landing pages",
 						"due_date" : "25 Nov 2025, 01:40 pm",
 						"owner" : "Martin Lewis",
-						"owner_image": "assets/img/profiles/avatar-20.jpg",
+						"owner_image": "client/images/profiles/avatar-20.jpg",
 						"created_date" : "20 Nov 2025, 08:20 am",
 						"status" : "2",
 						"action": ""
@@ -105,7 +105,7 @@ $(document).ready(function () {
 						"title" : "Regarding latest updates in project",
 						"due_date" : "30 Nov 2025, 09:20 pm",
 						"owner" : "Newell Egan",
-						"owner_image": "assets/img/profiles/avatar-15.jpg",
+						"owner_image": "client/images/profiles/avatar-15.jpg",
 						"created_date" : "25 Nov 2025, 07:20 pm",
 						"status" : "1",
 						"action": ""
@@ -116,7 +116,7 @@ $(document).ready(function () {
 						"title" : "Discussed budget proposal with Edwin",
 						"due_date" : "08 Dec 2025, 04:35 pm",
 						"owner" : "Janet Carlson",
-						"owner_image": "assets/img/profiles/avatar-04.jpg",
+						"owner_image": "client/images/profiles/avatar-04.jpg",
 						"created_date" : "01 Dec 2025, 10:45 am",
 						"status" : "3",
 						"action": ""
@@ -127,7 +127,7 @@ $(document).ready(function () {
 						"title" : "Attach final proposal for upcoming project",
 						"due_date" : "19 Dec 2025, 02:20 pm",
 						"owner" : "Craig Brown",
-						"owner_image": "assets/img/profiles/avatar-21.jpg",
+						"owner_image": "client/images/profiles/avatar-21.jpg",
 						"created_date" : "10 Dec 2025, 06:30 pm",
 						"status" : "1",
 						"action": ""
@@ -138,7 +138,7 @@ $(document).ready(function () {
 						"title" : "Discussed budget proposal with Edwin",
 						"due_date" : "26 Dec 2025, 08:30 am",
 						"owner" : "Daniel Byrne",
-						"owner_image": "assets/img/profiles/avatar-23.jpg",
+						"owner_image": "client/images/profiles/avatar-23.jpg",
 						"created_date" : "18 Dec 2025, 05:00 pm",
 						"status" : "3",
 						"action": ""

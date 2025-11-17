@@ -28,7 +28,7 @@ $(document).ready(function () {
 						"title" : "Store and manage contact data",
 						"due_date" : "19 Oct 2025, 02:35 pm",
 						"owner" : "Craig Brown",
-						"owner_image": "assets/img/profiles/avatar-21.jpg",
+						"owner_image": "client/images/profiles/avatar-21.jpg",
 						"created_date" : "14 Oct 2025, 01:25 pm",
 						"status" : "2",
 						"action": ""
@@ -39,7 +39,7 @@ $(document).ready(function () {
 						"title" : "Built landing pages",
 						"due_date" : "25 Nov 2025, 01:40 pm",
 						"owner" : "Daniel Byrne",
-						"owner_image": "assets/img/profiles/avatar-23.jpg",
+						"owner_image": "client/images/profiles/avatar-23.jpg",
 						"created_date" : "20 Nov 2025, 08:20 am",
 						"status" : "2",
 						"action": ""

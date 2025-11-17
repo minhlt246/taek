@@ -28,7 +28,7 @@ $(document).ready(function () {
 						"select" : "",
 						"country_code": "US",
 						"country_id": "840",
-						"country_image":"assets/img/country/country-01.svg",
+						"country_image":"client/images/country/country-01.svg",
 						"country_name": "United States",
 						"Action": ""
 					},
@@ -38,7 +38,7 @@ $(document).ready(function () {
 						"select" : "",
 						"country_code": "CAN",
 						"country_id": "124",
-						"country_image":"assets/img/country/country-02.svg",
+						"country_image":"client/images/country/country-02.svg",
 						"country_name": "Canada",
 						"Action": ""
 					},
@@ -48,7 +48,7 @@ $(document).ready(function () {
 						"select" : "",
 						"country_code": "ES",
 						"country_id": "34",
-						"country_image":"assets/img/country/country-03.svg",
+						"country_image":"client/images/country/country-03.svg",
 						"country_name": "Spain",
 						"Action": ""
 					},
@@ -58,7 +58,7 @@ $(document).ready(function () {
 						"select" : "",
 						"country_code": "IN",
 						"country_id": "356",
-						"country_image":"assets/img/country/country-04.svg",
+						"country_image":"client/images/country/country-04.svg",
 						"country_name": "India",
 						"Action": ""
 					},
@@ -68,7 +68,7 @@ $(document).ready(function () {
 						"select" : "",
 						"country_code": "BR",
 						"country_id": "076",
-						"country_image":"assets/img/country/country-05.svg",
+						"country_image":"client/images/country/country-05.svg",
 						"country_name": "Brazil",
 						"Action": ""
 					},
@@ -78,7 +78,7 @@ $(document).ready(function () {
 						"select" : "",
 						"country_code": "DE",
 						"country_id": "49",
-						"country_image":"assets/img/country/country-06.svg",
+						"country_image":"client/images/country/country-06.svg",
 						"country_name": "Germany",
 						"Action": ""
 					},
@@ -88,7 +88,7 @@ $(document).ready(function () {
 						"select" : "",
 						"country_code": "MX",
 						"country_id": "52",
-						"country_image":"assets/img/country/country-07.svg",
+						"country_image":"client/images/country/country-07.svg",
 						"country_name": "Mexico",
 						"Action": ""
 					},
@@ -98,7 +98,7 @@ $(document).ready(function () {
 						"select" : "",
 						"country_code": "CN",
 						"country_id": "156",
-						"country_image":"assets/img/country/country-08.svg",
+						"country_image":"client/images/country/country-08.svg",
 						"country_name": "China",
 						"Action": ""
 					},
@@ -108,7 +108,7 @@ $(document).ready(function () {
 						"select" : "",
 						"country_code": "RU",
 						"country_id": "7",
-						"country_image":"assets/img/country/country-09.svg",
+						"country_image":"client/images/country/country-09.svg",
 						"country_name": "Russia",
 						"Action": ""
 					},
@@ -118,7 +118,7 @@ $(document).ready(function () {
 						"select" : "",
 						"country_code": "IT",
 						"country_id": "39",
-						"country_image":"assets/img/country/country-10.svg",
+						"country_image":"client/images/country/country-10.svg",
 						"country_name": "Italy",
 						"Action": ""
 					}

@@ -65,10 +65,8 @@ export class CreateUserDto {
   @IsNumber()
   cap_dai_id?: number;
 
-  @IsOptional()
-  @ValidateIf((o) => o.password !== undefined && o.password !== null && o.password !== '')
   @IsString()
   @MinLength(6, { message: 'Password must be at least 6 characters long' })
   @MaxLength(255)
-  password?: string;
+  password: string;
 }

@@ -10298,7 +10298,7 @@ Author URL: https://themeforest.net/user/dreamstechnologies
 
 .message-body {
   max-height: calc(-23.5rem + 100vh) !important;
-  background-image: url(../img/bg/chat-bg.png);
+  background-image: url(/client/images/bg/chat-bg.png);
   background-size: cover;
 }
 
@@ -11242,7 +11242,7 @@ Author: Dreams Technologies
 Author URL: https://themeforest.net/user/dreamstechnologies
 */
 .account-bg-01 {
-  background-image: url(../img/authentication/login-bg.jpg);
+  background-image: url(/client/images/authentication/login-bg.jpg);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -11251,7 +11251,7 @@ Author URL: https://themeforest.net/user/dreamstechnologies
 }
 
 .account-bg-02 {
-  background-image: url(../img/authentication/register-bg.jpg);
+  background-image: url(/client/images/authentication/register-bg.jpg);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -11260,7 +11260,7 @@ Author URL: https://themeforest.net/user/dreamstechnologies
 }
 
 .account-bg-03 {
-  background-image: url(../img/authentication/forgot-bg.jpg);
+  background-image: url(/client/images/authentication/forgot-bg.jpg);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -11269,7 +11269,7 @@ Author URL: https://themeforest.net/user/dreamstechnologies
 }
 
 .account-bg-04 {
-  background-image: url(../img/authentication/reset-bg.jpg);
+  background-image: url(/client/images/authentication/reset-bg.jpg);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -11278,7 +11278,7 @@ Author URL: https://themeforest.net/user/dreamstechnologies
 }
 
 .account-bg-05 {
-  background-image: url(../img/authentication/email-bg.jpg);
+  background-image: url(/client/images/authentication/email-bg.jpg);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -11287,7 +11287,7 @@ Author URL: https://themeforest.net/user/dreamstechnologies
 }
 
 .account-bg-06 {
-  background-image: url(../img/authentication/verification-bg.jpg);
+  background-image: url(/client/images/authentication/verification-bg.jpg);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -11296,7 +11296,7 @@ Author URL: https://themeforest.net/user/dreamstechnologies
 }
 
 .account-bg-07 {
-  background-image: url(../img/authentication/success-bg.jpg);
+  background-image: url(/client/images/authentication/success-bg.jpg);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;

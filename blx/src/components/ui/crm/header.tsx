@@ -28,12 +28,6 @@ const Header: React.FC = () => {
     { href: "/gioi-thieu", label: "Giới thiệu", icon: "ti ti-info-circle" },
     { href: "/lop-hoc", label: "Lớp học", icon: "ti ti-school" },
     { href: "/tin-tuc", label: "Tin tức", icon: "ti ti-news" },
-    {
-      href: "/huan-luyen-vien",
-      label: "Huấn luyện viên",
-      icon: "ti ti-user-star",
-    },
-    { href: "/lich-tap", label: "Lịch tập", icon: "ti ti-calendar" },
     { href: "/thu-vien", label: "Thư viện", icon: "ti ti-photo" },
     { href: "/lien-he", label: "Liên hệ", icon: "ti ti-phone" },
   ];
@@ -91,11 +85,42 @@ const Header: React.FC = () => {
 
             {/* Login/User Menu */}
             {loginSuccess ? (
-              <li className="nav-item">
-                <Link href="/user-center/profile" className="nav-link me-lg-3">
+              <li className="nav-item dropdown">
+                <a
+                  className="nav-link dropdown-toggle me-lg-3"
+                  href="#"
+                  id="userDropdown"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
                   <i className="ti ti-user nav-icon"></i>
                   <span>{account?.name || "Tài khoản"}</span>
-                </Link>
+                </a>
+                <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                  <li>
+                    <Link href="/user-center/profile" className="dropdown-item">
+                      <i className="ti ti-user me-2"></i>
+                      Tài khoản
+                    </Link>
+                  </li>
+                  <li>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => {
+                        // Handle logout
+                        if (typeof window !== "undefined") {
+                          const { logout } = require("@/stores/account").useAccountStore.getState();
+                          logout();
+                          window.location.href = "/";
+                        }
+                      }}
+                    >
+                      <i className="ti ti-logout me-2"></i>
+                      Đăng xuất
+                    </button>
+                  </li>
+                </ul>
               </li>
             ) : (
               <li className="nav-item">

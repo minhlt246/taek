@@ -14,6 +14,12 @@ import { TrainingProgram } from "@/constants/training-programs";
 import { FAQ } from "@/constants/faqs";
 import { useClubs } from "@/hooks/useClubs";
 import { coachesApi, Coach } from "@/services/api/coaches";
+import {
+  schedulesApi,
+  ScheduleGroup,
+  ScheduleResponse,
+} from "@/services/api/schedules";
+import http from "@/services/http";
 
 export default function LopHocPage() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
@@ -27,6 +33,8 @@ export default function LopHocPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { overview: clubsOverview, loading: clubsLoading } = useClubs();
+  const [allSchedules, setAllSchedules] = useState<ScheduleGroup[]>([]);
+  const [rawSchedules, setRawSchedules] = useState<ScheduleResponse[]>([]);
 
   const toggleFaq = (index: number) => {
     setActiveFaq(activeFaq === index ? null : index);
@@ -48,13 +56,34 @@ export default function LopHocPage() {
           benefitsData,
           trainingProgramsData,
           faqsData,
+          schedulesData,
         ] = await Promise.all([
           coursesApi.getAll(),
           coachesApi.getAll(),
           pageContentApi.getBenefits(),
           pageContentApi.getTrainingPrograms(),
           pageContentApi.getFAQs(),
+          schedulesApi.getAll(),
         ]);
+
+        // Fetch raw schedules để có branch_id
+        try {
+          const rawSchedulesResponse = await http.get<
+            ScheduleResponse[] | { data: ScheduleResponse[] }
+          >("/schedules");
+          let rawSchedulesData: ScheduleResponse[] = [];
+          if (Array.isArray(rawSchedulesResponse.data)) {
+            rawSchedulesData = rawSchedulesResponse.data;
+          } else {
+            rawSchedulesData =
+              (rawSchedulesResponse.data as { data: ScheduleResponse[] })
+                ?.data || [];
+          }
+          setRawSchedules(rawSchedulesData);
+        } catch (err) {
+          console.error("Error loading raw schedules:", err);
+          setRawSchedules([]);
+        }
 
         // Create a map of coaches by ID for quick lookup
         const coachesMap = new Map<number, Coach>();
@@ -67,6 +96,7 @@ export default function LopHocPage() {
         setBenefits(benefitsData);
         setTrainingPrograms(trainingProgramsData);
         setFaqs(faqsData);
+        setAllSchedules(schedulesData);
       } catch (err) {
         console.error("Error loading page data:", err);
         setError("Không thể tải dữ liệu. Vui lòng thử lại sau.");
@@ -131,6 +161,101 @@ export default function LopHocPage() {
     } catch {
       return "Đang cập nhật";
     }
+  };
+
+  /**
+   * Get day name in Vietnamese
+   */
+  const getDayName = (dayOfWeek: string): string => {
+    const dayMap: Record<string, string> = {
+      Monday: "Thứ 2",
+      Tuesday: "Thứ 3",
+      Wednesday: "Thứ 4",
+      Thursday: "Thứ 5",
+      Friday: "Thứ 6",
+      Saturday: "Thứ 7",
+      Sunday: "Chủ nhật",
+    };
+    return dayMap[dayOfWeek] || dayOfWeek;
+  };
+
+  /**
+   * Format time from "HH:mm:ss" or "HH:mm" to "HH:mm"
+   */
+  const formatTime = (time?: string): string => {
+    if (!time) return "";
+    return time.substring(0, 5);
+  };
+
+  /**
+   * Format time range
+   */
+  const formatTimeRange = (startTime?: string, endTime?: string): string => {
+    const start = formatTime(startTime);
+    const end = formatTime(endTime);
+    if (!start && !end) return "";
+    if (!start) return end;
+    if (!end) return start;
+    return `${start} - ${end}`;
+  };
+
+  /**
+   * Get schedules for a specific branch
+   */
+  const getSchedulesForBranch = (
+    branchId?: number,
+    clubId?: number
+  ): ScheduleResponse[] => {
+    if (!branchId && !clubId) return [];
+    return rawSchedules.filter((schedule) => {
+      if (branchId) {
+        return schedule.branch_id === branchId;
+      }
+      if (clubId) {
+        return schedule.club_id === clubId && !schedule.branch_id;
+      }
+      return false;
+    });
+  };
+
+  /**
+   * Group schedules by day for a branch
+   */
+  const getBranchSchedulesGrouped = (
+    branchId?: number,
+    clubId?: number
+  ): Array<{ day: string; schedules: ScheduleResponse[] }> => {
+    const branchSchedules = getSchedulesForBranch(branchId, clubId);
+    const grouped: Record<string, ScheduleResponse[]> = {};
+
+    branchSchedules.forEach((schedule) => {
+      const dayName = getDayName(schedule.day_of_week);
+      if (!grouped[dayName]) {
+        grouped[dayName] = [];
+      }
+      grouped[dayName].push(schedule);
+    });
+
+    // Sort by day order
+    const dayOrder = [
+      "Thứ 2",
+      "Thứ 3",
+      "Thứ 4",
+      "Thứ 5",
+      "Thứ 6",
+      "Thứ 7",
+      "Chủ nhật",
+    ];
+    return dayOrder
+      .filter((day) => grouped[day])
+      .map((day) => ({
+        day,
+        schedules: grouped[day].sort((a, b) => {
+          const timeA = formatTime(a.start_time) || "00:00";
+          const timeB = formatTime(b.start_time) || "00:00";
+          return timeA.localeCompare(timeB);
+        }),
+      }));
   };
 
   if (loading) {
@@ -364,6 +489,51 @@ export default function LopHocPage() {
                         <span className="stat-label">Lớp học</span>
                       </div>
                     </div>
+
+                    {/* Lịch tập cho cơ sở chính */}
+                    {(() => {
+                      const clubSchedules = getBranchSchedulesGrouped(
+                        undefined,
+                        clubsOverview.club.id
+                      );
+                      return clubSchedules.length > 0 ? (
+                        <div className="branch-schedule mt-4">
+                          <h5 className="mb-3">
+                            <i className="ti ti-calendar me-2"></i>
+                            Lịch tập
+                          </h5>
+                          <div className="schedule-list">
+                            {clubSchedules.map((dayGroup, idx) => (
+                              <div key={idx} className="schedule-day-group mb-3">
+                                <div className="schedule-day-title fw-bold mb-2">
+                                  {dayGroup.day}
+                                </div>
+                                <div className="schedule-items">
+                                  {dayGroup.schedules.map((schedule, sIdx) => (
+                                    <div
+                                      key={sIdx}
+                                      className="schedule-item d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded"
+                                    >
+                                      <div className="schedule-time fw-semibold">
+                                        {formatTimeRange(
+                                          schedule.start_time,
+                                          schedule.end_time
+                                        )}
+                                      </div>
+                                      <div className="schedule-location text-muted small">
+                                        {schedule.location ||
+                                          schedule.branch?.name ||
+                                          ""}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null;
+                    })()}
                   </div>
                 </div>
               </div>
@@ -407,6 +577,57 @@ export default function LopHocPage() {
                             </div>
                           )}
                         </div>
+
+                        {/* Lịch tập cho chi nhánh */}
+                        {(() => {
+                          const branchSchedules = getBranchSchedulesGrouped(
+                            branch.id,
+                            undefined
+                          );
+                          return branchSchedules.length > 0 ? (
+                            <div className="branch-schedule mt-3">
+                              <h6 className="mb-2">
+                                <i className="ti ti-calendar me-2"></i>
+                                Lịch tập
+                              </h6>
+                              <div className="schedule-list">
+                                {branchSchedules.map((dayGroup, idx) => (
+                                  <div
+                                    key={idx}
+                                    className="schedule-day-group mb-2"
+                                  >
+                                    <div className="schedule-day-title fw-bold small mb-1">
+                                      {dayGroup.day}
+                                    </div>
+                                    <div className="schedule-items">
+                                      {dayGroup.schedules.map(
+                                        (schedule, sIdx) => (
+                                          <div
+                                            key={sIdx}
+                                            className="schedule-item d-flex justify-content-between align-items-center p-1 mb-1 bg-light rounded small"
+                                          >
+                                            <span className="schedule-time fw-semibold">
+                                              {formatTimeRange(
+                                                schedule.start_time,
+                                                schedule.end_time
+                                              )}
+                                            </span>
+                                            {schedule.location && (
+                                              <span className="schedule-location text-muted">
+                                                {schedule.location}
+                                              </span>
+                                            )}
+                                          </div>
+                                        )
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ) : null;
+                        })()}
+
                         <Link
                           href={`/cau-lac-bo?branch=${branch.id}`}
                           className="btn btn-outline-primary btn-sm mt-3 w-100"

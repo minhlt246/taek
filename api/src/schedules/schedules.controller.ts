@@ -40,21 +40,15 @@ export class SchedulesController {
     return schedule; // Return object directly for frontend compatibility
   }
 
-  @Get('club/:club_id')
-  async findByClub(@Param('club_id', ParseIntPipe) club_id: number) {
-    const schedules = await this.schedulesService.findByClub(club_id);
+  @Get('course/:courseId')
+  async findByCourse(@Param('courseId', ParseIntPipe) courseId: number) {
+    const schedules = await this.schedulesService.findByCourse(courseId);
     return schedules; // Return array directly for frontend compatibility
   }
 
-  @Get('branch/:branch_id')
-  async findByBranch(@Param('branch_id', ParseIntPipe) branch_id: number) {
-    const schedules = await this.schedulesService.findByBranch(branch_id);
-    return schedules; // Return array directly for frontend compatibility
-  }
-
-  @Get('day/:day_of_week')
-  async findByDay(@Param('day_of_week') day_of_week: string) {
-    const schedules = await this.schedulesService.findByDay(day_of_week);
+  @Get('day/:dayOfWeek')
+  async findByDay(@Param('dayOfWeek') dayOfWeek: string) {
+    const schedules = await this.schedulesService.findByDay(dayOfWeek);
     return schedules; // Return array directly for frontend compatibility
   }
 

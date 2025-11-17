@@ -8,23 +8,18 @@ interface ValidationResult {
 export const useValidate = () => {
   const validateUsername = useMemo(() => {
     return (username: string): ValidationResult => {
-      if (!username) {
-        return { valid: false, message: "Username is required" };
+      if (!username || username.trim().length === 0) {
+        return { valid: false, message: "Vui lòng nhập email, tên đăng nhập hoặc mã hội viên" };
       }
 
-      if (username.length < 3) {
+      if (username.trim().length < 2) {
         return {
           valid: false,
-          message: "Username must be at least 3 characters",
+          message: "Vui lòng nhập ít nhất 2 ký tự",
         };
       }
 
-      // Email validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(username)) {
-        return { valid: false, message: "Please enter a valid email address" };
-      }
-
+      // No strict validation - accept email, username, or ma_hoi_vien
       return { valid: true };
     };
   }, []);

@@ -84,13 +84,7 @@ export const coursesApi = {
         ? courses 
         : courses.filter((course) => course.is_active !== false);
     } catch (error: any) {
-      if (error.code === "ECONNREFUSED" || error.message === "Network Error") {
-        console.warn(
-          "API server is not running. Please start the backend server."
-        );
-      } else {
-        console.error("Error fetching courses:", error);
-      }
+      // http.ts đã log lỗi 500+ và connection errors rồi, không cần log lại ở đây
       return [];
     }
   },

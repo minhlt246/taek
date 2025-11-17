@@ -28,6 +28,7 @@ import { StudentEvaluationsModule } from './student-evaluations/student-evaluati
 import { TuitionPackagesModule } from './tuition-packages/tuition-packages.module';
 import { PoomsaeModule } from './poomsae/poomsae.module';
 import { MediaModule } from './media/media.module';
+import { TestRegistrationsModule } from './test-registrations/test-registrations.module';
 
 const createDatabaseConfig = (
   configService: ConfigService,
@@ -39,7 +40,9 @@ const createDatabaseConfig = (
     username: configService.get<string>('DB_USERNAME', 'taekwondo_user'),
     password: configService.get<string>('DB_PASSWORD', 'taekwondo_pass123'),
     database: configService.get<string>('DB_DATABASE', 'taekwondo_club'),
-    synchronize: configService.get<string>('NODE_ENV') !== 'production',
+    // Tắt synchronize để tránh lỗi foreign key constraint
+    // TODO: Sử dụng migrations thay vì synchronize trong production
+    synchronize: false, // Tạm thời tắt để tránh lỗi với dữ liệu orphan
     logging: false, // Disable query logging
   }) as TypeOrmModuleOptions;
 
@@ -81,6 +84,7 @@ const createDatabaseConfig = (
     TuitionPackagesModule,
     PoomsaeModule,
     MediaModule,
+    TestRegistrationsModule,
   ],
   controllers: [],
   providers: [],

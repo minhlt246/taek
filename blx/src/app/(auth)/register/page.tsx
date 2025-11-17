@@ -168,9 +168,7 @@ export default function Register() {
                         className="img-fluid "
                         alt="Logo"
                         style={{
-                          maxWidth: "100%",
-                          height: "auto",
-                          objectFit: "contain",
+                          
                         }}
                         width={50}
                         height={50}
@@ -523,7 +521,7 @@ export default function Register() {
                           >
                             <img
                               className="img-fluid m-1"
-                              src="/styles/assets/img/icons/facebook-logo.svg"
+                              src="/client/images/icons/facebook-logo.svg"
                               alt="Facebook"
                             />
                           </a>
@@ -535,7 +533,7 @@ export default function Register() {
                           >
                             <img
                               className="img-fluid m-1"
-                              src="/styles/assets/img/icons/google-logo.svg"
+                              src="/client/images/icons/google-logo.svg"
                               alt="Google"
                             />
                           </a>
@@ -547,7 +545,7 @@ export default function Register() {
                           >
                             <img
                               className="img-fluid m-1"
-                              src="/styles/assets/img/icons/apple-logo.svg"
+                              src="/client/images/icons/apple-logo.svg"
                               alt="Apple"
                             />
                           </a>

@@ -28,7 +28,7 @@ $(document).ready(function () {
 						"select" : "",
 						"country_code": "US",
 						"country_id": "840",
-						"country_image":"assets/img/country/country-01.svg",
+						"country_image":"client/images/country/country-01.svg",
 						"state": "United States",
 						"state_name": "Indiana",
 						"Action": ""
@@ -39,7 +39,7 @@ $(document).ready(function () {
 						"select" : "",
 						"country_code": "CAN",
 						"country_id": "124",
-						"country_image":"assets/img/country/country-02.svg",
+						"country_image":"client/images/country/country-02.svg",
 						"state": "Canada",
 						"state_name": "Alberta",
 						"Action": ""
@@ -50,7 +50,7 @@ $(document).ready(function () {
 						"select" : "",
 						"country_code": "ES",
 						"country_id": "34",
-						"country_image":"assets/img/country/country-03.svg",
+						"country_image":"client/images/country/country-03.svg",
 						"state": "Spain",
 						"state_name": "Madrid",
 						"Action": ""
@@ -61,7 +61,7 @@ $(document).ready(function () {
 						"select" : "",
 						"country_code": "IN",
 						"country_id": "356",
-						"country_image":"assets/img/country/country-04.svg",
+						"country_image":"client/images/country/country-04.svg",
 						"state": "India",
 						"state_name": "Tamil Nadu",
 						"Action": ""
@@ -72,7 +72,7 @@ $(document).ready(function () {
 						"select" : "",
 						"country_code": "BR",
 						"country_id": "076",
-						"country_image":"assets/img/country/country-05.svg",
+						"country_image":"client/images/country/country-05.svg",
 						"state": "Brazil",
 						"state_name": "Alagoas",
 						"Action": ""
@@ -83,7 +83,7 @@ $(document).ready(function () {
 						"select" : "",
 						"country_code": "DE",
 						"country_id": "49",
-						"country_image":"assets/img/country/country-06.svg",
+						"country_image":"client/images/country/country-06.svg",
 						"state": "Germany",
 						"state_name": "Saarland",
 						"Action": ""
@@ -94,7 +94,7 @@ $(document).ready(function () {
 						"select" : "",
 						"country_code": "MX",
 						"country_id": "52",
-						"country_image":"assets/img/country/country-07.svg",
+						"country_image":"client/images/country/country-07.svg",
 						"state": "Mexico",
 						"state_name": "Durango",
 						"Action": ""
@@ -105,7 +105,7 @@ $(document).ready(function () {
 						"select" : "",
 						"country_code": "CN",
 						"country_id": "156",
-						"country_image":"assets/img/country/country-08.svg",
+						"country_image":"client/images/country/country-08.svg",
 						"state": "China",
 						"state_name": "Shandong",
 						"Action": ""
@@ -116,7 +116,7 @@ $(document).ready(function () {
 						"select" : "",
 						"country_code": "RU",
 						"country_id": "7",
-						"country_image":"assets/img/country/country-09.svg",
+						"country_image":"client/images/country/country-09.svg",
 						"state": "Russia",
 						"state_name": "Kalmykia",
 						"Action": ""
@@ -127,7 +127,7 @@ $(document).ready(function () {
 						"select" : "",
 						"country_code": "IT",
 						"country_id": "39",
-						"country_image":"assets/img/country/country-10.svg",
+						"country_image":"client/images/country/country-10.svg",
 						"state": "Italy",
 						"state_name": "Tuscany",
 						"Action": ""

@@ -5,13 +5,20 @@ import http from "@/services/http";
  */
 export interface CoachResponse {
   id: number;
-  coach_code?: string;
-  name: string;
+  coach_code?: string; // Deprecated: use ma_hoi_vien instead
+  name?: string; // Deprecated: use ho_va_ten instead
+  ho_va_ten?: string; // Backend field name - Họ và tên đầy đủ
+  ma_hoi_vien?: string; // Backend field name - Mã hội viên HLV
+  ngay_thang_nam_sinh?: string; // Date of birth (YYYY-MM-DD)
+  ma_clb?: string; // Mã câu lạc bộ
+  ma_don_vi?: string; // Mã đơn vị
+  quyen_so?: number; // Quyền số
+  gioi_tinh?: "Nam" | "Nữ"; // Gender
   photo_url?: string;
   images?: string; // JSON string array
   phone?: string;
   email?: string;
-  role?: "head_coach" | "main_manager" | "assistant_manager" | "assistant";
+  role?: "owner" | "admin" | "head_coach" | "main_manager" | "assistant_manager" | "assistant";
   belt_level_id?: number;
   belt_level?: {
     id: number;
@@ -21,6 +28,9 @@ export interface CoachResponse {
   experience_years?: number;
   specialization?: string;
   bio?: string;
+  address?: string; // Địa chỉ
+  emergency_contact_name?: string; // Tên người liên hệ khẩn cấp
+  emergency_contact_phone?: string; // Số điện thoại liên hệ khẩn cấp
   club_id?: number;
   club?: {
     id: number;
@@ -114,12 +124,46 @@ const parseImages = (images?: string): string[] => {
 };
 
 /**
+ * Get avatar URL with default fallback and convert to full URL if needed
+ */
+const getAvatarUrl = (photoUrl?: string, images?: string): string => {
+  // Ưu tiên: photo_url -> images[0] -> default image
+  let avatarUrl: string | undefined = photoUrl;
+  
+  // Thử lấy từ images array nếu không có photo_url
+  if (!avatarUrl && images) {
+    try {
+      const parsedImages = parseImages(images);
+      if (parsedImages.length > 0 && parsedImages[0]) {
+        avatarUrl = parsedImages[0];
+      }
+    } catch {
+      // Ignore parse error
+    }
+  }
+  
+  // Nếu có avatarUrl, convert thành full URL nếu cần
+  if (avatarUrl) {
+    // Nếu là đường dẫn client/images/, truy cập qua backend API
+    if (avatarUrl.startsWith('client/images/')) {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      return `${apiUrl}/${avatarUrl}`;
+    }
+    // Nếu đã là full URL hoặc đường dẫn local (/client/images/...), giữ nguyên
+    return avatarUrl;
+  }
+  
+  // Fallback về ảnh mặc định cho huấn luyện viên
+  return "/client/images/users/user-40.jpg";
+};
+
+/**
  * Map backend CoachResponse to frontend Coach
  */
 const mapCoachResponse = (response: CoachResponse): Coach => {
   // Use email as fallback if name is empty
   const displayName =
-    response.name?.trim() || response.email?.split("@")[0] || "Huấn luyện viên";
+    response.name?.trim() || response.ho_va_ten?.trim() || response.email?.split("@")[0] || "Huấn luyện viên";
 
   return {
     id: response.id,
@@ -127,7 +171,7 @@ const mapCoachResponse = (response: CoachResponse): Coach => {
     title: getRoleTitle(response.role),
     belt: response.belt_level?.name || "",
     experience: formatExperience(response.experience_years),
-    image: response.photo_url || "",
+    image: getAvatarUrl(response.photo_url, response.images),
     images: parseImages(response.images),
     bio: response.bio || "",
     specialization: response.specialization || "",
@@ -161,11 +205,6 @@ export const coachesApi = {
         "/coaches"
       );
 
-      // Debug logging
-      if (process.env.NODE_ENV === "development") {
-        console.log("[Coaches API] Raw response:", response.data);
-      }
-
       // Handle different response formats
       let coachesData: CoachResponse[] = [];
       if (Array.isArray(response.data)) {
@@ -179,10 +218,6 @@ export const coachesApi = {
         .filter((coach) => coach.is_active !== false)
         .map(mapCoachResponse);
 
-      if (process.env.NODE_ENV === "development") {
-        console.log("[Coaches API] Mapped coaches:", mappedCoaches);
-      }
-
       return mappedCoaches;
     } catch (error: any) {
       if (error.code === "ECONNREFUSED" || error.message === "Network Error") {
@@ -191,7 +226,6 @@ export const coachesApi = {
         );
       } else {
         console.error("Error fetching coaches:", error);
-        console.error("Error details:", error.response?.data || error.message);
       }
       return [];
     }
@@ -236,10 +270,6 @@ export const coachesApi = {
         "/coaches/head/coach"
       );
 
-      // Debug logging
-      if (process.env.NODE_ENV === "development") {
-        console.log("[Head Coach API] Raw response:", response.data);
-      }
 
       // Handle both response formats: direct CoachResponse or { data: CoachResponse }
       if (!response.data) {
@@ -262,9 +292,6 @@ export const coachesApi = {
 
       const mappedCoach = mapCoachResponse(coachData);
 
-      if (process.env.NODE_ENV === "development") {
-        console.log("[Head Coach API] Mapped coach:", mappedCoach);
-      }
 
       return mappedCoach;
     } catch (error: any) {
@@ -274,7 +301,6 @@ export const coachesApi = {
         );
       } else {
         console.error("Error fetching head coach:", error);
-        console.error("Error details:", error.response?.data || error.message);
       }
       return null;
     }
@@ -288,7 +314,6 @@ export const coachesApi = {
   create: async (data: any): Promise<CoachResponse> => {
     try {
       const response = await http.post<CoachResponse | { success: boolean; message: string; data: CoachResponse }>("/coaches", data);
-      console.log("[CoachesApi] Create response:", response.data);
       // Handle response format: { success, message, data } or direct CoachResponse
       if (response.data && "id" in response.data && !("success" in response.data)) {
         return response.data as CoachResponse;
@@ -309,7 +334,6 @@ export const coachesApi = {
   update: async (id: number, data: any): Promise<CoachResponse> => {
     try {
       const response = await http.patch<CoachResponse | { success: boolean; message: string; data: CoachResponse }>(`/coaches/${id}`, data);
-      console.log("[CoachesApi] Update response:", response.data);
       // Handle response format: { success, message, data } or direct CoachResponse
       if (response.data && "id" in response.data && !("success" in response.data)) {
         return response.data as CoachResponse;

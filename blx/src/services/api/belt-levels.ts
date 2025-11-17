@@ -7,7 +7,8 @@ export interface BeltLevel {
   id: number;
   name: string;
   color?: string;
-  order?: number;
+  order?: number; // Alias cho order_sequence
+  order_sequence?: number; // Backend field name
   description?: string;
   created_at?: string;
   updated_at?: string;

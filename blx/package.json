@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "NEXT_PRIVATE_STANDALONE=true next dev --turbopack",
+    "dev:quiet": "NEXT_PRIVATE_STANDALONE=true next dev --turbopack 2>&1 | grep -v 'POST /api/auth/callback' | grep -v '302 in'",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint"

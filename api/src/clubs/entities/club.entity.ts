@@ -9,8 +9,8 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { Coach } from '../../coaches/entities/coach.entity';
 import { Course } from '../../courses/entities/course.entity';
+import { Coach } from '../../coaches/entities/coach.entity';
 import { Event } from '../../events/entities/event.entity';
 import { Notification } from '../../notifications/entities/notification.entity';
 import { TuitionPackage } from '../../tuition-packages/entities/tuition-package.entity';
@@ -59,8 +59,9 @@ export class Club {
   @OneToMany(() => Branch, (branch) => branch.club)
   branches: Branch[];
 
-  @OneToMany(() => Coach, (coach) => coach.club)
-  coaches: Coach[];
+  // Note: Coach không có foreign key trực tiếp với Club
+  // Quan hệ được quản lý qua ma_clb (mã câu lạc bộ) trong bảng huan_luyen_vien
+  // Không thể dùng @OneToMany relation vì không có club_id trong bảng huan_luyen_vien
 
   @ManyToOne(() => Coach, (coach) => coach.id)
   @JoinColumn({ name: 'head_coach_id' })

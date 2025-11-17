@@ -27,7 +27,7 @@ $(document).ready(function () {
 						"si_no" : "",
 						"select" : "",
 						"city_name" : "Indianapolis",
-						"country_image":"assets/img/country/country-01.svg",
+						"country_image":"client/images/country/country-01.svg",
 						"country_name": "United States",
 						"state_name": "Indiana",
 						"Action" : ""
@@ -37,7 +37,7 @@ $(document).ready(function () {
 						"si_no" : "",
 						"select" : "",
 						"city_name" : "Calgary",
-						"country_image":"assets/img/country/country-02.svg",
+						"country_image":"client/images/country/country-02.svg",
 						"country_name": "Canada",
 						"state_name": "Alberta",
 						"Action" : ""
@@ -48,7 +48,7 @@ $(document).ready(function () {
 						"si_no" : "",
 						"select" : "",
 						"city_name" : "Bulgaria",
-						"country_image":"assets/img/country/country-03.svg",
+						"country_image":"client/images/country/country-03.svg",
 						"country_name": "Spain",
 						"state_name": "Madrid",
 						"Action" : ""
@@ -58,7 +58,7 @@ $(document).ready(function () {
 						"si_no" : "",
 						"select" : "",
 						"city_name" : "Trichy",
-						"country_image":"assets/img/country/country-04.svg",
+						"country_image":"client/images/country/country-04.svg",
 						"country_name": "India",
 						"state_name": "Tamil Nadu",
 						"Action" : ""
@@ -68,7 +68,7 @@ $(document).ready(function () {
 						"si_no" : "",
 						"select" : "",
 						"city_name" : "Porto Alegre",
-						"country_image":"assets/img/country/country-05.svg",
+						"country_image":"client/images/country/country-05.svg",
 						"country_name": "Brazil",
 						"state_name": "Alagoas",
 						"Action" : ""
@@ -78,7 +78,7 @@ $(document).ready(function () {
 						"si_no" : "",
 						"select" : "",
 						"city_name" : "Hamburg",
-						"country_image":"assets/img/country/country-06.svg",
+						"country_image":"client/images/country/country-06.svg",
 						"country_name": "Germany",
 						"state_name": "Saarland",
 						"Action" : ""
@@ -88,7 +88,7 @@ $(document).ready(function () {
 						"si_no" : "",
 						"select" : "",
 						"city_name" : "Guadalajara",
-						"country_image":"assets/img/country/country-07.svg",
+						"country_image":"client/images/country/country-07.svg",
 						"country_name": "Mexico",
 						"state_name": "Durango",
 						"Action" : ""
@@ -98,7 +98,7 @@ $(document).ready(function () {
 						"si_no" : "",
 						"select" : "",
 						"city_name" : "Chengdu",
-						"country_image":"assets/img/country/country-08.svg",
+						"country_image":"client/images/country/country-08.svg",
 						"country_name": "China",
 						"state_name": "Shandong",
 						"Action" : ""
@@ -108,7 +108,7 @@ $(document).ready(function () {
 						"si_no" : "",
 						"select" : "",
 						"city_name" : "Moscow",
-						"country_image":"assets/img/country/country-09.svg",
+						"country_image":"client/images/country/country-09.svg",
 						"country_name": "Russia",
 						"state_name": "Kalmykia",
 						"Action" : ""
@@ -119,7 +119,7 @@ $(document).ready(function () {
 						"si_no" : "",
 						"select" : "",
 						"city_name" : "Rome",
-						"country_image":"assets/img/country/country-10.svg",
+						"country_image":"client/images/country/country-10.svg",
 						"country_name": "Italy",
 						"state_name": "Tuscany",
 						"Action" : ""

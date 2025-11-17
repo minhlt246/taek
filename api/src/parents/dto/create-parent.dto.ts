@@ -25,6 +25,16 @@ export class CreateParentDto {
   phone?: string;
 
   @IsOptional()
+  @IsString()
+  @MinLength(6, { message: 'Password must be at least 6 characters long' })
+  @MaxLength(255)
+  password?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  active_status?: boolean;
+
+  @IsOptional()
   @IsEnum(['father', 'mother', 'guardian', 'other'])
   relationship?: 'father' | 'mother' | 'guardian' | 'other';
 

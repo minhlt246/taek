@@ -28,7 +28,7 @@ $(document).ready(function () {
 						"title" : "Analysing latest time estimation for new project",
 						"due_date" : "11 Oct 2025, 05:00 pm",
 						"owner" : "Theresa Nelson",
-						"owner_image": "assets/img/profiles/avatar-26.jpg",
+						"owner_image": "client/images/profiles/avatar-26.jpg",
 						"created_date" : "03 Oct 2025, 03:53 pm",
 						"status" : "1",
 						"action": ""
@@ -39,7 +39,7 @@ $(document).ready(function () {
 						"title" : "Regarding latest updates in project",
 						"due_date" : "30 Nov 2025, 09:20 pm",
 						"owner" : "Guilory Berggren",
-						"owner_image": "assets/img/profiles/avatar-06.jpg",
+						"owner_image": "client/images/profiles/avatar-06.jpg",
 						"created_date" : "25 Nov 2025, 07:20 pm",
 						"status" : "1",
 						"action": ""
@@ -50,7 +50,7 @@ $(document).ready(function () {
 						"title" : "Attach final proposal for upcoming project",
 						"due_date" : "19 Dec 2025, 02:20 pm",
 						"owner" : "Jami Carlile",
-						"owner_image": "assets/img/profiles/avatar-13.jpg",
+						"owner_image": "client/images/profiles/avatar-13.jpg",
 						"created_date" : "10 Dec 2025, 06:30 pm",
 						"status" : "1",
 						"action": ""

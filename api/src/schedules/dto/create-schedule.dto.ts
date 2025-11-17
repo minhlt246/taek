@@ -8,23 +8,21 @@ import {
 
 export class CreateScheduleDto {
   @IsNumber()
-  club_id: number;
-
-  @IsNumber()
-  branch_id: number;
+  @IsOptional()
+  courseId?: number;
 
   @IsString()
   @MinLength(1)
   @MaxLength(255)
-  day_of_week: string;
+  dayOfWeek: string;
 
   @IsOptional()
   @IsString()
-  start_time?: string;
+  startTime?: string;
 
   @IsOptional()
   @IsString()
-  end_time?: string;
+  endTime?: string;
 
   @IsOptional()
   @IsString()

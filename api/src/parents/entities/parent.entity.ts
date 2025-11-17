@@ -22,6 +22,12 @@ export class Parent {
   @Column({ length: 15, nullable: true })
   phone: string;
 
+  @Column({ length: 255, nullable: true })
+  password: string;
+
+  @Column({ default: true })
+  active_status: boolean;
+
   @Column({
     type: 'enum',
     enum: ['father', 'mother', 'guardian', 'other'],

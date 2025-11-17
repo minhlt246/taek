@@ -28,7 +28,7 @@ $(document).ready(function () {
 						"title" : "We scheduled a meeting for next week",
 						"due_date" : "25 Sep 2025, 12:12 pm",
 						"owner" : "Theresa Nelson",
-						"owner_image": "assets/img/profiles/avatar-17.jpg",
+						"owner_image": "client/images/profiles/avatar-17.jpg",
 						"created_date" : "22 Sep 2025, 10:14 am",
 						"status" : "0",
 						"action": ""
@@ -39,7 +39,7 @@ $(document).ready(function () {
 						"title" : "Will have a meeting before project start",
 						"due_date" : "27 Oct 2025, 12:30 pm",
 						"owner" : "Smith Cooper",
-						"owner_image": "assets/img/profiles/avatar-14.jpg",
+						"owner_image": "client/images/profiles/avatar-14.jpg",
 						"created_date" : "21 Oct 2025, 03:00 pm",
 						"status" : "0",
 						"action": ""

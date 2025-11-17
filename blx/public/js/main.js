@@ -526,7 +526,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setTimeout(() => {
       statusBlock.innerHTML = `
-        <img src="./client/images/success.png" alt="Success" class="img-fluid mx-auto d-block" style="width: 80px; height: 80px;">
+        <img src=".//client/images/success.png" alt="Success" class="img-fluid mx-auto d-block" style="width: 80px; height: 80px;">
         <h5 class="fw-bold text-success mt-3">Send Success</h5>
         <p class="text-muted">Your transaction has been confirmed on the blockchain</p>
       `;

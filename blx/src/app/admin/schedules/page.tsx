@@ -62,15 +62,17 @@ export default function SchedulesPage() {
   const fetchSchedules = async () => {
     setLoading(true);
     try {
-      const response = await http.get<ScheduleResponse[]>("/schedules");
-      const data = Array.isArray(response.data) ? response.data : [];
-      console.log("[SchedulesPage] Raw fetched data:", data);
-      setSchedules(data as Schedule[]);
-    } catch (error: any) {
-      // Only log if error is not suppressed (connection errors are handled by interceptor)
-      if (!error.suppressLog) {
-        console.error("Failed to fetch schedules:", error);
+      // Gọi trực tiếp API và map về ScheduleResponse format
+      const response = await http.get<ScheduleResponse[] | { data: ScheduleResponse[] }>("/schedules");
+      let schedulesData: ScheduleResponse[] = [];
+      if (Array.isArray(response.data)) {
+        schedulesData = response.data;
+      } else {
+        schedulesData = (response.data as { data: ScheduleResponse[] })?.data || [];
       }
+      setSchedules(schedulesData as Schedule[]);
+    } catch (error: any) {
+      // http.ts đã log lỗi 500+ rồi, không cần log lại ở đây
       setSchedules([]);
     } finally {
       setLoading(false);
