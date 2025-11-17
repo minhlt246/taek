@@ -39,7 +39,7 @@ interface Reply {
 export default function TicketDetailPage() {
   const searchParams = useSearchParams();
   const ticketId = searchParams.get("id");
-  const { loginSuccess, account } = useAccountStore();
+  const { loginSuccess } = useAccountStore();
 
   const [ticket, setTicket] = useState<TicketDetail | null>(null);
   const [replies, setReplies] = useState<Reply[]>([]);
@@ -367,7 +367,7 @@ export default function TicketDetailPage() {
                       Conversation ({replies.length} replies)
                     </h6>
                     <div className="replies-container">
-                      {replies.map((reply, index) => (
+                      {replies.map((reply) => (
                         <div
                           key={reply.id}
                           className={`reply-item ${
