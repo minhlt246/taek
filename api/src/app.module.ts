@@ -32,19 +32,33 @@ import { TestRegistrationsModule } from './test-registrations/test-registrations
 
 const createDatabaseConfig = (
   configService: ConfigService,
-): TypeOrmModuleOptions =>
-  ({
+): TypeOrmModuleOptions => {
+  const host = configService.get<string>('DB_HOST', 'localhost');
+  const port = configService.get<number>('DB_PORT', 8889);
+  const username = configService.get<string>('DB_USERNAME', 'taekwondo_user');
+  const password = configService.get<string>('DB_PASSWORD', 'taekwondo_pass123');
+  const database = configService.get<string>('DB_DATABASE', 'taekwondo_club');
+
+  // Log database configuration (without password)
+  console.log('📊 Database Configuration:');
+  console.log(`   Host: ${host}`);
+  console.log(`   Port: ${port}`);
+  console.log(`   Database: ${database}`);
+  console.log(`   Username: ${username}`);
+
+  return {
     ...databaseConfig,
-    host: configService.get<string>('DB_HOST', 'localhost'),
-    port: configService.get<number>('DB_PORT', 8889),
-    username: configService.get<string>('DB_USERNAME', 'taekwondo_user'),
-    password: configService.get<string>('DB_PASSWORD', 'taekwondo_pass123'),
-    database: configService.get<string>('DB_DATABASE', 'taekwondo_club'),
+    host,
+    port,
+    username,
+    password,
+    database,
     // Tắt synchronize để tránh lỗi foreign key constraint
     // TODO: Sử dụng migrations thay vì synchronize trong production
     synchronize: false, // Tạm thời tắt để tránh lỗi với dữ liệu orphan
     logging: false, // Disable query logging
-  }) as TypeOrmModuleOptions;
+  } as TypeOrmModuleOptions;
+};
 
 @Module({
   imports: [

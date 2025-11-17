@@ -1,0 +1,6 @@
+{
+  "buildCommand": "cd blx && yarn install && yarn build",
+  "outputDirectory": "blx/.next",
+  "installCommand": "cd blx && yarn install"
+}
+
