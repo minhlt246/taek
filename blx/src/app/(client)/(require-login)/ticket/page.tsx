@@ -43,7 +43,7 @@ export default function TicketPage() {
     date: "",
   });
 
-  const [pagination, _setPagination] = useState({
+  const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
     total: 0,

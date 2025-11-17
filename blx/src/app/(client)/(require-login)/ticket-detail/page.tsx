@@ -367,7 +367,7 @@ export default function TicketDetailPage() {
                       Conversation ({replies.length} replies)
                     </h6>
                     <div className="replies-container">
-                      {replies.map((reply) => (
+                      {replies.map((reply, index) => (
                         <div
                           key={reply.id}
                           className={`reply-item ${
