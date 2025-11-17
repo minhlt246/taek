@@ -1,43 +1,39 @@
 {
+  "name": "portfolio-website",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
   "dependencies": {
     "next": "^14.0.0",
-    
-      "name": "portfolio-website",
-      "version": "0.1.0",
-      "private": true,
-      "scripts": {
-        "dev": "next dev",
-        "build": "next build",
-        "start": "next start",
-        "lint": "next lint"
-      },
-      "dependencies": {
-        "@heroicons/react": "^2.0.12",
-        "@next/swc-darwin-x64": "^12.3.2",
-        "framer-motion": "^7.6.2",
-        "next": "^12.2.4",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0",
-        "react-hook-form": "^7.38.0",
-        "react-simple-typewriter": "^4.0.5",
-        "react-social-icons": "^5.15.0"
-      },
-      "devDependencies": {
-        "@types/node": "18.11.7",
-        "@types/react": "18.0.24",
-        "@types/react-dom": "18.0.8",
-        "autoprefixer": "^10.4.12",
-        "eslint": "8.26.0",
-        "eslint-config-next": "13.0.0",
-        "postcss": "^8.4.18",
-        "tailwind-scrollbar": "^2.0.1",
-        "tailwindcss": "^3.2.1",
-        "typescript": "4.8.4"
-      },
-      "optionalDependencies": {
-        "@next/swc-linux-x64-gnu": "12.3.2"
-      }
+    "@heroicons/react": "^2.0.12",
+    "@next/swc-darwin-x64": "^12.3.2",
+    "framer-motion": "^7.6.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.38.0",
+    "react-simple-typewriter": "^4.0.5",
+    "react-social-icons": "^5.15.0"
+  },
+  "devDependencies": {
+    "@types/node": "18.11.7",
+    "@types/react": "18.0.24",
+    "@types/react-dom": "18.0.8",
+    "autoprefixer": "^10.4.12",
+    "eslint": "8.26.0",
+    "eslint-config-next": "13.0.0",
+    "postcss": "^8.4.18",
+    "tailwind-scrollbar": "^2.0.1",
+    "tailwindcss": "^3.2.1",
+    "typescript": "4.8.4"
+  },
+  "optionalDependencies": {
+    "@next/swc-linux-x64-gnu": "12.3.2"
   }
 }
-
 
