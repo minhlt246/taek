@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import type { NextAuthOptions } from "next-auth";
+import { DefaultSession } from "next-auth";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -34,27 +35,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
       }
-      return token;    import { DefaultSession } from "next-auth";
-    
-    declare module "next-auth" {
-      interface User {
-        id?: string;
-      }
-    
-      interface Session extends DefaultSession {
-        user: {
-          id?: string;
-        } & DefaultSession["user"];
-      }
-    }
-    
-    declare module "next-auth/jwt" {
-      interface JWT {
-        id?: string;
-      }
-    }
-    
-    export {};
+      return token;
     },
     async session({ session, token }) {
       if (session.user) {
@@ -72,3 +53,21 @@ export const authOptions: NextAuthOptions = {
 const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
+
+declare module "next-auth" {
+  interface User {
+    id?: string;
+  }
+
+  interface Session extends DefaultSession {
+    user: {
+      id?: string;
+    } & DefaultSession["user"];
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id?: string;
+  }
+}

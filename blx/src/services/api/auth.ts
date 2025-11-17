@@ -1,4 +1,4 @@
-import { http } from "../../services/http";
+import http from "@/services/http";
 
 export interface ForgotPasswordRequest {
   email: string;
@@ -74,7 +74,6 @@ export const authApi = {
     const response = await http.put("/auth/profile", userData);
     return response.data;
   },
-
 
   async uploadImage(file: File): Promise<{ url: string }> {
     const formData = new FormData();
