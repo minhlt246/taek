@@ -50,7 +50,7 @@ export default function Home() {
             {/* Right Column - Image Placeholder */}
             <div className="col-lg-6">
               <div className="hero-image-placeholder">
-                  <img src="/styles/images/logo.png" alt="Hero Image" />
+                <img src="/styles/images/logo.png" alt="Hero Image" />
               </div>
             </div>
           </div>
@@ -237,7 +237,10 @@ export default function Home() {
             <div className="col-lg-4 col-md-6">
               <div className="training-program-card">
                 <div className="training-program-image-placeholder">
-                  <img src="/styles/images/children.png" alt="Trẻ Em (5-12 tuổi)" />
+                  <img
+                    src="/styles/images/children.png"
+                    alt="Trẻ Em (5-12 tuổi)"
+                  />
                 </div>
                 <div className="training-program-content">
                   <h3 className="training-program-card-title">
@@ -256,7 +259,10 @@ export default function Home() {
             <div className="col-lg-4 col-md-6">
               <div className="training-program-card">
                 <div className="training-program-image-placeholder">
-                  <img src="/styles/images/teen.png" alt="Thiếu Niên (13-17 tuổi)" />
+                  <img
+                    src="/styles/images/teen.png"
+                    alt="Thiếu Niên (13-17 tuổi)"
+                  />
                 </div>
                 <div className="training-program-content">
                   <h3 className="training-program-card-title">
@@ -346,6 +352,102 @@ export default function Home() {
                 <div className="achievement-stat-label">Huấn luyện viên</div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Honor Section */}
+      <section className="honor-section section-padding">
+        <div className="container">
+          <div className="honor-header text-center mb-5">
+            <div className="honor-label">VINH DANH</div>
+            <h2 className="honor-title">Học Viên & Huấn Luyện Viên Xuất Sắc</h2>
+            <p className="honor-subtitle">
+              Tôn vinh những cá nhân đã đóng góp và đạt thành tích nổi bật
+            </p>
+          </div>
+          <div className="row g-4">
+            <div className="col-lg-4 col-md-6">
+              <div className="honor-card">
+                <div className="honor-image-wrapper">
+                  <img
+                    src="/styles/images/honor-1.png"
+                    alt="Học viên xuất sắc"
+                  />
+                  <div className="honor-badge">
+                    <i className="ti ti-trophy"></i>
+                  </div>
+                </div>
+                <div className="honor-content">
+                  <h5 className="honor-card-title">Học Viên Xuất Sắc</h5>
+                  <p className="honor-card-description">
+                    Những học viên đạt thành tích cao trong thi đấu và rèn luyện
+                  </p>
+                  <div className="honor-stats">
+                    <span className="honor-stat-item">
+                      <i className="ti ti-award"></i>
+                      25+ Huy chương vàng
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="col-lg-4 col-md-6">
+              <div className="honor-card">
+                <div className="honor-image-wrapper">
+                  <img
+                    src="/styles/images/honor-2.png"
+                    alt="Huấn luyện viên danh dự"
+                  />
+                  <div className="honor-badge">
+                    <i className="ti ti-star"></i>
+                  </div>
+                </div>
+                <div className="honor-content">
+                  <h5 className="honor-card-title">Huấn Luyện Viên Danh Dự</h5>
+                  <p className="honor-card-description">
+                    Đội ngũ HLV đai đen với nhiều năm kinh nghiệm và thành tích
+                  </p>
+                  <div className="honor-stats">
+                    <span className="honor-stat-item">
+                      <i className="ti ti-user"></i>
+                      15+ Năm kinh nghiệm
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="col-lg-4 col-md-6">
+              <div className="honor-card">
+                <div className="honor-image-wrapper">
+                  <img
+                    src="/styles/images/honor-3.png"
+                    alt="Đội tuyển quốc gia"
+                  />
+                  <div className="honor-badge">
+                    <i className="ti ti-flag"></i>
+                  </div>
+                </div>
+                <div className="honor-content">
+                  <h5 className="honor-card-title">Đội Tuyển Quốc Gia</h5>
+                  <p className="honor-card-description">
+                    Học viên được tuyển chọn vào đội tuyển quốc gia và thi đấu
+                    quốc tế
+                  </p>
+                  <div className="honor-stats">
+                    <span className="honor-stat-item">
+                      <i className="ti ti-world"></i>
+                      10+ Đại diện quốc gia
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="text-center mt-5">
+            <Link href="/vinh-danh" className="btn-honor-view-all">
+              Xem tất cả vinh danh
+            </Link>
           </div>
         </div>
       </section>
