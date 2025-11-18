@@ -1,5 +1,5 @@
 {
-  "name": "portfolio-website",
+  "name": "taek",
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint"
   },
-  "dependencies": {
+  "blxDependencies": {
     "next": "^14.0.0",
     "@heroicons/react": "^2.0.12",
     "@next/swc-darwin-x64": "^12.3.2",
