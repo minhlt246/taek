@@ -1,0 +1,12 @@
+[build]
+  base = "blx"
+  command = "yarn install && yarn build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20.x"
+  NPM_FLAGS = "--legacy-peer-deps"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
