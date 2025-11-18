@@ -10,7 +10,32 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "^14.0.0",
+    "next": "^14.0.0",Failed to compile.
+9:59:28 AM: 
+9:59:28 AM: ./src/app/(client)/(require-login)/ticket-detail/page.tsx:189:46
+9:59:28 AM: Type error: Property 'closeTicket' does not exist on type '{ getSupportCategories(): Promise<{ success: boolean; data: SupportCategory[]; }>; getMyTickets(params: GetMyTicketsParams): Promise<GetMyTicketsResponse>; ... 5 more ...; uploadFile(file: File): Promise<...>; }'.
+9:59:28 AM:   187 |     try {
+9:59:28 AM:   188 |       setSubmitting(true);
+9:59:28 AM: > 189 |       const response: any = await supportApi.closeTicket(ticketId);
+9:59:28 AM:       |                                              ^
+9:59:28 AM:   190 |       if (response && response.success !== false) {
+9:59:28 AM:   191 |         useToast.success("Ticket closed successfully!");
+9:59:28 AM:   192 |         loadTicketDetail();
+9:59:28 AM: Next.js build worker exited with code: 1 and signal: null
+9:59:28 AM: error Command failed with exit code 1. (https://ntl.fyi/exit-code-1)
+9:59:28 AM: info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.
+9:59:28 AM: ​
+9:59:28 AM: "build.command" failed                                        
+9:59:28 AM: ────────────────────────────────────────────────────────────────
+9:59:28 AM: ​
+9:59:28 AM:   Error message
+9:59:28 AM:   Command failed with exit code 1: yarn install && yarn build (https://ntl.fyi/exit-code-1)
+9:59:28 AM: ​
+9:59:28 AM:   Error location
+9:59:28 AM:   In build.command from netlify.toml:
+9:59:28 AM:   yarn install && yarn build
+9:59:28 AM: ​
+9:59:28 AM:   Resolved config
     "@heroicons/react": "^2.0.12",
     "@next/swc-darwin-x64": "^12.3.2",
     "framer-motion": "^7.6.2",

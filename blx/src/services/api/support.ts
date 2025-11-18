@@ -112,5 +112,12 @@ export const supportApi = {
     });
     return response.data?.data || response.data || [];
   },
+
+  async closeTicket(
+    ticketId: string
+  ): Promise<{ success: boolean; message?: string }> {
+    const response = await http.patch(`/support/tickets/${ticketId}/close`);
+    return response.data;
+  },
 };
 
