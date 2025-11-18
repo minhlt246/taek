@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint"
   },
-  "blxDependencies": {
+  "dependencies": {
     "next": "^14.0.0",
     "@heroicons/react": "^2.0.12",
     "@next/swc-darwin-x64": "^12.3.2",
