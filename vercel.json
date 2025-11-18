@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "rootDirectory": "blx",
-  "buildCommand": "yarn install && yarn build",
+  "buildCommand": "yarn build",
   "installCommand": "yarn install",
   "outputDirectory": ".next",
   "framework": "nextjs",
   "regions": ["sin1"],
+  "rootDirectory": "blx",
   "env": {
     "NODE_ENV": "production"
   }
