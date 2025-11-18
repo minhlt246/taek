@@ -24,8 +24,6 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [show2FaModal, setShow2FaModal] = useState(false);
-  const [twoFaLoading, setTwoFaLoading] = useState(false);
 
   const { validateUsername } = useValidate();
   const usernameResult = validateUsername(username);
@@ -201,22 +199,6 @@ export default function Login() {
     }
   };
 
-  const handle2FASubmit = async (code: string) => {
-    // TODO: Implement 2FA flow khi backend hỗ trợ
-    setTwoFaLoading(true);
-    try {
-      useToast.error("2FA chưa được hỗ trợ. Vui lòng liên hệ quản trị viên.");
-      setTwoFaLoading(false);
-    } catch (error: any) {
-      useToast.error(error.message || "2FA verification failed");
-      setTwoFaLoading(false);
-    }
-  };
-
-  const handle2FAClose = () => {
-    setShow2FaModal(false);
-    setTwoFaLoading(false);
-  };
 
   return (
     <div className="account-page bg-white">
