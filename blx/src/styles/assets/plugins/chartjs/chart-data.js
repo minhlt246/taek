@@ -1,7 +1,10 @@
 $(function() {
 	'use strict';
 
-  	Chart.defaults.borderColor = "#ced2d4";
+  	// Check if Chart is available before accessing defaults
+  	if (typeof Chart !== 'undefined' && Chart.defaults) {
+  		Chart.defaults.borderColor = "#ced2d4";
+  	}
 
 	if ($('#chartBar1').length > 0) {
 	var ctx1 = document.getElementById('chartBar1').getContext('2d');

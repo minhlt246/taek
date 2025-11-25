@@ -41,8 +41,10 @@ Thumbs.db
 CRMS-Template-coppy/
 
 # Lock files (using yarn)
+# Ignore yarn.lock only at root, but keep blx/yarn.lock for Netlify
 package-lock.json
-yarn.lock
+/yarn.lock
+!blx/yarn.lock
 
 # TypeScript
 *.tsbuildinfo

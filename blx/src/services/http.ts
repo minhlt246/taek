@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 
 // Get API base URL from environment variable, fallback to default
 // Check both NEXT_PUBLIC_API_BASE_URL and NEXT_PUBLIC_API_URL for compatibility
@@ -9,7 +9,12 @@ const baseURL =
 
 // Log baseURL removed to reduce console noise
 
-export const http = axios.create({
+// Ensure axios is available
+if (typeof axios === "undefined" || !axios.create) {
+  throw new Error("Axios is not properly imported or available");
+}
+
+export const http: AxiosInstance = axios.create({
   baseURL,
   timeout: 15000,
   headers: {

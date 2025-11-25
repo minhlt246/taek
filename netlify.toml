@@ -1,12 +1,16 @@
+# Netlify configuration for Next.js monorepo
+# Base directory: nơi Netlify kiểm tra package.json, .nvmrc, cài đặt dependencies và chạy build command
 [build]
   base = "blx"
-  command = "yarn install && yarn build"
+  command = "yarn build"
   publish = ".next"
 
+# Environment variables
 [build.environment]
   NODE_VERSION = "20.x"
   NPM_FLAGS = "--legacy-peer-deps"
 
+# Next.js plugin for optimal Next.js deployment
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
