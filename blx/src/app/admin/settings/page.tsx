@@ -63,7 +63,7 @@ export default function SettingsPage() {
     appearance: {
       theme: "light",
       primaryColor: "#007bff",
-      logoUrl: "/images/logo.png",
+      logoUrl: "/client/images/logo.png",
       faviconUrl: "/images/favicon.ico",
     },
   });

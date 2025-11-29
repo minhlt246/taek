@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import PageHeader from "@/components/ui/crm/PageHeader";
 import { galleryApi, GalleryImage, GalleryVideo } from "@/services/api/gallery";
+// Import SCSS từ client assets
+import "@/styles/scss/thu-vien.scss";
 
 export default function ThuVienPage() {
   const [activeFilter, setActiveFilter] = useState<
@@ -130,7 +132,7 @@ export default function ThuVienPage() {
                     alt={image.badge}
                     className="gallery-image"
                     onError={(e) => {
-                      e.currentTarget.src = "/styles/images/logo.png";
+                      e.currentTarget.src = "/client/images/logo.png";
                     }}
                   />
                   <div className="gallery-overlay">
@@ -160,7 +162,7 @@ export default function ThuVienPage() {
                       alt={video.title}
                       className="video-thumbnail"
                       onError={(e) => {
-                        e.currentTarget.src = "/styles/images/logo.png";
+                        e.currentTarget.src = "/client/images/logo.png";
                       }}
                     />
                     <div className="video-play-button">

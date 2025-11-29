@@ -2,6 +2,7 @@
 
 import React from "react";
 import PageHeader from "@/components/ui/crm/PageHeader";
+import "@/styles/scss/chinh-sach-bao-mat.scss";
 
 export default function ChinhSachBaoMatPage() {
   return (

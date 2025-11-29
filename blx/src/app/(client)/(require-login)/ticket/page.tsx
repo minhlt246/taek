@@ -43,12 +43,6 @@ export default function TicketPage() {
     date: "",
   });
 
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 10,
-    total: 0,
-  });
-
   useEffect(() => {
     if (loginSuccess) {
       loadCategories();
@@ -81,7 +75,7 @@ export default function TicketPage() {
       }
 
       const response: any = await supportApi.getMyTickets({
-        page: tickets.page,
+        page: page,
         limit: tickets.limit,
         query,
       });
@@ -608,36 +602,35 @@ export default function TicketPage() {
               )}
             </div>
 
-            {pagination.total > pagination.limit && (
+            {tickets.totalDocs > tickets.limit && (
               <div className="pagination-section">
                 <nav aria-label="Tickets pagination">
                   <div className="d-flex justify-content-between align-items-center">
                     <div className="pagination-info">
-                      Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
+                      Showing {(tickets.page - 1) * tickets.limit + 1} to{" "}
                       {Math.min(
-                        pagination.page * pagination.limit,
-                        pagination.total
+                        tickets.page * tickets.limit,
+                        tickets.totalDocs
                       )}{" "}
-                      of {pagination.total} tickets
+                      of {tickets.totalDocs} tickets
                     </div>
                     <div className="pagination-controls">
                       <button
-                        onClick={() => loadMyTickets(pagination.page - 1)}
-                        disabled={pagination.page <= 1}
+                        onClick={() => loadMyTickets(tickets.page - 1)}
+                        disabled={tickets.page <= 1}
                         className="btn btn-sm btn-outline-primary me-2"
                       >
                         <i className="fas fa-chevron-left me-1"></i>
                         Previous
                       </button>
                       <span className="pagination-current">
-                        Page {pagination.page} of{" "}
-                        {Math.ceil(pagination.total / pagination.limit)}
+                        Page {tickets.page} of{" "}
+                        {tickets.totalPages}
                       </span>
                       <button
-                        onClick={() => loadMyTickets(pagination.page + 1)}
+                        onClick={() => loadMyTickets(tickets.page + 1)}
                         disabled={
-                          pagination.page >=
-                          Math.ceil(pagination.total / pagination.limit)
+                          tickets.page >= tickets.totalPages
                         }
                         className="btn btn-sm btn-outline-primary ms-2"
                       >

@@ -5,18 +5,19 @@ import Script from "next/script";
 
 /**
  * Component để load CSS và JS cho admin interface
- * Sử dụng next/script và useEffect để tải assets
+ * Sử dụng assets từ /client/assets
  */
 export const AdminAssets = () => {
   useEffect(() => {
-    // Load CSS files
+    // Load CSS files từ /client/assets
     const links = [
-      "/styles/assets/css/bootstrap.min.css",
-      "/styles/assets/plugins/tabler-icons/tabler-icons.min.css",
-      "/styles/assets/plugins/simplebar/simplebar.min.css",
-      "/styles/assets/plugins/datatables/css/dataTables.bootstrap5.min.css",
-      "/styles/assets/plugins/daterangepicker/daterangepicker.css",
-      "/styles/assets/css/style.css",
+      "/client/assets/css/bootstrap.min.css",
+      "/client/assets/css/style.css",
+      "/client/assets/plugins/tabler-icons/tabler-icons.min.css",
+      "/client/assets/plugins/simplebar/simplebar.min.css",
+      "/client/assets/plugins/datatables/css/dataTables.bootstrap5.min.css",
+      "/client/assets/plugins/daterangepicker/daterangepicker.css",
+      "/client/assets/plugins/fontawesome/css/all.min.css",
     ];
 
     links.forEach((href) => {
@@ -39,13 +40,13 @@ export const AdminAssets = () => {
     <>
       {/* Load jQuery first - essential for other scripts */}
       <Script
-        src="/styles/assets/js/jquery-3.7.1.min.js"
-        strategy="afterInteractive"
+        src="/client/js/jquery.min.js"
+        strategy="beforeInteractive"
       />
 
       {/* Load Bootstrap after jQuery */}
       <Script
-        src="/styles/assets/js/bootstrap.bundle.min.js"
+        src="/client/js/bootstrap.bundle.min.js"
         strategy="afterInteractive"
         onLoad={() => {
           console.log("Bootstrap loaded successfully");
@@ -54,12 +55,35 @@ export const AdminAssets = () => {
 
       {/* Load Simplebar */}
       <Script
-        src="/styles/assets/plugins/simplebar/simplebar.min.js"
+        src="/client/assets/plugins/simplebar/simplebar.min.js"
         strategy="lazyOnload"
       />
 
-      {/* Load theme script */}
-      <Script src="/styles/assets/js/theme-script.js" strategy="lazyOnload" />
+      {/* Load DataTables */}
+      <Script
+        src="/client/assets/plugins/datatables/js/jquery.dataTables.min.js"
+        strategy="lazyOnload"
+      />
+      <Script
+        src="/client/assets/plugins/datatables/js/dataTables.bootstrap5.min.js"
+        strategy="lazyOnload"
+      />
+
+      {/* Load DateRangePicker */}
+      <Script
+        src="/client/js/moment.min.js"
+        strategy="lazyOnload"
+      />
+      <Script
+        src="/client/assets/plugins/daterangepicker/daterangepicker.js"
+        strategy="lazyOnload"
+      />
+
+      {/* Load main admin script */}
+      <Script
+        src="/client/js/main.js"
+        strategy="lazyOnload"
+      />
     </>
   );
 };

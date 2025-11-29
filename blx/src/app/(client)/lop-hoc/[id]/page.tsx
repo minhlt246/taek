@@ -176,7 +176,7 @@ export default function CourseDetailPage() {
                     alt={courseDetail.title}
                     className="course-detail-image"
                     onError={(e) => {
-                      e.currentTarget.src = "/styles/images/logo.png";
+                      e.currentTarget.src = "/client/images/logo.png";
                     }}
                   />
                 ) : (

@@ -6,6 +6,7 @@ import Footer from "@/components/ui/crm/footer";
 import React from "react";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import Loading from "@/components/ui/loading";
+import ClientAssets from "@/components/ui/ClientAssets";
 
 export default function ClientLayout({
   children,
@@ -20,6 +21,7 @@ export default function ClientLayout({
 
   return (
     <AuthProvider>
+      <ClientAssets />
       <Header />
       <main className="main-content">{children}</main>
       <Footer />

@@ -2,6 +2,7 @@
 
 import React from "react";
 import PageHeader from "@/components/ui/crm/PageHeader";
+import "@/styles/scss/gioi-thieu.scss";
 
 export default function GioiThieuPage() {
   return (
@@ -38,7 +39,7 @@ export default function GioiThieuPage() {
                   src="/client/images/blogs/blog-1.jpg"
                   alt="Câu lạc bộ Taekwondo"
                   onError={(e) => {
-                    e.currentTarget.src = "/styles/images/logo.png";
+                    e.currentTarget.src = "/client/images/logo.png";
                   }}
                 />
               </div>

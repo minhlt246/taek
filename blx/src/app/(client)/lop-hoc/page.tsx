@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import PageHeader from "@/components/ui/crm/PageHeader";
+import "@/styles/scss/lop-hoc.scss";
 import {
   coursesApi,
   Course,
@@ -369,7 +370,7 @@ export default function LopHocPage() {
                         alt={course.title}
                         className="course-image"
                         onError={(e) => {
-                          e.currentTarget.src = "/styles/images/logo.png";
+                          e.currentTarget.src = "/client/images/logo.png";
                         }}
                       />
                     ) : (

@@ -53,9 +53,9 @@ const createDatabaseConfig = (
     username,
     password,
     database,
-    // Tắt synchronize để tránh lỗi foreign key constraint
+    // Bật synchronize để tự động tạo bảng từ entities (chỉ dùng trong development)
     // TODO: Sử dụng migrations thay vì synchronize trong production
-    synchronize: false, // Tạm thời tắt để tránh lỗi với dữ liệu orphan
+    synchronize: true, // Tự động tạo/update schema từ entities
     logging: false, // Disable query logging
   } as TypeOrmModuleOptions;
 };

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import PageHeader from "@/components/ui/crm/PageHeader";
+import "@/styles/scss/lich-tap.scss";
 import { schedulesApi, ScheduleGroup } from "@/services/api/schedules";
 
 export default function LichTapPage() {

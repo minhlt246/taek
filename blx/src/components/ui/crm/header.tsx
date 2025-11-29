@@ -11,6 +11,7 @@ import { useAccountStore } from "@/stores/account";
  */
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const pathname = usePathname();
   const { loginSuccess, account } = useAccountStore();
 
@@ -22,6 +23,29 @@ const Header: React.FC = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Đóng dropdown khi click bên ngoài
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      const dropdownElement = document.querySelector(".nav-item.dropdown");
+      if (
+        isDropdownOpen &&
+        dropdownElement &&
+        !dropdownElement.contains(target)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   const navLinks = [
     { href: "/", label: "Trang chủ", icon: "ti ti-home" },
@@ -39,18 +63,6 @@ const Header: React.FC = () => {
     return pathname.startsWith(href);
   };
 
-  const handleOffcanvasClose = (): void => {
-    const offcanvasElement = document.getElementById("menu");
-    if (offcanvasElement) {
-      const bsOffcanvas = (window as any).bootstrap?.Offcanvas.getInstance(
-        offcanvasElement
-      );
-      if (bsOffcanvas) {
-        bsOffcanvas.hide();
-      }
-    }
-  };
-
   return (
     <header className={`header ${isScrolled ? "scrolled" : ""}`}>
       <nav className="navbar navbar-expand-lg py-0">
@@ -58,7 +70,7 @@ const Header: React.FC = () => {
           {/* Logo */}
           <Link href="/" className="navbar-brand p-0">
             <Image
-              src="/styles/images/logo.png"
+              src="/client/images/logo.png"
               alt="Taekwondo Logo"
               width={100}
               height={100}
@@ -68,7 +80,7 @@ const Header: React.FC = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <ul className="navbar-nav ms-auto d-none d-lg-flex">
+          <ul className="navbar-nav ms-auto d-none d-lg-flex" style={{ overflow: "visible" }}>
             {navLinks.map((link) => (
               <li key={link.href} className="nav-item">
                 <Link
@@ -85,21 +97,43 @@ const Header: React.FC = () => {
 
             {/* Login/User Menu */}
             {loginSuccess ? (
-              <li className="nav-item dropdown">
+              <li className="nav-item dropdown" style={{ position: "relative", overflow: "visible" }}>
                 <a
                   className="nav-link dropdown-toggle me-lg-3"
                   href="#"
                   id="userDropdown"
                   role="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsDropdownOpen(!isDropdownOpen);
+                  }}
+                  aria-expanded={isDropdownOpen}
                 >
                   <i className="ti ti-user nav-icon"></i>
                   <span>{account?.name || "Tài khoản"}</span>
                 </a>
-                <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                <ul
+                  className={`dropdown-menu dropdown-menu-end ${
+                    isDropdownOpen ? "show" : ""
+                  }`}
+                  aria-labelledby="userDropdown"
+                  style={{
+                    display: isDropdownOpen ? "block" : "none",
+                    position: "absolute",
+                    top: "100%",
+                    right: 0,
+                    left: "auto",
+                    marginTop: "0.125rem",
+                    zIndex: 9999,
+                    minWidth: "200px",
+                  }}
+                >
                   <li>
-                    <Link href="/user-center/profile" className="dropdown-item">
+                    <Link
+                      href="/user-center/profile"
+                      className="dropdown-item"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
                       <i className="ti ti-user me-2"></i>
                       Tài khoản
                     </Link>
@@ -108,6 +142,7 @@ const Header: React.FC = () => {
                     <button
                       className="dropdown-item"
                       onClick={() => {
+                        setIsDropdownOpen(false);
                         // Handle logout
                         if (typeof window !== "undefined") {
                           const { logout } = require("@/stores/account").useAccountStore.getState();

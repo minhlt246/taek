@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import PageHeader from "@/components/ui/crm/PageHeader";
+import "@/styles/scss/lien-he.scss";
 
 export default function LienHePage() {
   const [formData, setFormData] = useState({

@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState, useRef } from "react";
+// Import style chính từ client - chứa các style chung cho tất cả pages
+import "@/styles/scss/style.scss";
 
 export default function Home() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -50,7 +52,7 @@ export default function Home() {
             {/* Right Column - Image Placeholder */}
             <div className="col-lg-6">
               <div className="hero-image-placeholder">
-                <img src="/styles/images/logo.png" alt="Hero Image" />
+                <img src="/client/images/logo.png" alt="Hero Image" />
               </div>
             </div>
           </div>

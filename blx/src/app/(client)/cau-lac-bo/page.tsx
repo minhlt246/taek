@@ -200,7 +200,7 @@ export default function CauLacBoPage() {
                         alt={course.title}
                         className="course-image"
                         onError={(e) => {
-                          e.currentTarget.src = "/styles/images/logo.png";
+                          e.currentTarget.src = "/client/images/logo.png";
                         }}
                       />
                     ) : (

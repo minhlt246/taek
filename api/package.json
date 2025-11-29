@@ -25,6 +25,7 @@
     "test-login": "ts-node -r tsconfig-paths/register scripts/test-login.ts",
     "set-default-password": "ts-node -r tsconfig-paths/register scripts/set-default-password.ts",
     "check-db": "ts-node -r tsconfig-paths/register scripts/check-database-connection.ts",
+    "setup-db": "ts-node -r tsconfig-paths/register scripts/setup-database.ts",
     "fix-orphan": "ts-node -r tsconfig-paths/register scripts/fix-orphan-assistants.ts",
     "import-test-results": "ts-node -r tsconfig-paths/register scripts/import-test-results.ts"
   },

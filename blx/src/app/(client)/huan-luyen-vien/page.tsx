@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import PageHeader from "@/components/ui/crm/PageHeader";
+import "@/styles/scss/huan-luyen-vien.scss";
 import { coachesApi, Coach } from "@/services/api/coaches";
 import { COACH_STANDARDS } from "@/constants/coach-standards";
 

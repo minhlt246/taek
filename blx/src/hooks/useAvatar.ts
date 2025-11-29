@@ -1,13 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import http from "@/services/http";
 import { getAvatarUrl } from "@/utils/avatar";
 
 /**
  * Hook để load avatar từ API dựa trên coach ID
  * @param coachId - ID của coach (từ account.id)
+ * @param refreshTrigger - Optional trigger để force refresh (có thể là timestamp hoặc version)
  * @returns Avatar URL hoặc null nếu chưa load được
  */
-export const useAvatar = (coachId?: string | number): string | null => {
+export const useAvatar = (
+  coachId?: string | number,
+  refreshTrigger?: number | string
+): string | null => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -19,7 +23,11 @@ export const useAvatar = (coachId?: string | number): string | null => {
     const loadAvatar = async () => {
       try {
         // Gọi API trực tiếp để lấy raw coach data
-        const response = await http.get(`/coaches/${coachId}`);
+        // Thêm timestamp vào query để bypass cache khi có refreshTrigger
+        const cacheBuster = refreshTrigger || Date.now();
+        const response = await http.get(`/coaches/${coachId}`, {
+          params: { _t: cacheBuster },
+        });
         const coachData = response.data;
 
         if (coachData) {
@@ -27,6 +35,8 @@ export const useAvatar = (coachId?: string | number): string | null => {
           const avatar = getAvatarUrl(coachData.photo_url, coachData.images);
           if (avatar) {
             setAvatarUrl(avatar);
+          } else {
+            setAvatarUrl(null);
           }
         }
       } catch (error) {
@@ -37,7 +47,7 @@ export const useAvatar = (coachId?: string | number): string | null => {
     };
 
     loadAvatar();
-  }, [coachId]);
+  }, [coachId, refreshTrigger]);
 
   return avatarUrl;
 };

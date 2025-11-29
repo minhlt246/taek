@@ -59,7 +59,7 @@ const nextConfig = {
     },
   },
 
-  // Webpack configuration for better module resolution
+  // Webpack configuration for better module resolution (only used when not using Turbopack)
   webpack: (config) => {
     // Ensure proper module resolution for TypeScript paths
     config.resolve.alias = {
@@ -67,6 +67,24 @@ const nextConfig = {
       "@": path.resolve(__dirname, "./src"),
     };
     return config;
+  },
+
+  // Turbopack configuration
+  experimental: {
+    turbo: {
+      resolveAlias: {
+        "@": path.resolve(__dirname, "./src"),
+      },
+      resolveExtensions: [
+        ".mdx",
+        ".tsx",
+        ".ts",
+        ".jsx",
+        ".js",
+        ".mjs",
+        ".json",
+      ],
+    },
   },
 };
 

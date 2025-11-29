@@ -79,7 +79,7 @@ const AdminSidebar = () => {
           {/* Logo Normal */}
           <Link href="/admin" className="logo logo-normal">
             <Image
-              src="/styles/images/logo.png"
+              src="/client/images/logo.png"
               alt="Logo"
               width={180}
               height={60}
@@ -91,7 +91,7 @@ const AdminSidebar = () => {
           {/* Logo Small */}
           <Link href="/admin" className="logo-small">
             <Image
-              src="/styles/images/logo.png"
+              src="/client/images/logo.png"
               alt="Logo"
               width={40}
               height={40}
@@ -103,7 +103,7 @@ const AdminSidebar = () => {
           {/* Logo Dark */}
           <Link href="/admin" className="dark-logo">
             <Image
-              src="/styles/images/logo.png"
+              src="/client/images/logo.png"
               alt="Logo"
               width={180}
               height={60}

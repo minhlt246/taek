@@ -15,14 +15,10 @@ export const databaseConfig: TypeOrmModuleOptions = {
   extra: {
     // Connection pool configuration
     connectionLimit: 10,
-    // Connection timeout settings
+    // Connection timeout settings (in milliseconds)
     connectTimeout: 60000,
-    acquireTimeout: 60000,
-    timeout: 60000,
     // Keep connection alive
     enableKeepAlive: true,
     keepAliveInitialDelay: 0,
-    // Reconnect on connection lost
-    reconnect: true,
   },
 };

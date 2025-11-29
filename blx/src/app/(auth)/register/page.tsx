@@ -164,7 +164,7 @@ export default function Register() {
                   >
                     <div className="text-center mb-3 auth-logo">
                       <img
-                        src="/styles/images/logo.png"
+                        src="/client/images/logo.png"
                         className="img-fluid "
                         alt="Logo"
                         style={{
@@ -566,7 +566,7 @@ export default function Register() {
             <div className="col-lg-6 d-flex align-items-center justify-content-center bg-light position-relative overflow-hidden">
               <div className="text-center p-5">
                 <Image
-                  src="/styles/images/logo.png"
+                  src="/client/images/logo.png"
                   alt="Taekwondo Đồng Phú Logo"
                   width={500}
                   height={500}

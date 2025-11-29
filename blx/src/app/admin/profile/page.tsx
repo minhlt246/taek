@@ -28,7 +28,8 @@ interface UserProfile {
 
 export default function ProfilePage() {
   const { account, token, updateUser } = useAccountStore();
-  const avatarUrl = useAvatar(account?.id);
+  const [avatarRefreshTrigger, setAvatarRefreshTrigger] = useState<number>(Date.now());
+  const avatarUrl = useAvatar(account?.id, avatarRefreshTrigger);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -46,13 +47,14 @@ export default function ProfilePage() {
 
   // Logic ưu tiên hiển thị avatar:
   // 1. avatarPreview (khi đang upload/preview ảnh mới)
-  // 2. avatarUrl từ hook useAvatar (load từ API /coaches/{id})
-  // 3. profile.avatar từ state (đã load từ API trong useEffect)
+  // 2. profile.avatar từ state (ưu tiên vì được cập nhật trực tiếp sau upload)
+  // 3. avatarUrl từ hook useAvatar (load từ API /coaches/{id})
   // 4. defaultAvatarUrl (FALLBACK - chỉ khi không có dữ liệu từ database)
+  // Lưu ý: profile.avatar được ưu tiên hơn avatarUrl vì nó được cập nhật ngay sau khi upload thành công
   const displayAvatarUrl =
     avatarPreview ||
-    (avatarUrl && !avatarError ? avatarUrl : null) ||
     (profile?.avatar && !avatarError ? profile.avatar : null) ||
+    (avatarUrl && !avatarError ? avatarUrl : null) ||
     defaultAvatarUrl;
 
   // Debug: Log avatar URLs để kiểm tra
@@ -536,6 +538,9 @@ export default function ProfilePage() {
           fileInputRef.current.value = "";
         }
 
+        // Trigger refresh hook useAvatar để load avatar mới từ API
+        setAvatarRefreshTrigger(Date.now());
+
         // Reload profile để lấy thông tin mới nhất từ database
         try {
           const userId = account?.id
@@ -566,6 +571,8 @@ export default function ProfilePage() {
                   return prev;
                 });
                 updateUser({ avatar: finalAvatarUrl } as any);
+                // Trigger refresh hook useAvatar sau khi reload thành công
+                setAvatarRefreshTrigger(Date.now());
               }
               // Nếu không có avatar từ database, để logic displayAvatarUrl tự fallback
             }
@@ -623,6 +630,8 @@ export default function ProfilePage() {
                     return prev;
                   });
                   updateUser({ avatar: finalAvatarUrl } as any);
+                  // Trigger refresh hook useAvatar sau khi reload thành công
+                  setAvatarRefreshTrigger(Date.now());
                 }
                 // Nếu không có avatar từ database, để logic displayAvatarUrl tự fallback
               }
