@@ -19,7 +19,7 @@ async function createDatabase() {
 
   const dbName = process.env.DB_DATABASE || 'taekwondo_club';
 
-  console.log('🔧 Đang tạo database...');
+  console.log('Dang tao database...');
   console.log(`Database: ${dbName}`);
   console.log(`Host: ${config.host}:${config.port}`);
   console.log(`User: ${config.user}`);
@@ -33,39 +33,42 @@ async function createDatabase() {
       password: config.password || undefined,
     });
 
-    console.log('✅ Kết nối MySQL thành công!');
+    console.log('Ket noi MySQL thanh cong!');
 
     // Tạo database
     await connection.execute(
-      `CREATE DATABASE IF NOT EXISTS \`${dbName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
+      `CREATE DATABASE IF NOT EXISTS \`${dbName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`,
     );
 
-    console.log(`✅ Database "${dbName}" đã được tạo thành công!`);
+    console.log(`Database "${dbName}" da duoc tao thanh cong!`);
 
     // Kiểm tra database đã tồn tại
     const [databases] = await connection.execute<mysql.RowDataPacket[]>(
-      `SHOW DATABASES LIKE '${dbName}'`
+      `SHOW DATABASES LIKE '${dbName}'`,
     );
 
     if (databases.length > 0) {
-      console.log(`\n✅ Xác nhận: Database "${dbName}" đã tồn tại!`);
+      console.log(`\nXac nhan: Database "${dbName}" da ton tai!`);
     }
 
     await connection.end();
-    console.log('\n🎉 Hoàn tất! Bây giờ bạn có thể restart NestJS server.');
+    console.log('\nHoan tat! Bay gio ban co the restart NestJS server.');
   } catch (error: any) {
-    console.error('\n❌ Lỗi:', error.message);
-    
+    console.error('\nLoi:', error.message);
+
     if (error.code === 'ER_ACCESS_DENIED_ERROR') {
-      console.error('\n💡 Hướng dẫn:');
-      console.error('1. Kiểm tra lại DB_USERNAME và DB_PASSWORD trong file .env');
+      console.error('\nHuong dan:');
+      console.error(
+        '1. Kiểm tra lại DB_USERNAME và DB_PASSWORD trong file .env',
+      );
       console.error('2. Hoặc chạy SQL trực tiếp trong MySQL client:');
-      console.error(`\n   CREATE DATABASE IF NOT EXISTS \`${dbName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`);
+      console.error(
+        `\n   CREATE DATABASE IF NOT EXISTS \`${dbName}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`,
+      );
     }
-    
+
     process.exit(1);
   }
 }
 
 createDatabase();
-

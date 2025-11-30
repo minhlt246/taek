@@ -1,0 +1,213 @@
+@use "./breakpoint" as breakpoint;
+@use "./galaxy" as galaxy;
+
+.thu-vien-page {
+  .gallery-section {
+    padding: 4rem 0;
+
+    @include breakpoint.sm {
+      padding: 2rem 0;
+    }
+
+    .gallery-filters {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+
+      @include breakpoint.sm {
+        margin-bottom: 2rem;
+      }
+
+      .filter-btn {
+        padding: 0.5rem 1.5rem;
+        border: 2px solid #e3e6f0;
+        background: white;
+        color: #6c757d;
+        border-radius: 25px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        cursor: pointer;
+
+        @include breakpoint.sm {
+          padding: 0.4rem 1.25rem;
+          font-size: 0.875rem;
+        }
+
+        &:hover,
+        &.active {
+          border-color: #4e73df;
+          background: #4e73df;
+          color: white;
+        }
+      }
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+
+      @include breakpoint.md {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+      }
+
+      @include breakpoint.sm {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .gallery-item {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+
+          .gallery-overlay {
+            opacity: 1;
+          }
+        }
+
+        .gallery-image {
+          width: 100%;
+          height: 300px;
+          object-fit: cover;
+
+          @include breakpoint.sm {
+            height: 250px;
+          }
+        }
+
+        .gallery-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(78, 115, 223, 0.9);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          transition: all 0.3s ease;
+
+          i {
+            color: white;
+            font-size: 3rem;
+          }
+        }
+
+        .gallery-badge {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          background: rgba(255, 255, 255, 0.9);
+          padding: 0.25rem 0.75rem;
+          border-radius: 20px;
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: #4e73df;
+        }
+      }
+    }
+
+    .video-section {
+      margin-top: 4rem;
+
+      @include breakpoint.sm {
+        margin-top: 2rem;
+      }
+
+      .video-section-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 2rem;
+
+        @include breakpoint.sm {
+          font-size: 1.5rem;
+        }
+      }
+
+      .video-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+
+        @include breakpoint.md {
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 1rem;
+        }
+
+        @include breakpoint.sm {
+          grid-template-columns: 1fr;
+        }
+
+        .video-item {
+          position: relative;
+          border-radius: 12px;
+          overflow: hidden;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          &:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+          }
+
+          .video-thumbnail {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+
+            @include breakpoint.sm {
+              height: 200px;
+            }
+          }
+
+          .video-play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(78, 115, 223, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+
+            &:hover {
+              background: #4e73df;
+              transform: translate(-50%, -50%) scale(1.1);
+            }
+          }
+
+          .video-title {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            padding: 1.5rem 1rem 1rem;
+            color: white;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+}

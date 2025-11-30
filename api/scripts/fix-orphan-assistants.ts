@@ -17,14 +17,14 @@ async function fixOrphanAssistants() {
     database: process.env.DB_DATABASE || 'taekwondo_club',
   };
 
-  console.log('🔧 Sửa dữ liệu orphan trong tro_giang_chi_nhanh...');
+  console.log('Sua du lieu orphan trong tro_giang_chi_nhanh...');
 
   try {
     const connection = await mysql.createConnection(config);
-    console.log('✅ Kết nối database thành công!');
+    console.log('Ket noi database thanh cong!');
 
     // Kiểm tra dữ liệu orphan trước
-    console.log('\n🔍 Kiểm tra dữ liệu orphan...');
+    console.log('\nKiem tra du lieu orphan...');
     const [orphanRows] = await connection.execute(
       `SELECT 
         ba.id,
@@ -34,51 +34,52 @@ async function fixOrphanAssistants() {
         ba.assigned_at
       FROM tro_giang_chi_nhanh ba
       LEFT JOIN huan_luyen_vien hlv ON ba.assistant_id = hlv.id
-      WHERE hlv.id IS NULL`
+      WHERE hlv.id IS NULL`,
     );
 
     if (Array.isArray(orphanRows) && orphanRows.length > 0) {
-      console.log(`⚠️  Tìm thấy ${orphanRows.length} record orphan:`);
+      console.log(`Tim thay ${orphanRows.length} record orphan:`);
       console.table(orphanRows);
 
       // Xóa dữ liệu orphan
-      console.log('\n🗑️  Đang xóa dữ liệu orphan...');
+      console.log('\nDang xoa du lieu orphan...');
       const [result] = await connection.execute(
         `DELETE ba FROM tro_giang_chi_nhanh ba
         LEFT JOIN huan_luyen_vien hlv ON ba.assistant_id = hlv.id
-        WHERE hlv.id IS NULL`
+        WHERE hlv.id IS NULL`,
       );
 
       const affectedRows = (result as any).affectedRows;
-      console.log(`✅ Đã xóa ${affectedRows} record orphan!`);
+      console.log(`Da xoa ${affectedRows} record orphan!`);
 
       // Kiểm tra lại sau khi xóa
-      console.log('\n🔍 Kiểm tra lại sau khi xóa...');
+      console.log('\nKiem tra lai sau khi xoa...');
       const [remainingOrphans] = await connection.execute(
         `SELECT COUNT(*) as count
         FROM tro_giang_chi_nhanh ba
         LEFT JOIN huan_luyen_vien hlv ON ba.assistant_id = hlv.id
-        WHERE hlv.id IS NULL`
+        WHERE hlv.id IS NULL`,
       );
 
       const remainingCount = (remainingOrphans as any[])[0].count;
       if (remainingCount === 0) {
-        console.log('✅ Không còn dữ liệu orphan!');
-        console.log('\n💡 Bây giờ có thể bật lại synchronize trong app.module.ts nếu cần.');
+        console.log('Khong con du lieu orphan!');
+        console.log(
+          '\nBay gio co the bat lai synchronize trong app.module.ts neu can.',
+        );
       } else {
-        console.log(`⚠️  Vẫn còn ${remainingCount} record orphan!`);
+        console.log(`Van con ${remainingCount} record orphan!`);
       }
     } else {
-      console.log('✅ Không có dữ liệu orphan!');
+      console.log('Khong co du lieu orphan!');
     }
 
     await connection.end();
-    console.log('\n✅ Hoàn tất!');
+    console.log('\nHoan tat!');
   } catch (error) {
-    console.error('❌ Lỗi:', error);
+    console.error('Loi:', error);
     process.exit(1);
   }
 }
 
 fixOrphanAssistants();
-

@@ -1,0 +1,280 @@
+@use "./breakpoint" as breakpoint;
+
+.chinh-sach-bao-mat-page,
+.dieu-khoan-su-dung-page {
+  .policy-content-section {
+    padding: 4rem 0 6rem;
+    background: #f8f9fc;
+
+    @include breakpoint.sm {
+      padding: 2rem 0 3rem;
+    }
+
+    .policy-content-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      padding: 3rem;
+      position: relative;
+      overflow: hidden;
+
+      @include breakpoint.sm {
+        padding: 1.5rem;
+        border-radius: 12px;
+      }
+
+      // Decorative element
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #0d6efd 0%, #4e73df 100%);
+      }
+
+      .policy-section {
+        margin-bottom: 3rem;
+
+        @include breakpoint.sm {
+          margin-bottom: 2rem;
+        }
+
+        &:last-of-type {
+          margin-bottom: 0;
+        }
+
+        .policy-section-title {
+          font-size: 1.75rem;
+          font-weight: 700;
+          color: #2c3e50;
+          margin-bottom: 1.5rem;
+          padding-bottom: 0.75rem;
+          border-bottom: 2px solid #e3e6f0;
+          position: relative;
+
+          @include breakpoint.sm {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+          }
+
+          &::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background: #0d6efd;
+          }
+        }
+
+        .policy-subtitle {
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: #34495e;
+          margin-top: 1.5rem;
+          margin-bottom: 1rem;
+
+          @include breakpoint.sm {
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            margin-bottom: 0.75rem;
+          }
+        }
+
+        .policy-text {
+          font-size: 1rem;
+          line-height: 1.8;
+          color: #5a6c7d;
+          margin-bottom: 1.25rem;
+          text-align: justify;
+
+          @include breakpoint.sm {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+          }
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+
+        .policy-list {
+          list-style: none;
+          padding: 0;
+          margin: 1rem 0 1.5rem;
+
+          @include breakpoint.sm {
+            margin: 0.75rem 0 1rem;
+          }
+
+          li {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: #5a6c7d;
+            padding: 0.75rem 0 0.75rem 2rem;
+            position: relative;
+            transition: all 0.3s ease;
+
+            @include breakpoint.sm {
+              font-size: 0.95rem;
+              padding: 0.5rem 0 0.5rem 1.75rem;
+            }
+
+            &::before {
+              content: "✓";
+              position: absolute;
+              left: 0;
+              top: 0.75rem;
+              width: 24px;
+              height: 24px;
+              background: linear-gradient(135deg, #0d6efd 0%, #4e73df 100%);
+              color: white;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 0.75rem;
+              font-weight: 700;
+              box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
+
+              @include breakpoint.sm {
+                width: 20px;
+                height: 20px;
+                font-size: 0.65rem;
+                top: 0.5rem;
+              }
+            }
+
+            &:hover {
+              color: #2c3e50;
+              padding-left: 2.25rem;
+
+              @include breakpoint.sm {
+                padding-left: 2rem;
+              }
+            }
+
+            strong {
+              color: #2c3e50;
+              font-weight: 600;
+            }
+          }
+        }
+
+        .contact-info-box {
+          background: linear-gradient(135deg, #f8f9fc 0%, #e9ecef 100%);
+          border-left: 4px solid #0d6efd;
+          border-radius: 8px;
+          padding: 1.5rem;
+          margin-top: 1.5rem;
+
+          @include breakpoint.sm {
+            padding: 1.25rem;
+            margin-top: 1rem;
+          }
+
+          p {
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            color: #5a6c7d;
+            line-height: 1.6;
+
+            @include breakpoint.sm {
+              font-size: 0.95rem;
+              margin-bottom: 0.5rem;
+            }
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            strong {
+              color: #2c3e50;
+              font-weight: 700;
+              font-size: 1.1rem;
+              display: block;
+              margin-bottom: 0.5rem;
+
+              @include breakpoint.sm {
+                font-size: 1rem;
+              }
+            }
+
+            i {
+              color: #0d6efd;
+              margin-right: 0.5rem;
+              font-size: 1.1rem;
+            }
+
+            a {
+              color: #0d6efd;
+              text-decoration: none;
+              font-weight: 500;
+              transition: all 0.3s ease;
+
+              &:hover {
+                color: #4e73df;
+                text-decoration: underline;
+              }
+            }
+          }
+        }
+      }
+
+      .policy-footer {
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 2px solid #e3e6f0;
+        text-align: center;
+
+        @include breakpoint.sm {
+          margin-top: 2rem;
+          padding-top: 1.5rem;
+        }
+
+        .policy-update-date {
+          font-size: 0.95rem;
+          color: #6c757d;
+          margin: 0;
+
+          @include breakpoint.sm {
+            font-size: 0.9rem;
+          }
+
+          strong {
+            color: #2c3e50;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Specific styling for dieu-khoan-su-dung page
+.dieu-khoan-su-dung-page {
+  .policy-content-section {
+    .policy-content-card {
+      .policy-section {
+        .policy-list {
+          li {
+            &::before {
+              content: "•";
+              background: transparent;
+              color: #0d6efd;
+              font-size: 1.5rem;
+              box-shadow: none;
+              font-weight: 700;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

@@ -2,7 +2,7 @@ import { ToastContainer } from "react-toastify";
 import Script from "next/script";
 
 import "@/styles/css/bootstrap.min.css";
-import "@/styles/css/all.min.css";
+// import "@/styles/css/all.min.css"; // Temporarily commented out - Font Awesome CSS
 import "react-toastify/dist/ReactToastify.css";
 import "@/styles/scss/admin.scss";
 import "@/styles/scss/style.scss";
@@ -35,6 +35,10 @@ export default function RootLayout({
         <link
           rel="stylesheet"
           href="/styles/assets/plugins/tabler-icons/tabler-icons.min.css"
+        />
+        <link
+          rel="stylesheet"
+          href="/styles/css/all.min.css"
         />
       </head>
       <body suppressHydrationWarning={true}>

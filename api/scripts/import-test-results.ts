@@ -29,8 +29,10 @@ async function importTestResults() {
   const clubId = clubIdArg ? parseInt(clubIdArg.split('=')[1]) : undefined;
 
   if (!filePath) {
-    console.error('❌ Vui lòng cung cấp đường dẫn đến file Excel');
-    console.log('Cách sử dụng: npm run import-test-results -- <path-to-excel-file> [--test-id=<id>] [--club-id=<id>]');
+    console.error('Vui long cung cap duong dan den file Excel');
+    console.log(
+      'Cach su dung: npm run import-test-results -- <path-to-excel-file> [--test-id=<id>] [--club-id=<id>]',
+    );
     process.exit(1);
   }
 
@@ -39,11 +41,11 @@ async function importTestResults() {
     : path.join(process.cwd(), filePath);
 
   if (!fs.existsSync(fullPath)) {
-    console.error(`❌ File không tồn tại: ${fullPath}`);
+    console.error(`File khong ton tai: ${fullPath}`);
     process.exit(1);
   }
 
-  console.log('📂 Đang đọc file Excel...');
+  console.log('Dang doc file Excel...');
   console.log(`   File: ${fullPath}`);
 
   // Read Excel file
@@ -65,7 +67,7 @@ async function importTestResults() {
 
   try {
     await dataSource.initialize();
-    console.log('✅ Kết nối database thành công!');
+    console.log('Ket noi database thanh cong!');
 
     const testRegistrationRepo = dataSource.getRepository(TestRegistration);
     const testExamRepo = dataSource.getRepository(TestExam);
@@ -82,21 +84,22 @@ async function importTestResults() {
     }) as any[];
 
     if (data.length < 2) {
-      throw new Error('Excel file must have at least header row and one data row');
+      throw new Error(
+        'Excel file must have at least header row and one data row',
+      );
     }
 
     const headers = data[0] as string[];
     const rows = data.slice(1);
 
-    console.log(`\n📊 Tìm thấy ${rows.length} dòng dữ liệu`);
+    console.log(`\nTim thay ${rows.length} dong du lieu`);
 
     // Find column indices
     const findColumnIndex = (keywords: string[]): number => {
       for (const keyword of keywords) {
         const index = headers.findIndex(
           (h) =>
-            h &&
-            h.toString().toLowerCase().includes(keyword.toLowerCase()),
+            h && h.toString().toLowerCase().includes(keyword.toLowerCase()),
         );
         if (index !== -1) return index;
       }
@@ -109,12 +112,7 @@ async function importTestResults() {
       'mã',
       'code',
     ]);
-    const hoTenIndex = findColumnIndex([
-      'họ tên',
-      'ho ten',
-      'tên',
-      'name',
-    ]);
+    const hoTenIndex = findColumnIndex(['họ tên', 'ho ten', 'tên', 'name']);
     const capDaiHienTaiIndex = findColumnIndex([
       'cấp đai hiện tại',
       'cap dai hien tai',
@@ -142,14 +140,28 @@ async function importTestResults() {
       'chú thích',
     ]);
 
-    console.log('\n📋 Các cột được tìm thấy:');
-    console.log(`   - Mã hội viên: ${maHoiVienIndex !== -1 ? `Cột ${maHoiVienIndex + 1}` : '❌ Không tìm thấy'}`);
-    console.log(`   - Họ tên: ${hoTenIndex !== -1 ? `Cột ${hoTenIndex + 1}` : '❌ Không tìm thấy'}`);
-    console.log(`   - Cấp đai hiện tại: ${capDaiHienTaiIndex !== -1 ? `Cột ${capDaiHienTaiIndex + 1}` : '❌ Không tìm thấy'}`);
-    console.log(`   - Cấp đai mục tiêu: ${capDaiMucTieuIndex !== -1 ? `Cột ${capDaiMucTieuIndex + 1}` : '❌ Không tìm thấy'}`);
-    console.log(`   - Điểm: ${diemIndex !== -1 ? `Cột ${diemIndex + 1}` : '❌ Không tìm thấy'}`);
-    console.log(`   - Kết quả: ${ketQuaIndex !== -1 ? `Cột ${ketQuaIndex + 1}` : '❌ Không tìm thấy'}`);
-    console.log(`   - Ghi chú: ${ghiChuIndex !== -1 ? `Cột ${ghiChuIndex + 1}` : '❌ Không tìm thấy'}`);
+    console.log('\nCac cot duoc tim thay:');
+    console.log(
+      `   - Ma hoi vien: ${maHoiVienIndex !== -1 ? `Cot ${maHoiVienIndex + 1}` : 'Khong tim thay'}`,
+    );
+    console.log(
+      `   - Ho ten: ${hoTenIndex !== -1 ? `Cot ${hoTenIndex + 1}` : 'Khong tim thay'}`,
+    );
+    console.log(
+      `   - Cap dai hien tai: ${capDaiHienTaiIndex !== -1 ? `Cot ${capDaiHienTaiIndex + 1}` : 'Khong tim thay'}`,
+    );
+    console.log(
+      `   - Cap dai muc tieu: ${capDaiMucTieuIndex !== -1 ? `Cot ${capDaiMucTieuIndex + 1}` : 'Khong tim thay'}`,
+    );
+    console.log(
+      `   - Diem: ${diemIndex !== -1 ? `Cot ${diemIndex + 1}` : 'Khong tim thay'}`,
+    );
+    console.log(
+      `   - Ket qua: ${ketQuaIndex !== -1 ? `Cot ${ketQuaIndex + 1}` : 'Khong tim thay'}`,
+    );
+    console.log(
+      `   - Ghi chu: ${ghiChuIndex !== -1 ? `Cot ${ghiChuIndex + 1}` : 'Khong tim thay'}`,
+    );
 
     if (maHoiVienIndex === -1 && hoTenIndex === -1) {
       throw new Error('Excel file must have "Mã hội viên" or "Họ tên" column');
@@ -164,7 +176,9 @@ async function importTestResults() {
       if (!testExam) {
         throw new Error(`Test exam with ID ${testId} not found`);
       }
-      console.log(`\n📝 Sử dụng kỳ thi: ${testExam.test_name} (ID: ${testExam.id})`);
+      console.log(
+        `\nSu dung ky thi: ${testExam.test_name} (ID: ${testExam.id})`,
+      );
     } else {
       // Auto-create test exam from filename
       let testName = 'Kỳ thi thăng cấp';
@@ -173,7 +187,10 @@ async function importTestResults() {
           .replace(/\.(xlsx|xls|xlsm)$/i, '')
           .trim();
 
-        if (nameWithoutExt.includes('THI') || nameWithoutExt.includes('KẾT QUẢ')) {
+        if (
+          nameWithoutExt.includes('THI') ||
+          nameWithoutExt.includes('KẾT QUẢ')
+        ) {
           const quarterMatch = nameWithoutExt.match(/(Q[1-4]\.?\d{4})/i);
           if (quarterMatch) {
             testName = `Kỳ thi ${quarterMatch[1]}`;
@@ -206,9 +223,13 @@ async function importTestResults() {
         } as any);
         const saved = await testExamRepo.save(newTestExam);
         testExam = Array.isArray(saved) ? saved[0] : saved;
-        console.log(`\n✅ Đã tạo kỳ thi mới: ${testExam.test_name} (ID: ${testExam.id})`);
+        console.log(
+          `\nDa tao ky thi moi: ${testExam.test_name} (ID: ${testExam.id})`,
+        );
       } else {
-        console.log(`\n📝 Sử dụng kỳ thi hiện có: ${testExam.test_name} (ID: ${testExam.id})`);
+        console.log(
+          `\nSu dung ky thi hien co: ${testExam.test_name} (ID: ${testExam.id})`,
+        );
       }
     }
 
@@ -245,13 +266,13 @@ async function importTestResults() {
       }
     });
 
-    console.log(`\n📚 Đã load ${beltLevels.length} cấp đai từ database`);
+    console.log(`\nDa load ${beltLevels.length} cap dai tu database`);
 
     const errors: string[] = [];
     let imported = 0;
     let failed = 0;
 
-    console.log('\n🔄 Bắt đầu import dữ liệu...\n');
+    console.log('\nBat dau import du lieu...\n');
 
     // Process each row
     for (let i = 0; i < rows.length; i++) {
@@ -261,9 +282,7 @@ async function importTestResults() {
       try {
         // Get student identifier
         const maHoiVien =
-          maHoiVienIndex !== -1
-            ? String(row[maHoiVienIndex] || '').trim()
-            : '';
+          maHoiVienIndex !== -1 ? String(row[maHoiVienIndex] || '').trim() : '';
         const hoTen =
           hoTenIndex !== -1 ? String(row[hoTenIndex] || '').trim() : '';
 
@@ -363,7 +382,9 @@ async function importTestResults() {
 
         const ketQuaStr =
           ketQuaIndex !== -1
-            ? String(row[ketQuaIndex] || '').trim().toLowerCase()
+            ? String(row[ketQuaIndex] || '')
+                .trim()
+                .toLowerCase()
             : '';
         let testResult: 'pass' | 'fail' | 'pending' = 'pending';
         if (ketQuaStr.includes('đạt') || ketQuaStr.includes('pass')) {
@@ -376,13 +397,12 @@ async function importTestResults() {
           ghiChuIndex !== -1 ? String(row[ghiChuIndex] || '').trim() : '';
 
         // Create or update test registration
-        const existingRegistration =
-          await testRegistrationRepo.findOne({
-            where: {
-              user_id: user.id,
-              test_id: testExam.id,
-            },
-          });
+        const existingRegistration = await testRegistrationRepo.findOne({
+          where: {
+            user_id: user.id,
+            test_id: testExam.id,
+          },
+        });
 
         if (existingRegistration) {
           existingRegistration.current_belt_id = currentBeltId;
@@ -391,7 +411,9 @@ async function importTestResults() {
           existingRegistration.test_result = testResult;
           (existingRegistration as any).examiner_notes = ghiChu || null;
           await testRegistrationRepo.save(existingRegistration);
-          console.log(`   ✅ Row ${i + 2}: Cập nhật ${user.ho_va_ten} (${maHoiVien || hoTen})`);
+          console.log(
+            `   Row ${i + 2}: Cap nhat ${user.ho_va_ten} (${maHoiVien || hoTen})`,
+          );
         } else {
           const newRegistration = testRegistrationRepo.create({
             test_id: testExam.id,
@@ -404,25 +426,27 @@ async function importTestResults() {
             payment_status: 'paid',
           } as any);
           await testRegistrationRepo.save(newRegistration);
-          console.log(`   ✅ Row ${i + 2}: Import ${user.ho_va_ten} (${maHoiVien || hoTen})`);
+          console.log(
+            `   Row ${i + 2}: Import ${user.ho_va_ten} (${maHoiVien || hoTen})`,
+          );
         }
 
         imported++;
       } catch (error: any) {
         errors.push(`Row ${i + 2}: ${error.message || 'Unknown error'}`);
         failed++;
-        console.log(`   ❌ Row ${i + 2}: ${error.message || 'Unknown error'}`);
+        console.log(`   Row ${i + 2}: ${error.message || 'Unknown error'}`);
       }
     }
 
     console.log('\n' + '='.repeat(50));
-    console.log('📊 KẾT QUẢ IMPORT:');
-    console.log(`   ✅ Thành công: ${imported} bản ghi`);
-    console.log(`   ❌ Thất bại: ${failed} bản ghi`);
-    console.log(`   📝 Kỳ thi: ${testExam.test_name} (ID: ${testExam.id})`);
+    console.log('KET QUA IMPORT:');
+    console.log(`   Thanh cong: ${imported} ban ghi`);
+    console.log(`   That bai: ${failed} ban ghi`);
+    console.log(`   Ky thi: ${testExam.test_name} (ID: ${testExam.id})`);
 
     if (errors.length > 0) {
-      console.log('\n⚠️  CÁC LỖI:');
+      console.log('\nCAC LOI:');
       errors.slice(0, 20).forEach((error) => {
         console.log(`   - ${error}`);
       });
@@ -432,13 +456,12 @@ async function importTestResults() {
     }
 
     await dataSource.destroy();
-    console.log('\n✅ Hoàn tất!');
+    console.log('\nHoan tat!');
   } catch (error: any) {
-    console.error('\n❌ Lỗi:', error.message);
+    console.error('\nLoi:', error.message);
     console.error(error);
     process.exit(1);
   }
 }
 
 importTestResults();
-

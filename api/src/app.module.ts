@@ -36,15 +36,25 @@ const createDatabaseConfig = (
   const host = configService.get<string>('DB_HOST', 'localhost');
   const port = configService.get<number>('DB_PORT', 8889);
   const username = configService.get<string>('DB_USERNAME', 'taekwondo_user');
-  const password = configService.get<string>('DB_PASSWORD', 'taekwondo_pass123');
+  const password = configService.get<string>(
+    'DB_PASSWORD',
+    'taekwondo_pass123',
+  );
   const database = configService.get<string>('DB_DATABASE', 'taekwondo_club');
 
+  // Validate required variables
+  if (!host || !username || !password || !database) {
+    throw new Error(
+      'Database configuration is incomplete. Please check your .env file:\n' +
+        `   DB_HOST=${host || 'MISSING'}\n` +
+        `   DB_PORT=${port || 'MISSING'}\n` +
+        `   DB_USERNAME=${username || 'MISSING'}\n` +
+        `   DB_PASSWORD=${password ? '***' : 'MISSING'}\n` +
+        `   DB_DATABASE=${database || 'MISSING'}`,
+    );
+  }
+
   // Log database configuration (without password)
-  console.log('📊 Database Configuration:');
-  console.log(`   Host: ${host}`);
-  console.log(`   Port: ${port}`);
-  console.log(`   Database: ${database}`);
-  console.log(`   Username: ${username}`);
 
   return {
     ...databaseConfig,
