@@ -2,6 +2,8 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -327,5 +329,64 @@ export class UsersService implements IUserService {
   async remove(id: number): Promise<void> {
     const user = await this.findOne(id);
     await this.userRepository.remove(user);
+  }
+
+  /**
+   * Change user password
+   * @param id - User ID
+   * @param oldPassword - Current password
+   * @param newPassword - New password
+   * @returns Promise<void>
+   */
+  async changePassword(
+    id: number,
+    oldPassword: string,
+    newPassword: string,
+  ): Promise<void> {
+    // Find user with password field included
+    const user = await this.userRepository.findOne({
+      where: { id },
+      select: ['id', 'password', 'email', 'ho_va_ten'],
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    // Validate old password
+    if (!user.password) {
+      throw new BadRequestException('User does not have a password set');
+    }
+
+    // Compare passwords (plain text comparison - hệ thống đang dùng plain text)
+    const normalizedOldPassword = oldPassword.trim();
+    const normalizedDbPassword = user.password.trim();
+
+    const isPasswordValid =
+      normalizedDbPassword === normalizedOldPassword ||
+      normalizedDbPassword.toLowerCase() === normalizedOldPassword.toLowerCase();
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Old password is incorrect');
+    }
+
+    // Validate new password
+    if (!newPassword || newPassword.trim().length < 6) {
+      throw new BadRequestException(
+        'New password must be at least 6 characters long',
+      );
+    }
+
+    // Check if new password is same as old password
+    if (normalizedDbPassword === newPassword.trim()) {
+      throw new BadRequestException(
+        'New password must be different from old password',
+      );
+    }
+
+    // Update password (plain text - theo cách hệ thống đang dùng)
+    await this.userRepository.update(id, {
+      password: newPassword.trim(),
+    });
   }
 }

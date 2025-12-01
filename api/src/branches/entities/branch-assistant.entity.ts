@@ -35,7 +35,7 @@ export class BranchAssistant {
   @JoinColumn({ name: 'branch_id' })
   branch: Branch;
 
-  @ManyToOne(() => Coach, (coach) => coach.id, {
+  @ManyToOne(() => Coach, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'assistant_id' })

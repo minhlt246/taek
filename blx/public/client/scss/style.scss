@@ -8,9 +8,7 @@
 @use "./lien-he";
 @use "./chinh-sach-bao-mat";
 @use "./langding";
-
-
-
+@use "./profile" as profile;
 
 .btn:active {
   transform: translateY(1px) !important;

@@ -32,6 +32,7 @@ export interface User {
   date_of_birth?: string; // Backend: ngay_thang_nam_sinh (format: YYYY-MM-DD)
   gender?: "male" | "female"; // Backend: gioi_tinh ('Nam' | 'Nữ')
   address?: string;
+  ma_hoi_vien?: string; // Backend: ma_hoi_vien - Mã hội viên
   belt_level_id?: number; // Backend: cap_dai_id
   belt_level?: {
     id: number;
@@ -219,12 +220,43 @@ export const usersApi = {
       if (!hasFile) {
         throw new Error("FormData không chứa file. Vui lòng chọn ảnh trước khi upload.");
       }
+      
+      // Backend expect field name là "image" không phải "avatar"
+      // Kiểm tra xem có field "image" không, nếu không thì rename từ "avatar" sang "image"
+      const entries = Array.from(formData.entries());
+      const hasImageField = entries.some(([key]) => key === "image");
+      if (!hasImageField) {
+        // Nếu không có field "image", tìm field "avatar" và rename
+        const avatarEntry = entries.find(([key, value]) => key === "avatar" && value instanceof File);
+        if (avatarEntry) {
+          formData.delete("avatar");
+          formData.append("image", avatarEntry[1] as File);
+        }
+      }
+
+      // Lấy userId và role từ account store nếu chưa có trong formData
+      const userId = formData.get("userId");
+      const role = formData.get("role");
+      
+      if (!userId) {
+        // Try to get from account store
+        try {
+          const { useAccountStore } = await import("@/stores/account");
+          const { account } = useAccountStore.getState();
+          if (account?.id) {
+            formData.append("userId", String(account.id));
+          }
+          if (account?.role) {
+            formData.append("role", account.role);
+          }
+        } catch (e) {
+          console.warn("Could not get userId from account store:", e);
+        }
+      }
 
       // Upload avatar
-
       // Sử dụng endpoint /auth/profile/avatar
       // Axios sẽ tự động detect FormData và set Content-Type với boundary
-      // Không set Content-Type header trong headers để axios tự động xử lý
       const config: any = {
         headers: {},
         maxContentLength: Infinity,
@@ -258,24 +290,29 @@ export const usersApi = {
 
   /**
    * Change user password
-   * TODO: Backend chưa có endpoint này. Cần implement POST /users/change-password trong backend.
    * @param data - Password change data
+   * @param userId - Optional user ID (if not provided, will be extracted from token or account store)
    * @returns Promise<boolean>
    */
-  changePassword: async (data: {
-    oldPassword: string;
-    newPassword: string;
-  }): Promise<boolean> => {
+  changePassword: async (
+    data: {
+      oldPassword: string;
+      newPassword: string;
+    },
+    userId?: number | string
+  ): Promise<boolean> => {
     try {
-      // TODO: Endpoint này chưa tồn tại trong backend
-      // Cần implement POST /users/change-password trong users.controller.ts
-      await http.post("/users/change-password", data);
+      // Backend cần userId trong query hoặc body
+      const requestData = userId
+        ? { ...data, userId: userId.toString() }
+        : data;
+
+      await http.post("/users/change-password", requestData, {
+        params: userId ? { userId: userId.toString() } : undefined,
+      });
       return true;
     } catch (error: any) {
       console.error("Error changing password:", error);
-      console.warn(
-        "[UsersApi] POST /users/change-password endpoint không tồn tại trong backend. Cần implement."
-      );
       throw error;
     }
   },

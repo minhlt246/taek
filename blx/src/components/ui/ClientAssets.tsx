@@ -1,13 +1,15 @@
 "use client";
 
 import Script from "next/script";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 /**
  * Component để load các CSS và JS từ bộ client assets
  * Sử dụng cho các page giao diện client
  */
 export default function ClientAssets() {
+  const [jQueryReady, setJQueryReady] = useState(false);
+
   useEffect(() => {
     // Load CSS từ client vào head
     const cssFiles = [
@@ -32,19 +34,44 @@ export default function ClientAssets() {
         document.head.appendChild(link);
       }
     });
-
-    // Cleanup khi component unmount (optional - thường không cần vì CSS nên giữ lại)
-    // return () => { ... }
   }, []);
 
   return (
     <>
-      {/* Load các JS từ client */}
-      <Script src="/client/js/jquery.min.js" strategy="beforeInteractive" />
-      <Script src="/client/js/bootstrap.bundle.min.js" strategy="afterInteractive" />
+      {/* Load jQuery trước - sử dụng afterInteractive để onLoad hoạt động đúng */}
+      <Script
+        src="/client/js/jquery.min.js"
+        strategy="afterInteractive"
+        onLoad={() => {
+          // Đảm bảo jQuery đã sẵn sàng
+          if (typeof window !== "undefined" && (window as any).jQuery) {
+            setJQueryReady(true);
+          }
+        }}
+      />
+      
+      {/* Load Bootstrap sau jQuery */}
+      {jQueryReady && (
+        <Script
+          src="/client/js/bootstrap.bundle.min.js"
+          strategy="afterInteractive"
+        />
+      )}
+      
+      {/* Load các script khác */}
       <Script src="/client/js/all.min.js" strategy="afterInteractive" />
       <Script src="/client/js/moment.min.js" strategy="afterInteractive" />
-      <Script src="/client/js/main.js" strategy="afterInteractive" />
+      
+      {/* Chỉ load main.js sau khi jQuery đã sẵn sàng */}
+      {jQueryReady && (
+        <Script
+          src="/client/js/main.js"
+          strategy="afterInteractive"
+          onError={(e) => {
+            console.error("Error loading main.js:", e);
+          }}
+        />
+      )}
     </>
   );
 }

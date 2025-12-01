@@ -12,8 +12,9 @@ import {
   Req,
   BadRequestException,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { CreateUserDto, UpdateUserDto } from './dto';
+import { CreateUserDto, UpdateUserDto, ChangePasswordDto } from './dto';
 import { CoachesService } from '../coaches/coaches.service';
 import type { Request } from 'express';
 
@@ -196,6 +197,52 @@ export class UsersController {
     return {
       success: true,
       message: 'User deleted successfully',
+    };
+  }
+
+  @Post('change-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ 
+    summary: 'Change user password',
+    description: 'Change password for current user. Requires old password and new password.'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Password changed successfully'
+  })
+  @ApiResponse({ 
+    status: 400, 
+    description: 'Bad request - invalid input or new password same as old password'
+  })
+  @ApiResponse({ 
+    status: 401, 
+    description: 'Unauthorized - old password is incorrect'
+  })
+  @ApiResponse({ 
+    status: 404, 
+    description: 'User not found'
+  })
+  async changePassword(
+    @Body() changePasswordDto: ChangePasswordDto,
+    @Req() req: any,
+  ) {
+    // Lấy user ID từ request (có thể từ token hoặc body)
+    const userId = req.query?.userId || req.body?.userId;
+    if (!userId) {
+      throw new BadRequestException('User ID is required');
+    }
+
+    const id = parseInt(userId);
+
+    await this.usersService.changePassword(
+      id,
+      changePasswordDto.oldPassword,
+      changePasswordDto.newPassword,
+    );
+
+    return {
+      success: true,
+      message: 'Password changed successfully',
     };
   }
 }

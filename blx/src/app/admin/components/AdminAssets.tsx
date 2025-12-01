@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Script from "next/script";
 
 /**
@@ -8,6 +8,8 @@ import Script from "next/script";
  * Sử dụng assets từ /client/assets
  */
 export const AdminAssets = () => {
+  const [jQueryReady, setJQueryReady] = useState(false);
+
   useEffect(() => {
     // Load CSS files từ /client/assets
     const links = [
@@ -41,49 +43,70 @@ export const AdminAssets = () => {
       {/* Load jQuery first - essential for other scripts */}
       <Script
         src="/client/js/jquery.min.js"
-        strategy="beforeInteractive"
-      />
-
-      {/* Load Bootstrap after jQuery */}
-      <Script
-        src="/client/js/bootstrap.bundle.min.js"
         strategy="afterInteractive"
         onLoad={() => {
-          console.log("Bootstrap loaded successfully");
+          // Đảm bảo jQuery đã sẵn sàng
+          if (typeof window !== "undefined" && (window as any).jQuery) {
+            setJQueryReady(true);
+          }
         }}
       />
 
-      {/* Load Simplebar */}
-      <Script
-        src="/client/assets/plugins/simplebar/simplebar.min.js"
-        strategy="lazyOnload"
-      />
+      {/* Load Bootstrap after jQuery */}
+      {jQueryReady && (
+        <Script
+          src="/client/js/bootstrap.bundle.min.js"
+          strategy="afterInteractive"
+          onLoad={() => {
+            console.log("Bootstrap loaded successfully");
+          }}
+        />
+      )}
 
-      {/* Load DataTables */}
-      <Script
-        src="/client/assets/plugins/datatables/js/jquery.dataTables.min.js"
-        strategy="lazyOnload"
-      />
-      <Script
-        src="/client/assets/plugins/datatables/js/dataTables.bootstrap5.min.js"
-        strategy="lazyOnload"
-      />
+      {/* Load Simplebar */}
+      {jQueryReady && (
+        <Script
+          src="/client/assets/plugins/simplebar/simplebar.min.js"
+          strategy="lazyOnload"
+        />
+      )}
+
+      {/* Load DataTables - cần jQuery */}
+      {jQueryReady && (
+        <>
+          <Script
+            src="/client/assets/plugins/datatables/js/jquery.dataTables.min.js"
+            strategy="lazyOnload"
+          />
+          <Script
+            src="/client/assets/plugins/datatables/js/dataTables.bootstrap5.min.js"
+            strategy="lazyOnload"
+          />
+        </>
+      )}
 
       {/* Load DateRangePicker */}
       <Script
         src="/client/js/moment.min.js"
         strategy="lazyOnload"
       />
-      <Script
-        src="/client/assets/plugins/daterangepicker/daterangepicker.js"
-        strategy="lazyOnload"
-      />
+      {jQueryReady && (
+        <Script
+          src="/client/assets/plugins/daterangepicker/daterangepicker.js"
+          strategy="lazyOnload"
+        />
+      )}
 
-      {/* Load main admin script */}
-      <Script
-        src="/client/js/main.js"
-        strategy="lazyOnload"
-      />
+      {/* Load main admin script - cần jQuery */}
+      {jQueryReady && (
+        <Script
+          src="/client/js/main.js"
+          strategy="lazyOnload"
+          onError={(e) => {
+            console.error("Error loading main.js:", e);
+          }}
+        />
+      )}
     </>
   );
 };
