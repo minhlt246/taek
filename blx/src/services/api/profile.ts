@@ -134,8 +134,9 @@ const mapUserToProfileData = (
   const beltLevelColor = beltLevel?.color || "#808080";
 
   // Lấy mã hội viên từ API, nếu không có thì fallback về VS-{id}
-  const memberId = user.ma_hoi_vien
-    ? user.ma_hoi_vien
+  // Kiểm tra ma_hoi_vien có giá trị hợp lệ (không null, undefined, hoặc chuỗi rỗng)
+  const memberId = user.ma_hoi_vien && user.ma_hoi_vien.trim() !== ""
+    ? user.ma_hoi_vien.trim()
     : user.id && !isNaN(Number(user.id)) && user.id > 0
       ? `VS-${String(user.id).padStart(6, "0")}`
       : "N/A";

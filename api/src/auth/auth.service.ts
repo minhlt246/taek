@@ -1344,7 +1344,112 @@ export class AuthService {
         };
       }
 
-      // Nếu không tìm thấy user, vẫn trả về URL
+      // Nếu không tìm thấy admin/coach, thử tìm user (võ sinh)
+      if (userRole === 'student' || !userRole) {
+        const userIdNumber = parseInt(userId);
+        console.log('[Auth Service] Looking for user (võ sinh) with ID:', userIdNumber);
+
+        const user = await this.userRepository.findOne({
+          where: { id: userIdNumber },
+        });
+
+        console.log('[Auth Service] User found:', {
+          found: !!user,
+          userId: user?.id,
+          userEmail: user?.email,
+          currentProfileImageUrl: user?.profile_image_url,
+        });
+
+        if (user) {
+          // Xóa file avatar cũ nếu có
+          if (user.profile_image_url) {
+            let oldFilePath: string;
+            if (user.profile_image_url.startsWith('client/images/')) {
+              oldFilePath = path.join(process.cwd(), user.profile_image_url);
+            } else if (user.profile_image_url.startsWith('/uploads/avatars/')) {
+              oldFilePath = path.join(process.cwd(), user.profile_image_url);
+            } else if (user.profile_image_url.startsWith('/')) {
+              oldFilePath = path.join(process.cwd(), user.profile_image_url.substring(1));
+            } else {
+              oldFilePath = path.join(process.cwd(), user.profile_image_url);
+            }
+
+            if (fs.existsSync(oldFilePath)) {
+              try {
+                fs.unlinkSync(oldFilePath);
+                console.log('[Auth Service] Deleted old user avatar file:', oldFilePath);
+              } catch (error) {
+                console.error('Error deleting old user avatar file:', error);
+              }
+            }
+          }
+
+          // Cập nhật profile_image_url vào database
+          try {
+            const updateResult = await this.userRepository.update(userIdNumber, {
+              profile_image_url: fileUrl,
+            });
+
+            console.log('[Auth Service] User update result:', {
+              affected: updateResult.affected,
+              generatedMaps: updateResult.generatedMaps,
+              raw: updateResult.raw,
+            });
+
+            // Verify update thành công bằng cách query lại
+            const updatedUser = await this.userRepository.findOne({
+              where: { id: userIdNumber },
+              select: ['id', 'profile_image_url', 'ho_va_ten', 'email'],
+            });
+
+            console.log('[Auth Service] Verified user after update:', {
+              userId: updatedUser?.id,
+              profile_image_url: updatedUser?.profile_image_url,
+            });
+
+            if (!updatedUser || updatedUser.profile_image_url !== fileUrl) {
+              console.error('[Auth Service] User update verification failed:', {
+                expectedProfileImageUrl: fileUrl,
+                actualProfileImageUrl: updatedUser?.profile_image_url,
+              });
+              throw new BadRequestException('Database update verification failed');
+            }
+
+            console.log('[Auth Service] User updated successfully and verified');
+
+            return {
+              success: true,
+              message: 'Avatar uploaded successfully',
+              data: {
+                avatar: fileUrl,
+                profile_image_url: fileUrl,
+                photo_url: fileUrl,
+                user: {
+                  id: updatedUser.id,
+                  name: updatedUser.ho_va_ten,
+                  email: updatedUser.email,
+                  role: 'student',
+                  avatar: fileUrl,
+                },
+              },
+            };
+          } catch (saveError: any) {
+            console.error('[Auth Service] Error saving user:', saveError);
+            console.error('[Auth Service] Error details:', {
+              message: saveError?.message,
+              sql: saveError?.sql,
+              code: saveError?.code,
+              stack: saveError?.stack,
+            });
+            throw new BadRequestException(
+              `Failed to update user in database: ${saveError?.message || 'Unknown error'}`,
+            );
+          }
+        }
+      }
+
+      // Nếu không tìm thấy user, vẫn trả về URL (nhưng không lưu vào database)
+      console.warn('[Auth Service] User not found, returning URL without saving to database');
       return {
         success: true,
         message: 'Avatar uploaded successfully',

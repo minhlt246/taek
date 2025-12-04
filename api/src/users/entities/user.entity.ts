@@ -33,8 +33,14 @@ export class User {
   @Column({ type: 'date', comment: 'Ngày tháng năm sinh' })
   ngay_thang_nam_sinh: Date;
 
-  @Column({ length: 50, unique: true, comment: 'Mã hội viên' })
-  ma_hoi_vien: string;
+  @Column({
+    type: 'varchar',
+    length: 50,
+    // unique: true, // Temporarily disabled to allow server startup, will be re-enabled after data fix
+    nullable: true,
+    comment: 'Mã hội viên',
+  })
+  ma_hoi_vien: string | null;
 
   @Column({ length: 20, comment: 'Mã câu lạc bộ' })
   ma_clb: string;
@@ -76,7 +82,11 @@ export class User {
   @Column({ length: 255, nullable: true })
   profile_image_url: string;
 
-  @Column({ length: 255, nullable: false, comment: 'Mật khẩu đăng nhập cho võ sinh' })
+  @Column({
+    length: 255,
+    nullable: false,
+    comment: 'Mật khẩu đăng nhập cho võ sinh',
+  })
   password: string;
 
   @CreateDateColumn()

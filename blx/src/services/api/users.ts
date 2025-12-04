@@ -163,7 +163,6 @@ export const usersApi = {
       throw error;
     }
   },
-
   /**
    * Get user profile
    * @param userId - User ID (optional, can be passed via query param)
@@ -188,8 +187,29 @@ export const usersApi = {
    */
   updateProfile: async (data: any, userId?: number): Promise<User> => {
     try {
-      // Thêm userId vào data nếu có
-      const requestData = userId ? { ...data, userId: userId.toString() } : data;
+      // Backend yêu cầu userId trong body hoặc query
+      // Lấy userId từ account store nếu không được truyền vào
+      let finalUserId = userId;
+      if (!finalUserId) {
+        try {
+          const { useAccountStore } = await import("@/stores/account");
+          const { account } = useAccountStore.getState();
+          if (account?.id) {
+            finalUserId = Number(account.id);
+          }
+        } catch (e) {
+          console.warn("Could not get userId from account store:", e);
+        }
+      }
+
+      // Backend yêu cầu userId, nếu không có thì throw error
+      if (!finalUserId) {
+        throw new Error("User ID is required. Please login again.");
+      }
+
+      // Thêm userId vào data
+      const requestData = { ...data, userId: finalUserId.toString() };
+
       const response = await http.patch<
         User | { success: boolean; message: string; data: User }
       >("/users/profile", requestData);
@@ -213,21 +233,30 @@ export const usersApi = {
    * @param token - Optional auth token
    * @returns Promise with avatar URL
    */
-  updateProfileWithAvatar: async (formData: FormData, token?: string): Promise<{ success: boolean; message: string; data: any }> => {
+  updateProfileWithAvatar: async (
+    formData: FormData,
+    token?: string
+  ): Promise<{ success: boolean; message: string; data: any }> => {
     try {
       // Kiểm tra FormData có file không
-      const hasFile = Array.from(formData.entries()).some(([key, value]) => value instanceof File);
+      const hasFile = Array.from(formData.entries()).some(
+        ([key, value]) => value instanceof File
+      );
       if (!hasFile) {
-        throw new Error("FormData không chứa file. Vui lòng chọn ảnh trước khi upload.");
+        throw new Error(
+          "FormData không chứa file. Vui lòng chọn ảnh trước khi upload."
+        );
       }
-      
+
       // Backend expect field name là "image" không phải "avatar"
       // Kiểm tra xem có field "image" không, nếu không thì rename từ "avatar" sang "image"
       const entries = Array.from(formData.entries());
       const hasImageField = entries.some(([key]) => key === "image");
       if (!hasImageField) {
         // Nếu không có field "image", tìm field "avatar" và rename
-        const avatarEntry = entries.find(([key, value]) => key === "avatar" && value instanceof File);
+        const avatarEntry = entries.find(
+          ([key, value]) => key === "avatar" && value instanceof File
+        );
         if (avatarEntry) {
           formData.delete("avatar");
           formData.append("image", avatarEntry[1] as File);
@@ -237,7 +266,7 @@ export const usersApi = {
       // Lấy userId và role từ account store nếu chưa có trong formData
       const userId = formData.get("userId");
       const role = formData.get("role");
-      
+
       if (!userId) {
         // Try to get from account store
         try {
@@ -270,11 +299,13 @@ export const usersApi = {
 
       // Đảm bảo không set Content-Type để axios tự động set multipart/form-data với boundary
       // Axios sẽ tự động detect FormData và set header đúng
-      
-      const response = await http.post<
-        { success: boolean; message: string; data: any }
-      >("/auth/profile/avatar", formData, config);
-      
+
+      const response = await http.post<{
+        success: boolean;
+        message: string;
+        data: any;
+      }>("/auth/profile/avatar", formData, config);
+
       return response.data;
     } catch (error: any) {
       console.error("Error updating profile with avatar:", error);

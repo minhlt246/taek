@@ -62,6 +62,8 @@ export default function Profile() {
     null
   );
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [userCreatedAt, setUserCreatedAt] = useState<string | null>(null);
+  const [userData, setUserData] = useState<any>(null);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [beltHistory, setBeltHistory] = useState<BeltHistory[]>([]);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
@@ -182,6 +184,83 @@ export default function Profile() {
     setIsShowAddPaymentModal(true);
   }, []);
 
+  // Handle avatar upload directly
+  const handleAvatarUpload = useCallback(async (file: File) => {
+    try {
+      // Get token and account info from account store
+      const { token, account, updateUser } = useAccountStore.getState();
+
+      // Create FormData with userId and role
+      const avatarFormData = new FormData();
+      avatarFormData.append("image", file);
+      if (account?.id) {
+        avatarFormData.append("userId", String(account.id));
+      }
+      if (account?.role) {
+        avatarFormData.append("role", account.role);
+      }
+
+      // Use usersApi directly to upload avatar
+      const { usersApi } = await import("@/services/api/users");
+      const uploadResponse = await usersApi.updateProfileWithAvatar(
+        avatarFormData,
+        token || undefined
+      );
+
+      if (uploadResponse.success && uploadResponse.data) {
+        // Backend trả về avatar, profile_image_url, hoặc photo_url
+        let avatarUrl =
+          uploadResponse.data.avatarUrl ||
+          uploadResponse.data.avatar ||
+          uploadResponse.data.profile_image_url ||
+          uploadResponse.data.photo_url;
+
+        if (avatarUrl) {
+          // Convert relative path thành full URL nếu cần
+          const apiUrl =
+            process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+          if (avatarUrl.startsWith("client/images/")) {
+            avatarUrl = `${apiUrl}/${avatarUrl}`;
+          } else if (avatarUrl.startsWith("/uploads/")) {
+            avatarUrl = `${apiUrl}${avatarUrl}`;
+          } else if (
+            !avatarUrl.startsWith("http") &&
+            !avatarUrl.startsWith("/")
+          ) {
+            avatarUrl = `${apiUrl}/${avatarUrl}`;
+          }
+
+          // Update account store with new avatar URL
+          updateUser({ avatarUrl: avatarUrl } as any);
+          useToast.success("Cập nhật ảnh đại diện thành công!");
+
+          // Refresh profile data từ database để đảm bảo đồng bộ
+          // Sử dụng event để trigger refresh (fetchProfileData sẽ lắng nghe event này)
+          window.dispatchEvent(new Event("profileUpdated"));
+
+          // Update preview
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            setAvatarPreview(e.target?.result as string);
+          };
+          reader.readAsDataURL(file);
+        } else {
+          throw new Error("Không nhận được URL ảnh đại diện từ server");
+        }
+      } else {
+        throw new Error(uploadResponse.message || "Upload ảnh thất bại");
+      }
+    } catch (error: any) {
+      console.error("Error uploading avatar:", error);
+      const errorMsg =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Không thể upload ảnh đại diện";
+      useToast.error(errorMsg);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Handle avatar file change
   const handleAvatarFileChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -207,17 +286,16 @@ export default function Profile() {
           return;
         }
 
-        setSelectedAvatarFile(file);
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          setAvatarPreview(e.target?.result as string);
-        };
-        reader.readAsDataURL(file);
-        // Open update profile modal
-        setIsUpdateProfileModalOpen(true);
+        // Upload avatar directly
+        handleAvatarUpload(file);
+
+        // Reset input
+        if (e.target) {
+          e.target.value = "";
+        }
       }
     },
-    []
+    [handleAvatarUpload]
   );
 
   // Handle open update profile modal
@@ -279,6 +357,47 @@ export default function Profile() {
   const fetchProfileData = useCallback(async () => {
     try {
       setIsLoadingProfile(true);
+
+      // Fetch user data để lấy created_at và ma_hoi_vien
+      const { usersApi } = await import("@/services/api/users");
+      const user = await usersApi.getProfile();
+      if (user) {
+        // Xử lý ma_hoi_vien: chỉ loại bỏ NaN và giá trị không hợp lệ, giữ lại tất cả giá trị hợp lệ
+        let validatedMaHoiVien: string | null = user.ma_hoi_vien ?? null;
+        if (user.ma_hoi_vien !== null && user.ma_hoi_vien !== undefined) {
+          // Kiểm tra nếu là NaN (number) - loại bỏ
+          if (
+            typeof user.ma_hoi_vien === "number" &&
+            Number.isNaN(user.ma_hoi_vien)
+          ) {
+            validatedMaHoiVien = null;
+          } else {
+            // Convert sang string và kiểm tra chuỗi không hợp lệ
+            const maHoiVienStr = String(user.ma_hoi_vien).trim();
+            // Chỉ loại bỏ nếu là chuỗi "NaN", "null", "undefined" hoặc rỗng
+            if (
+              maHoiVienStr === "" ||
+              maHoiVienStr === "NaN" ||
+              maHoiVienStr === "null" ||
+              maHoiVienStr === "undefined"
+            ) {
+              validatedMaHoiVien = null;
+            } else {
+              // Giữ lại giá trị gốc (có thể là số hoặc chuỗi)
+              validatedMaHoiVien = user.ma_hoi_vien;
+            }
+          }
+        }
+        const validatedUser = {
+          ...user,
+          ma_hoi_vien: validatedMaHoiVien,
+        };
+        setUserData(validatedUser);
+        if (user.created_at) {
+          setUserCreatedAt(user.created_at);
+        }
+      }
+
       const data = await profileApi.getProfileData();
 
       // Validate and set profile data
@@ -292,8 +411,10 @@ export default function Profile() {
             ? String(data.profileData.username)
             : "N/A",
           memberId:
-            data.profileData.memberId && data.profileData.memberId !== "NaN"
-              ? String(data.profileData.memberId).replace(/NaN/g, "N/A")
+            data.profileData.memberId &&
+            data.profileData.memberId !== "NaN" &&
+            data.profileData.memberId.trim() !== ""
+              ? String(data.profileData.memberId).replace(/NaN/g, "N/A").trim()
               : "N/A",
           beltLevel: data.profileData.beltLevel
             ? String(data.profileData.beltLevel)
@@ -405,6 +526,39 @@ export default function Profile() {
   const getInitialAvatar = useCallback((email: string): string => {
     return email ? email.charAt(0).toUpperCase() : "U";
   }, []);
+
+  // Calculate years of training from created_at
+  const calculateYearsTraining = useCallback((createdAt?: string): string => {
+    if (!createdAt) return "N/A";
+    try {
+      const startDate = new Date(createdAt);
+      if (isNaN(startDate.getTime())) {
+        return "N/A";
+      }
+      const now = new Date();
+      const diffTime = Math.abs(now.getTime() - startDate.getTime());
+      const daysDiff = diffTime / (1000 * 60 * 60 * 24);
+      const diffYears = Math.floor(daysDiff / 365);
+
+      if (diffYears > 0) {
+        return `${diffYears} năm`;
+      } else if (daysDiff >= 30) {
+        const months = Math.floor(daysDiff / 30);
+        return `${months} tháng`;
+      } else {
+        return "Dưới 1 tháng";
+      }
+    } catch (error) {
+      return "N/A";
+    }
+  }, []);
+
+  // Get years training from user created_at
+  const yearsTraining = useMemo(() => {
+    // Lấy created_at từ user data đã fetch hoặc từ account
+    const createdAt = userCreatedAt || (account as any)?.created_at;
+    return calculateYearsTraining(createdAt);
+  }, [userCreatedAt, account, calculateYearsTraining]);
 
   // Show loading while component not mounted or account not loaded or profile data loading
   if (!account || !mounted || isLoadingProfile) {
@@ -1000,9 +1154,21 @@ export default function Profile() {
                             minWidth: "140px",
                           }}
                         >
-                          Mã võ sinh:
+                          Mã hội viên:
                         </strong>
-                        <span>{profileData?.memberId || "N/A"}</span>
+                        <span>
+                          {(() => {
+                            const maHoiVien = userData?.ma_hoi_vien;
+                            if (maHoiVien === null || maHoiVien === undefined) {
+                              return "Chưa có mã";
+                            }
+                            const str = String(maHoiVien).trim();
+                            if (str === "" || str === "NaN" || str === "null" || str === "undefined") {
+                              return "Chưa có mã";
+                            }
+                            return str;
+                          })()}
+                        </span>
                       </div>
                       <div style={{ display: "flex", alignItems: "center" }}>
                         <strong
@@ -1038,7 +1204,7 @@ export default function Profile() {
                         >
                           Số năm tập:
                         </strong>
-                        <span>{profileData?.yearsTraining || "N/A"}</span>
+                        <span>{yearsTraining}</span>
                       </div>
                       <div style={{ display: "flex", alignItems: "center" }}>
                         <strong
@@ -1076,7 +1242,7 @@ export default function Profile() {
                             fontSize: "16px",
                           }}
                         >
-                          Bảo Mật
+                          cập nhật
                         </h5>
                         <div style={{ marginBottom: "16px" }}>
                           <button
@@ -1084,64 +1250,27 @@ export default function Profile() {
                             onClick={handleOpenUpdateProfile}
                             style={{
                               padding: "10px 20px",
-                              background:
-                                "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                              color: "#fff",
-                              border: "none",
+                              backgroundColor: "transparent",
+                              color: "#667eea",
+                              border: "1px solid #667eea",
                               borderRadius: "50px",
                               cursor: "pointer",
                               fontSize: "14px",
                               fontWeight: "500",
+                              transition: "all 0.3s ease",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = "#667eea";
+                              e.currentTarget.style.color = "#fff";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                "transparent";
+                              e.currentTarget.style.color = "#667eea";
                             }}
                           >
-                            Đổi Mật Khẩu
+                            Cập nhật thông tin
                           </button>
-                        </div>
-                        <div>
-                          <strong
-                            style={{
-                              color: "#666",
-                              display: "block",
-                              marginBottom: "12px",
-                            }}
-                          >
-                            Cài đặt bảo mật:
-                          </strong>
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              gap: "8px",
-                            }}
-                          >
-                            <label
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                cursor: "pointer",
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                defaultChecked
-                                style={{ marginRight: "8px" }}
-                              />
-                              <span>Đã liên kết tài khoản Google</span>
-                            </label>
-                            <label
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                cursor: "pointer",
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                style={{ marginRight: "8px" }}
-                              />
-                              <span>Liên kết tài khoản Facebook</span>
-                            </label>
-                          </div>
                         </div>
                       </div>
                     </div>
@@ -1269,7 +1398,7 @@ export default function Profile() {
                       Số năm tập luyện:
                     </strong>
                     <p style={{ margin: "8px 0 0", color: "#666" }}>
-                      {profileData?.yearsTraining || "N/A"}
+                      {yearsTraining}
                     </p>
                   </div>
                 </div>

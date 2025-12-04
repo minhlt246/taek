@@ -4,6 +4,8 @@ import {
   ConflictException,
   UnauthorizedException,
   BadRequestException,
+  OnModuleInit,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -15,7 +17,9 @@ import { CreateUserDto, UpdateUserDto } from './dto';
 import { IUserService } from './interfaces';
 
 @Injectable()
-export class UsersService implements IUserService {
+export class UsersService implements IUserService, OnModuleInit {
+  private readonly logger = new Logger(UsersService.name);
+
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -24,6 +28,62 @@ export class UsersService implements IUserService {
     @InjectRepository(Poomsae)
     private readonly poomsaeRepository: Repository<Poomsae>,
   ) {}
+
+  async onModuleInit() {
+    // Fix duplicate empty ma_hoi_vien on startup
+    try {
+      await this.fixDuplicateMaHoiVien();
+    } catch (error) {
+      this.logger.warn('Failed to fix duplicate ma_hoi_vien on startup:', error.message);
+    }
+  }
+
+  /**
+   * Fix duplicate empty ma_hoi_vien by converting empty strings to NULL
+   * and recreate unique index if needed
+   */
+  private async fixDuplicateMaHoiVien(): Promise<void> {
+    try {
+      // Step 1: Update all empty strings to NULL
+      const result = await this.userRepository
+        .createQueryBuilder()
+        .update(User)
+        .set({ ma_hoi_vien: null })
+        .where("ma_hoi_vien = '' OR TRIM(ma_hoi_vien) = ''")
+        .execute();
+
+      if (result.affected && result.affected > 0) {
+        this.logger.log(`Fixed ${result.affected} records with empty ma_hoi_vien`);
+      }
+
+      // Step 2: Check if unique index exists, if not create it
+      const queryRunner = this.userRepository.manager.connection.createQueryRunner();
+      try {
+        const table = await queryRunner.getTable('vo_sinh');
+        const indexExists = table?.indices.some(
+          (idx) => idx.name === 'IDX_624be563ef47696d519ff536f9' || 
+                   (idx.isUnique && idx.columnNames.includes('ma_hoi_vien'))
+        );
+
+        if (!indexExists) {
+          // Create unique index on ma_hoi_vien
+          await queryRunner.query(`
+            CREATE UNIQUE INDEX IDX_624be563ef47696d519ff536f9 
+            ON vo_sinh (ma_hoi_vien)
+          `);
+          this.logger.log('Recreated unique index on ma_hoi_vien');
+        }
+      } catch (indexError) {
+        // Index might already exist or other error, ignore
+        this.logger.debug('Index creation check error (may be expected):', indexError.message);
+      } finally {
+        await queryRunner.release();
+      }
+    } catch (error) {
+      // Ignore if index doesn't exist or other errors
+      this.logger.debug('fixDuplicateMaHoiVien error (may be expected):', error.message);
+    }
+  }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     // Check if email already exists
@@ -52,12 +112,17 @@ export class UsersService implements IUserService {
     }
 
     if (createUserDto.password.trim().length < 6) {
-      throw new ConflictException('Password must be at least 6 characters long');
+      throw new ConflictException(
+        'Password must be at least 6 characters long',
+      );
     }
 
     // Lưu password plain text (không hash)
+    // Convert ma_hoi_vien rỗng thành null để tránh duplicate entry
+    const maHoiVien = createUserDto.ma_hoi_vien?.trim() || null;
     const user = this.userRepository.create({
       ...createUserDto,
+      ma_hoi_vien: maHoiVien,
       password: createUserDto.password.trim(), // Lưu plain text
     });
 
@@ -207,7 +272,8 @@ export class UsersService implements IUserService {
 
     // Override cap_dai based on quyen_so (via poomsae) if needed
     // Load all belt levels to map quyen_so to correct belt
-    const beltLevelRepository = this.userRepository.manager.getRepository(BeltLevel);
+    const beltLevelRepository =
+      this.userRepository.manager.getRepository(BeltLevel);
     const allBeltLevels = await beltLevelRepository.find({
       order: { order_sequence: 'ASC' },
     });
@@ -222,12 +288,17 @@ export class UsersService implements IUserService {
     const updatedUsers = await Promise.all(
       users.map(async (user) => {
         // Get correct belt level ID from quyen_so via poomsae
-        const correctCapDaiId = await this.getBeltLevelIdFromQuyenSo(user.quyen_so);
-        
+        const correctCapDaiId = await this.getBeltLevelIdFromQuyenSo(
+          user.quyen_so,
+        );
+
         if (correctCapDaiId) {
           const correctBeltLevel = beltLevelMap.get(correctCapDaiId);
 
-          if (correctBeltLevel && (!user.cap_dai || user.cap_dai.id !== correctCapDaiId)) {
+          if (
+            correctBeltLevel &&
+            (!user.cap_dai || user.cap_dai.id !== correctCapDaiId)
+          ) {
             // Override with belt level based on quyen_so -> poomsae -> belt_level
             console.log(
               `[UsersService] Mapped user ${user.id} (quyen_so: ${user.quyen_so}) to belt level ${correctCapDaiId} (${correctBeltLevel.name}) via poomsae`,
@@ -298,13 +369,17 @@ export class UsersService implements IUserService {
       }
     }
 
+    // Convert ma_hoi_vien rỗng thành null để tránh duplicate entry
+    // Tạo object riêng để update với ma_hoi_vien có thể là null
+    const updateData: any = { ...updateUserDto };
+    if (updateUserDto.ma_hoi_vien !== undefined) {
+      updateData.ma_hoi_vien = updateUserDto.ma_hoi_vien?.trim() || null;
+    }
+
     // Check if ma_hoi_vien already exists (if being updated)
-    if (
-      updateUserDto.ma_hoi_vien &&
-      updateUserDto.ma_hoi_vien !== user.ma_hoi_vien
-    ) {
+    if (updateData.ma_hoi_vien && updateData.ma_hoi_vien !== user.ma_hoi_vien) {
       const existingMemberCode = await this.userRepository.findOne({
-        where: { ma_hoi_vien: updateUserDto.ma_hoi_vien },
+        where: { ma_hoi_vien: updateData.ma_hoi_vien },
       });
 
       if (existingMemberCode) {
@@ -315,14 +390,16 @@ export class UsersService implements IUserService {
     // Validate password if provided in update and not empty
     if (updateUserDto.password && updateUserDto.password.trim().length > 0) {
       if (updateUserDto.password.trim().length < 6) {
-        throw new ConflictException('Password must be at least 6 characters long');
+        throw new ConflictException(
+          'Password must be at least 6 characters long',
+        );
       }
       // Lưu password plain text (không hash)
       updateUserDto.password = updateUserDto.password.trim();
     }
 
     // Update user - lưu password plain text nếu có
-    await this.userRepository.update(id, updateUserDto);
+    await this.userRepository.update(id, updateData);
     return await this.findOne(id);
   }
 
@@ -364,7 +441,8 @@ export class UsersService implements IUserService {
 
     const isPasswordValid =
       normalizedDbPassword === normalizedOldPassword ||
-      normalizedDbPassword.toLowerCase() === normalizedOldPassword.toLowerCase();
+      normalizedDbPassword.toLowerCase() ===
+        normalizedOldPassword.toLowerCase();
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Old password is incorrect');

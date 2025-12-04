@@ -122,22 +122,34 @@ export default function UpdateProfileModal({
     }
   }
 
-  function hasSpecialChars(str: string) {
-    // Chỉ cho phép chữ cái, số, khoảng trắng và một số ký tự phổ biến
-    return /[^a-zA-Z0-9 @._-]/.test(str);
+  // Validate email format
+  function isValidEmail(email: string): boolean {
+    if (!email) return true; // Không bắt buộc
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  // Validate phone number format (chỉ số và một số ký tự đặc biệt)
+  function isValidPhone(phone: string): boolean {
+    if (!phone) return true; // Không bắt buộc
+    // Cho phép số, khoảng trắng, dấu +, dấu -, dấu ngoặc đơn
+    const phoneRegex = /^[\d\s+\-()]+$/;
+    return phoneRegex.test(phone);
   }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // Validate các trường
-    if (
-      hasSpecialChars(formData.firstName) ||
-      hasSpecialChars(formData.lastName) ||
-      hasSpecialChars(formData.email) ||
-      hasSpecialChars(formData.phoneNumber)
-    ) {
-      setMessage("Fields must not contain special characters.");
+    // Validate email format nếu có nhập
+    if (formData.email && !isValidEmail(formData.email)) {
+      setMessage("Email không hợp lệ. Vui lòng nhập đúng định dạng email.");
+      setMessageType("error");
+      return;
+    }
+
+    // Validate phone number format nếu có nhập
+    if (formData.phoneNumber && !isValidPhone(formData.phoneNumber)) {
+      setMessage("Số điện thoại không hợp lệ. Chỉ được chứa số và các ký tự: +, -, (), khoảng trắng.");
       setMessageType("error");
       return;
     }
@@ -166,10 +178,31 @@ export default function UpdateProfileModal({
           const { usersApi } = await import("@/services/api/users");
           const uploadResponse = await usersApi.updateProfileWithAvatar(avatarFormData, token || undefined);
           
-          if (uploadResponse.success && uploadResponse.data?.avatarUrl) {
+          if (uploadResponse.success && uploadResponse.data) {
+            // Backend trả về avatar, profile_image_url, hoặc photo_url
+            let avatarUrl =
+              uploadResponse.data.avatarUrl ||
+              uploadResponse.data.avatar ||
+              uploadResponse.data.profile_image_url ||
+              uploadResponse.data.photo_url;
+
+            if (avatarUrl) {
+              // Convert relative path thành full URL nếu cần
+              const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+              if (avatarUrl.startsWith("client/images/")) {
+                avatarUrl = `${apiUrl}/${avatarUrl}`;
+              } else if (avatarUrl.startsWith("/uploads/")) {
+                avatarUrl = `${apiUrl}${avatarUrl}`;
+              } else if (!avatarUrl.startsWith("http") && !avatarUrl.startsWith("/")) {
+                avatarUrl = `${apiUrl}/${avatarUrl}`;
+              }
+
             // Update account store with new avatar URL
-            updateUser({ avatarUrl: uploadResponse.data.avatarUrl });
+              updateUser({ avatarUrl: avatarUrl });
             useToast.success("Upload ảnh đại diện thành công!");
+            } else {
+              throw new Error("Không nhận được URL ảnh đại diện từ server");
+            }
           } else {
             throw new Error(uploadResponse.message || "Upload ảnh thất bại");
           }
@@ -184,21 +217,48 @@ export default function UpdateProfileModal({
         }
       }
 
-      // Update profile data
-      const updateData = {
-        ho_va_ten: `${formData.firstName} ${formData.lastName}`.trim(),
-        email: formData.email,
-        phone: formData.phoneNumber,
-        address: formData.address,
-      };
+      // Update profile data - chỉ gửi các trường có giá trị
+      const updateData: any = {};
+      
+      // Chỉ thêm trường nếu có giá trị
+      const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+      if (fullName) {
+        updateData.ho_va_ten = fullName;
+      }
+      
+      if (formData.email) {
+        updateData.email = formData.email;
+      }
+      
+      if (formData.phoneNumber) {
+        updateData.phone = formData.phoneNumber;
+      }
+      
+      if (formData.address) {
+        updateData.address = formData.address;
+      }
 
-      // Use usersApi to update profile
-      const { usersApi } = await import("@/services/api/users");
-      await usersApi.updateProfile(updateData);
-
-      setMessage("Cập nhật profile thành công!");
-      setMessageType("success");
-      useToast.success("Cập nhật profile thành công!");
+      // Chỉ gọi API nếu có ít nhất một trường cần cập nhật hoặc có avatar
+      const hasUpdates = Object.keys(updateData).length > 0 || avatarFile;
+      
+      if (hasUpdates) {
+        // Use usersApi to update profile
+        if (Object.keys(updateData).length > 0) {
+          const { usersApi } = await import("@/services/api/users");
+          // Truyền userId từ account để backend biết cập nhật user nào
+          const userId = account?.id ? Number(account.id) : undefined;
+          await usersApi.updateProfile(updateData, userId);
+        }
+        
+        setMessage("Cập nhật profile thành công!");
+        setMessageType("success");
+        useToast.success("Cập nhật profile thành công!");
+      } else {
+        // Nếu không có thay đổi gì, chỉ đóng modal
+        setMessage(null);
+        onClose();
+        return;
+      }
 
       if (avatarInputRef.current) {
         avatarInputRef.current.value = "";
@@ -311,7 +371,8 @@ export default function UpdateProfileModal({
               fontSize: "14px",
             }}
           >
-            Cập nhật thông tin cá nhân và ảnh đại diện để giữ profile luôn mới nhất.
+            Cập nhật thông tin cá nhân và ảnh đại diện để giữ profile luôn mới nhất. 
+            <strong> Tất cả các trường đều không bắt buộc - bạn có thể chỉ cập nhật những thông tin muốn thay đổi.</strong>
           </div>
 
             <form onSubmit={handleSubmit}>
@@ -437,10 +498,9 @@ export default function UpdateProfileModal({
               <input
                 type="text"
                 id="firstName"
-                placeholder="Nhập họ"
+                placeholder="Nhập họ (không bắt buộc)"
                 value={formData.firstName}
                 onChange={handleChange}
-                required
                 disabled={isLoading}
                 style={{
                   width: "100%",
@@ -466,10 +526,9 @@ export default function UpdateProfileModal({
               <input
                 type="text"
                 id="lastName"
-                placeholder="Nhập tên"
+                placeholder="Nhập tên (không bắt buộc)"
                 value={formData.lastName}
                 onChange={handleChange}
-                required
                 disabled={isLoading}
                 style={{
                   width: "100%",
@@ -506,10 +565,9 @@ export default function UpdateProfileModal({
               <input
                 type="email"
                 id="email"
-                placeholder="Nhập email"
+                placeholder="Nhập email (không bắt buộc)"
                 value={formData.email}
                 onChange={handleChange}
-                required
                 disabled={isLoading}
                 style={{
                   width: "100%",
@@ -535,10 +593,9 @@ export default function UpdateProfileModal({
               <input
                 type="tel"
                 id="phoneNumber"
-                placeholder="Nhập số điện thoại"
+                placeholder="Nhập số điện thoại (không bắt buộc)"
                 value={formData.phoneNumber}
                 onChange={handleChange}
-                required
                 disabled={isLoading}
                 style={{
                   width: "100%",
@@ -567,10 +624,9 @@ export default function UpdateProfileModal({
             <input
               type="text"
               id="address"
-              placeholder="Nhập địa chỉ"
+              placeholder="Nhập địa chỉ (không bắt buộc)"
               value={formData.address}
               onChange={handleChange}
-              required
               disabled={isLoading}
               style={{
                 width: "100%",
