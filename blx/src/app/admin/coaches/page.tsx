@@ -23,14 +23,9 @@ export default function CoachesPage() {
     name: "",
     email: "",
     phone: "",
-    role: "assistant" as
-      | "head_coach"
-      | "main_manager"
-      | "assistant_manager"
-      | "assistant",
-    belt_level_id: 0,
-    experience_years: 0,
-    specialization: "",
+    role: "admin" as "admin" | "owner",
+    belt_level_id: "",
+    experience_years: "",
     bio: "",
     is_active: true,
     club_id: 0,
@@ -102,8 +97,10 @@ export default function CoachesPage() {
     const coachName = coach.ho_va_ten || coach.name || "";
     const coachCode = coach.ma_hoi_vien || (coach as any).coach_code || "";
     const matchesSearch =
-      (coachName && coachName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (coachCode && coachCode.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (coachName &&
+        coachName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (coachCode &&
+        coachCode.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (coach.email &&
         coach.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (coach.club?.name &&
@@ -114,14 +111,10 @@ export default function CoachesPage() {
   // Helper function để lấy màu text cho vai trò (không có background)
   const getRoleTextColor = (role: string): string => {
     switch (role) {
-      case "head_coach":
+      case "owner":
         return "#dc3545"; // danger red
-      case "main_manager":
-        return "#ffc107"; // warning yellow
-      case "assistant_manager":
+      case "admin":
         return "#0dcaf0"; // info cyan
-      case "assistant":
-        return "#6c757d"; // secondary gray
       default:
         return "#6c757d"; // secondary gray
     }
@@ -129,14 +122,10 @@ export default function CoachesPage() {
 
   const getRoleDisplayName = (role: string) => {
     switch (role) {
-      case "head_coach":
-        return "Huấn luyện viên trưởng";
-      case "main_manager":
-        return "Quản lý chính";
-      case "assistant_manager":
-        return "Quản lý phụ";
-      case "assistant":
-        return "Trợ giảng";
+      case "owner":
+        return "Chủ sở hữu";
+      case "admin":
+        return "Quản trị viên";
       default:
         return role;
     }
@@ -149,10 +138,12 @@ export default function CoachesPage() {
       name: coach.ho_va_ten || coach.name || "",
       email: coach.email || "",
       phone: coach.phone || "",
-      role: coach.role || "assistant",
-      belt_level_id: coach.belt_level_id || 0,
-      experience_years: coach.experience_years || 0,
-      specialization: coach.specialization || "",
+      role:
+        coach.role === "owner" || coach.role === "admin" ? coach.role : "admin",
+      belt_level_id: coach.belt_level_id ? String(coach.belt_level_id) : "",
+      experience_years: coach.experience_years
+        ? String(coach.experience_years)
+        : "",
       bio: coach.bio || "",
       is_active: coach.is_active !== false, // Mặc định true nếu undefined
       club_id: coach.club_id || 0,
@@ -172,16 +163,32 @@ export default function CoachesPage() {
         email: formData.email.trim() || undefined,
         phone: formData.phone.trim() || undefined,
         role: formData.role || undefined,
-        belt_level_id: formData.belt_level_id || undefined,
-        experience_years: formData.experience_years || undefined,
-        specialization: formData.specialization.trim() || undefined,
         bio: formData.bio.trim() || undefined,
         club_id: formData.club_id || undefined,
         branch_id: formData.branch_id || undefined,
         is_active: formData.is_active,
       };
 
-      // Remove undefined, null, empty string, or 0 values for optional number fields
+      // Parse belt_level_id from string to number if provided
+      if (formData.belt_level_id && formData.belt_level_id.trim() !== "") {
+        const beltLevelId = parseInt(formData.belt_level_id.trim());
+        if (!isNaN(beltLevelId) && beltLevelId > 0) {
+          cleanData.belt_level_id = beltLevelId;
+        }
+      }
+
+      // Parse experience_years from string to number if provided
+      if (
+        formData.experience_years &&
+        formData.experience_years.trim() !== ""
+      ) {
+        const experienceYears = parseInt(formData.experience_years.trim());
+        if (!isNaN(experienceYears) && experienceYears >= 0) {
+          cleanData.experience_years = experienceYears;
+        }
+      }
+
+      // Remove undefined, null, empty string, or 0 values for optional fields
       Object.keys(cleanData).forEach((key) => {
         if (
           cleanData[key] === undefined ||
@@ -192,10 +199,7 @@ export default function CoachesPage() {
         }
         // Remove 0 values for optional number fields
         if (
-          (key === "belt_level_id" ||
-            key === "club_id" ||
-            key === "branch_id" ||
-            key === "experience_years") &&
+          (key === "club_id" || key === "branch_id") &&
           cleanData[key] === 0
         ) {
           delete cleanData[key];
@@ -269,10 +273,9 @@ export default function CoachesPage() {
       name: "",
       email: "",
       phone: "",
-      role: "assistant",
-      belt_level_id: 0,
-      experience_years: 0,
-      specialization: "",
+      role: "admin",
+      belt_level_id: "",
+      experience_years: "",
       bio: "",
       is_active: true,
       club_id: 0,
@@ -371,8 +374,10 @@ export default function CoachesPage() {
                     <tr key={coach.id}>
                       <td>{coach.id}</td>
                       <td>
-                        {(coach.ma_hoi_vien || (coach as any).coach_code) && 
-                         (coach.ma_hoi_vien || (coach as any).coach_code).trim() ? (
+                        {(coach.ma_hoi_vien || (coach as any).coach_code) &&
+                        (
+                          coach.ma_hoi_vien || (coach as any).coach_code
+                        ).trim() ? (
                           <span style={{ color: "#6c757d" }}>
                             {coach.ma_hoi_vien || (coach as any).coach_code}
                           </span>
@@ -401,13 +406,19 @@ export default function CoachesPage() {
                         )}
                       </td>
                       <td>
-                        <span style={{ color: getRoleTextColor(coach.role || "assistant") }}>
-                          {getRoleDisplayName(coach.role || "assistant")}
+                        <span
+                          style={{
+                            color: getRoleTextColor(coach.role || "admin"),
+                          }}
+                        >
+                          {getRoleDisplayName(coach.role || "admin")}
                         </span>
                       </td>
                       <td>
                         {coach.belt_level && coach.belt_level.name ? (
-                          <span style={{ color: coach.belt_level.color || "#000" }}>
+                          <span
+                            style={{ color: coach.belt_level.color || "#000" }}
+                          >
                             {coach.belt_level.name}
                           </span>
                         ) : (
@@ -417,9 +428,10 @@ export default function CoachesPage() {
                       <td>
                         <span
                           style={{
-                            color: coach.is_active !== false
-                              ? "#198754" // success green
-                              : "#ffc107" // warning yellow
+                            color:
+                              coach.is_active !== false
+                                ? "#198754" // success green
+                                : "#ffc107", // warning yellow
                           }}
                         >
                           {coach.is_active !== false
@@ -558,34 +570,30 @@ export default function CoachesPage() {
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              role: e.target.value as any,
+                              role: e.target.value as "admin" | "owner",
                             })
                           }
                           required
                         >
-                          <option value="assistant">Trợ giảng</option>
-                          <option value="assistant_manager">Quản lý phụ</option>
-                          <option value="main_manager">Quản lý chính</option>
-                          <option value="head_coach">
-                            Huấn luyện viên trưởng
-                          </option>
+                          <option value="admin">Quản trị viên</option>
+                          <option value="owner">Chủ sở hữu</option>
                         </select>
                       </div>
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Cấp đai ID</label>
+                        <label className="form-label">Cấp đai</label>
                         <input
-                          type="number"
+                          type="text"
                           className="form-control"
                           value={formData.belt_level_id}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              belt_level_id: parseInt(e.target.value) || 0,
+                              belt_level_id: e.target.value,
                             })
                           }
-                          min="0"
+                          placeholder="Nhập cấp đai"
                         />
                       </div>
                     </div>
@@ -593,35 +601,18 @@ export default function CoachesPage() {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Kinh nghiệm (năm)</label>
+                        <label className="form-label">Kinh nghiệm</label>
                         <input
-                          type="number"
+                          type="text"
                           className="form-control"
                           value={formData.experience_years}
                           onChange={(e) =>
                             setFormData({
                               ...formData,
-                              experience_years: parseInt(e.target.value) || 0,
+                              experience_years: e.target.value,
                             })
                           }
-                          min="0"
-                        />
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <div className="mb-3">
-                        <label className="form-label">Chuyên môn</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={formData.specialization}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              specialization: e.target.value,
-                            })
-                          }
-                          placeholder="VD: Taekwondo, Karate..."
+                          placeholder="Nhập số năm kinh nghiệm"
                         />
                       </div>
                     </div>

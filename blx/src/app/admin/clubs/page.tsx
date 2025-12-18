@@ -1,13 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAccountStore } from "@/stores/account";
-import {
-  clubsApi,
-  Club as ApiClub,
-  Branch as ApiBranch,
-} from "@/services/api/clubs";
+import { clubsApi, Club as ApiClub } from "@/services/api/clubs";
 import { branchesApi } from "@/services/api/branches";
+import { CoachResponse } from "@/services/api/coaches";
+import http from "@/services/http";
 
 interface Branch {
   id: number;
@@ -33,7 +30,6 @@ interface Club {
 }
 
 export default function ClubsPage() {
-  const { account } = useAccountStore();
   const [clubs, setClubs] = useState<Club[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -51,14 +47,36 @@ export default function ClubsPage() {
     description: "",
     is_active: true,
   });
+  const [coaches, setCoaches] = useState<CoachResponse[]>([]);
   const [branchFormData, setBranchFormData] = useState({
     name: "",
     address: "",
     phone: "",
     email: "",
-    manager: "",
+    manager_ids: [] as string[],
     status: "active" as "active" | "inactive",
   });
+
+  // Load coaches khi component mount - không block nếu lỗi
+  useEffect(() => {
+    const loadCoaches = async () => {
+      try {
+        const response = await http.get<CoachResponse[]>("/coaches");
+        const coachesData = Array.isArray(response.data)
+          ? response.data
+          : (response.data as any)?.data || [];
+        setCoaches(coachesData);
+      } catch (error: any) {
+        // Không block page load nếu coaches API fail
+        console.warn(
+          "Error loading coaches (non-blocking):",
+          error?.message || error
+        );
+        setCoaches([]); // Set empty array để tránh lỗi khi render
+      }
+    };
+    loadCoaches();
+  }, []);
 
   /**
    * Lấy lại danh sách clubs từ API với đầy đủ branches
@@ -81,20 +99,35 @@ export default function ClubsPage() {
               (apiBranch: any) => {
                 // Lấy tên manager từ relations (nếu có)
                 // Backend load relations: ['managers', 'managers.manager']
-                const managerName =
-                  apiBranch?.managers?.[0]?.manager?.full_name ||
-                  apiBranch?.managers?.[0]?.manager?.name ||
-                  apiBranch?.managers?.[0]?.manager?.username ||
-                  "Chưa có quản lý";
+                let managerName = "Chưa có quản lý";
+                try {
+                  if (
+                    apiBranch?.managers &&
+                    Array.isArray(apiBranch.managers) &&
+                    apiBranch.managers.length > 0
+                  ) {
+                    const firstManager = apiBranch.managers[0];
+                    if (firstManager?.manager) {
+                      managerName =
+                        firstManager.manager.ho_va_ten ||
+                        firstManager.manager.full_name ||
+                        firstManager.manager.name ||
+                        firstManager.manager.username ||
+                        "Chưa có quản lý";
+                    }
+                  }
+                } catch (error) {
+                  console.warn("Error parsing manager name:", error);
+                }
 
                 return {
-                  id: apiBranch.id,
-                  name: apiBranch.name,
+                  id: apiBranch.id || 0,
+                  name: apiBranch.name || "",
                   address: apiBranch.address || "",
                   phone: apiBranch.phone || "",
                   email: apiBranch.email || "",
                   manager: managerName,
-                  status: apiBranch.is_active ? "active" : "inactive",
+                  status: apiBranch.is_active !== false ? "active" : "inactive",
                   created_at: apiBranch.created_at
                     ? new Date(apiBranch.created_at).toISOString()
                     : new Date().toISOString(),
@@ -139,9 +172,13 @@ export default function ClubsPage() {
       );
 
       setClubs(clubsWithBranches);
-    } catch (error) {
-      console.error("Lỗi khi tải danh sách câu lạc bộ:", error);
-      throw error;
+    } catch (error: any) {
+      console.error(
+        "Lỗi khi tải danh sách câu lạc bộ:",
+        error?.message || error
+      );
+      // Không throw error, set empty array để tránh crash
+      setClubs([]);
     }
   };
 
@@ -236,7 +273,7 @@ export default function ClubsPage() {
       address: "",
       phone: "",
       email: "",
-      manager: "",
+      manager_ids: [],
       status: "active",
     });
     setEditingBranch(null);
@@ -249,18 +286,37 @@ export default function ClubsPage() {
     setShowBranchModal(true);
   };
 
-  const handleEditBranch = (branch: Branch, clubId: number) => {
+  const handleEditBranch = async (branch: Branch, clubId: number) => {
     setEditingBranch(branch);
     setSelectedClubId(clubId);
+
+    // Set form data ngay lập tức với dữ liệu cơ bản
     setBranchFormData({
       name: branch.name,
       address: branch.address,
       phone: branch.phone,
       email: branch.email,
-      manager: branch.manager,
+      manager_ids: [], // Tạm thời để trống, sẽ load sau
       status: branch.status,
     });
     setShowBranchModal(true);
+
+    // Lấy tất cả manager_ids từ branch detail (async, không block)
+    try {
+      // Lấy manager_ids từ managers relation
+      const branchWithManagers = await http.get(`/branches/${branch.id}`);
+      const managers = (branchWithManagers.data as any)?.managers || [];
+      const managerIds = managers.map((m: any) => String(m.manager_id));
+
+      // Cập nhật lại form data với manager_ids
+      setBranchFormData((prev) => ({
+        ...prev,
+        manager_ids: managerIds,
+      }));
+    } catch (error) {
+      console.warn("Error loading branch managers (non-blocking):", error);
+      // Không block, form vẫn hiển thị được
+    }
   };
 
   const handleBranchSubmit = async (e: React.FormEvent) => {
@@ -271,18 +327,21 @@ export default function ClubsPage() {
         return;
       }
 
+      let branchId: number;
+
       if (editingBranch) {
         // Update existing branch
-        await branchesApi.update(editingBranch.id, {
+        const updatedBranch = await branchesApi.update(editingBranch.id, {
           name: branchFormData.name,
           address: branchFormData.address,
           phone: branchFormData.phone,
           email: branchFormData.email,
           is_active: branchFormData.status === "active",
         });
+        branchId = updatedBranch.id;
       } else {
         // Create new branch
-        await branchesApi.create({
+        const newBranch = await branchesApi.create({
           club_id: selectedClubId,
           name: branchFormData.name,
           address: branchFormData.address,
@@ -290,6 +349,93 @@ export default function ClubsPage() {
           email: branchFormData.email,
           is_active: branchFormData.status === "active",
         });
+        branchId = newBranch.id;
+      }
+
+      // Xử lý managers: xóa cũ và assign mới (nếu đang edit)
+      if (editingBranch) {
+        try {
+          // Lấy danh sách managers hiện tại
+          const branchWithManagers = await http.get(`/branches/${branchId}`);
+          const currentManagers =
+            (branchWithManagers.data as any)?.managers || [];
+          const currentManagerIds = currentManagers.map((m: any) =>
+            String(m.manager_id)
+          );
+
+          // Lấy danh sách manager_ids mới (convert sang string để so sánh)
+          const newManagerIds = (branchFormData.manager_ids || []).filter(
+            (id) => id && id !== ""
+          );
+
+          // Xóa các managers không còn trong danh sách mới
+          for (const manager of currentManagers) {
+            const managerIdStr = String(manager.manager_id);
+            if (!newManagerIds.includes(managerIdStr)) {
+              try {
+                await http.delete(
+                  `/branches/${branchId}/managers/${manager.manager_id}`
+                );
+              } catch (deleteError: any) {
+                console.warn(
+                  `Error removing manager ${manager.manager_id}:`,
+                  deleteError?.message || deleteError
+                );
+              }
+            }
+          }
+
+          // Thêm các managers mới (chưa có trong danh sách cũ)
+          for (const managerIdStr of newManagerIds) {
+            if (!currentManagerIds.includes(managerIdStr)) {
+              try {
+                await http.post(`/branches/${branchId}/managers`, {
+                  manager_id: parseInt(managerIdStr),
+                  role: "main_manager",
+                });
+              } catch (managerError: any) {
+                // Nếu lỗi do manager đã tồn tại, bỏ qua
+                if (managerError?.response?.status !== 409) {
+                  console.warn(
+                    `Error assigning manager ${managerIdStr}:`,
+                    managerError?.message || managerError
+                  );
+                }
+              }
+            }
+          }
+        } catch (error: any) {
+          console.warn(
+            "Error managing branch managers:",
+            error?.message || error
+          );
+          // Không block, tiếp tục với các bước khác
+        }
+      } else {
+        // Tạo mới: chỉ assign managers nếu có chọn
+        if (
+          branchFormData.manager_ids &&
+          branchFormData.manager_ids.length > 0
+        ) {
+          for (const managerIdStr of branchFormData.manager_ids) {
+            if (managerIdStr && managerIdStr !== "") {
+              try {
+                await http.post(`/branches/${branchId}/managers`, {
+                  manager_id: parseInt(managerIdStr),
+                  role: "main_manager",
+                });
+              } catch (managerError: any) {
+                // Nếu lỗi do manager đã tồn tại, bỏ qua
+                if (managerError?.response?.status !== 409) {
+                  console.warn(
+                    `Error assigning manager ${managerIdStr}:`,
+                    managerError?.message || managerError
+                  );
+                }
+              }
+            }
+          }
+        }
       }
 
       // Reload lại dữ liệu từ API để lấy đầy đủ branches
@@ -303,7 +449,7 @@ export default function ClubsPage() {
     }
   };
 
-  const handleDeleteBranch = async (branchId: number, clubId: number) => {
+  const handleDeleteBranch = async (branchId: number, _clubId: number) => {
     if (confirm("Bạn có chắc chắn muốn xóa chi nhánh này?")) {
       try {
         await branchesApi.delete(branchId);
@@ -796,19 +942,42 @@ export default function ClubsPage() {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Quản lý</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={branchFormData.manager}
-                          onChange={(e) =>
+                        <label className="form-label">
+                          Quản lý (có thể chọn nhiều)
+                        </label>
+                        <select
+                          className="form-select"
+                          multiple
+                          size={5}
+                          value={branchFormData.manager_ids}
+                          onChange={(e) => {
+                            const selectedOptions = Array.from(
+                              e.target.selectedOptions,
+                              (option) => option.value
+                            );
                             setBranchFormData({
                               ...branchFormData,
-                              manager: e.target.value,
-                            })
-                          }
-                          required
-                        />
+                              manager_ids: selectedOptions,
+                            });
+                          }}
+                        >
+                          {coaches && coaches.length > 0 ? (
+                            coaches.map((coach) => (
+                              <option key={coach.id} value={String(coach.id)}>
+                                {coach.ho_va_ten ||
+                                  coach.name ||
+                                  `HLV ${coach.id}`}
+                              </option>
+                            ))
+                          ) : (
+                            <option value="" disabled>
+                              Đang tải danh sách huấn luyện viên...
+                            </option>
+                          )}
+                        </select>
+                        <small className="form-text text-muted">
+                          Giữ Ctrl (Windows) hoặc Cmd (Mac) để chọn nhiều
+                        </small>
                       </div>
                     </div>
                     <div className="col-md-6">
