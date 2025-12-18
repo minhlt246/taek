@@ -27,6 +27,12 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 25,
+    totalDocs: 0,
+    totalPages: 0,
+  });
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -47,22 +53,40 @@ export default function EventsPage() {
     organizer: "",
   });
 
-  useEffect(() => {
-    // Lấy danh sách sự kiện từ API
-    const fetchEvents = async () => {
-      setLoading(true);
-      try {
-        // TODO: Thay thế bằng API call thực tế
-        // const response = await api.get('/events');
-        // setEvents(response.data);
-        setEvents([]);
-      } catch (error) {
-        console.error("Lỗi khi tải danh sách sự kiện:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Fetch sự kiện với pagination
+  const fetchEvents = async (page: number = pagination.page) => {
+    setLoading(true);
+    try {
+      const response = await eventsApi.getAll(page, pagination.limit);
 
+      // Handle paginated response
+      if (response && typeof response === "object" && "docs" in response) {
+        setEvents(response.docs);
+        setPagination({
+          page: response.page || page,
+          limit: response.limit || pagination.limit,
+          totalDocs: response.totalDocs || 0,
+          totalPages: response.totalPages || 0,
+        });
+      } else {
+        // Fallback for array response
+        setEvents(Array.isArray(response) ? response : []);
+      }
+    } catch (error) {
+      console.error("Lỗi khi tải danh sách sự kiện:", error);
+      setEvents([]);
+      setPagination({
+        page: 1,
+        limit: 25,
+        totalDocs: 0,
+        totalPages: 0,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchEvents();
   }, []);
 
@@ -327,6 +351,45 @@ export default function EventsPage() {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination */}
+          {pagination.totalDocs > pagination.limit && (
+            <div className="pagination-section mt-4">
+              <nav aria-label="Events pagination">
+                <div className="d-flex justify-content-between align-items-center">
+                  <div className="pagination-info">
+                    Hiển thị {(pagination.page - 1) * pagination.limit + 1} đến{" "}
+                    {Math.min(
+                      pagination.page * pagination.limit,
+                      pagination.totalDocs
+                    )}{" "}
+                    trong tổng số {pagination.totalDocs} sự kiện
+                  </div>
+                  <div className="pagination-controls">
+                    <button
+                      onClick={() => fetchEvents(pagination.page - 1)}
+                      disabled={pagination.page <= 1}
+                      className="btn btn-sm btn-outline-primary me-2"
+                    >
+                      <i className="fas fa-chevron-left me-1"></i>
+                      Trước
+                    </button>
+                    <span className="pagination-current">
+                      Trang {pagination.page} / {pagination.totalPages}
+                    </span>
+                    <button
+                      onClick={() => fetchEvents(pagination.page + 1)}
+                      disabled={pagination.page >= pagination.totalPages}
+                      className="btn btn-sm btn-outline-primary ms-2"
+                    >
+                      Sau
+                      <i className="fas fa-chevron-right ms-1"></i>
+                    </button>
+                  </div>
+                </div>
+              </nav>
+            </div>
+          )}
         </div>
       </div>
 

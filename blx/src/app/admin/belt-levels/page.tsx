@@ -421,6 +421,24 @@ export default function BeltLevelsPage() {
                           }}
                         ></div>
                         <span className="ms-2">{beltLevel.color}</span>
+                        {/* Helper function to determine if color is dark */}
+                        {(() => {
+                          const isDark = (color: string): boolean => {
+                            if (!color || !color.startsWith('#')) return false;
+                            const hex = color.replace('#', '');
+                            const r = parseInt(hex.substr(0, 2), 16);
+                            const g = parseInt(hex.substr(2, 2), 16);
+                            const b = parseInt(hex.substr(4, 2), 16);
+                            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+                            return brightness < 128;
+                          };
+                          const colorIsDark = isDark(beltLevel.color);
+                          return colorIsDark ? (
+                            <span className="ms-2 badge bg-warning text-dark">
+                              ⚠️ Màu tối - cần background sáng hơn
+                            </span>
+                          ) : null;
+                        })()}
                       </td>
                       <td>
                         {poomsaeMap[beltLevel.id] &&

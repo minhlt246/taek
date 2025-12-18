@@ -10,7 +10,6 @@ import {
   BeltPromotion,
 } from "@/services/api/dashboard";
 import { BeltLevel } from "@/services/api/belt-levels";
-import { testRegistrationsApi } from "@/services/api/test-registrations";
 import { useToast } from "@/utils/toast";
 
 export default function AdminDashboard() {
@@ -39,14 +38,6 @@ export default function AdminDashboard() {
   ); // Năm được chọn
   const [yearlyStats, setYearlyStats] = useState<any>(null);
 
-  // State cho import Excel
-  const [importing, setImporting] = useState(false);
-  const [importFile, setImportFile] = useState<File | null>(null);
-  const [importResult, setImportResult] = useState<{
-    imported: number;
-    failed: number;
-    errors: string[];
-  } | null>(null);
 
   // Fetch dữ liệu từ API
   const fetchDashboardData = async () => {
@@ -78,6 +69,7 @@ export default function AdminDashboard() {
     }
   };
 
+
   useEffect(() => {
     fetchDashboardData();
   }, [
@@ -88,43 +80,6 @@ export default function AdminDashboard() {
     selectedYear,
   ]);
 
-  // Handler for Excel import
-  const handleImportExcel = async () => {
-    if (!importFile) {
-      useToast.error("Vui lòng chọn file Excel");
-      return;
-    }
-
-    try {
-      setImporting(true);
-      setImportResult(null);
-
-      const result = await testRegistrationsApi.importExcel(importFile);
-
-      if (result.success) {
-        setImportResult(result.data);
-        useToast.success(`Import thành công ${result.data.imported} bản ghi`);
-
-        // Reset file input
-        const fileInput = document.getElementById(
-          "excelFile"
-        ) as HTMLInputElement;
-        if (fileInput) fileInput.value = "";
-        setImportFile(null);
-      } else {
-        useToast.error(result.message || "Import thất bại");
-      }
-    } catch (error: any) {
-      console.error("Error importing Excel:", error);
-      useToast.error(
-        error?.response?.data?.message ||
-          error?.message ||
-          "Có lỗi xảy ra khi import file"
-      );
-    } finally {
-      setImporting(false);
-    }
-  };
 
   useEffect(() => {
     // Load additional scripts for dashboard after DOM is ready
@@ -1087,106 +1042,6 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Import Excel Section */}
-      <div className="row mt-4">
-        <div className="col-md-12 d-flex">
-          <div className="card w-100">
-            <div className="card-header">
-              <h6 className="mb-0">Import Kết Quả Thi Từ Excel</h6>
-            </div>
-            <div className="card-body">
-              <div className="mb-3">
-                <label htmlFor="excelFile" className="form-label">
-                  Chọn file Excel (.xlsx, .xls)
-                </label>
-                <input
-                  type="file"
-                  className="form-control"
-                  id="excelFile"
-                  accept=".xlsx,.xls,.xlsm"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      setImportFile(file);
-                      setImportResult(null);
-                    }
-                  }}
-                />
-                <small className="form-text text-muted">
-                  File Excel cần có các cột: Mã hội viên (hoặc Họ tên), Cấp đai
-                  hiện tại, Cấp đai mục tiêu, Điểm, Kết quả, Ghi chú
-                </small>
-              </div>
-
-              {importFile && (
-                <div className="mb-3">
-                  <p className="mb-1">
-                    <strong>File đã chọn:</strong> {importFile.name}
-                  </p>
-                  <p className="text-muted mb-0">
-                    Kích thước: {(importFile.size / 1024).toFixed(2)} KB
-                  </p>
-                </div>
-              )}
-
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={handleImportExcel}
-                disabled={!importFile || importing}
-              >
-                {importing ? (
-                  <>
-                    <span
-                      className="spinner-border spinner-border-sm me-2"
-                      role="status"
-                      aria-hidden="true"
-                    ></span>
-                    Đang import...
-                  </>
-                ) : (
-                  "Import Dữ Liệu"
-                )}
-              </button>
-
-              {importResult && (
-                <div
-                  className={`mt-3 alert ${
-                    importResult.failed > 0 ? "alert-warning" : "alert-success"
-                  }`}
-                >
-                  <h6 className="alert-heading">Kết quả import:</h6>
-                  <p className="mb-1">
-                    <strong>Thành công:</strong> {importResult.imported} bản ghi
-                  </p>
-                  <p className="mb-1">
-                    <strong>Thất bại:</strong> {importResult.failed} bản ghi
-                  </p>
-                  {importResult.errors.length > 0 && (
-                    <div className="mt-2">
-                      <strong>Lỗi chi tiết:</strong>
-                      <ul className="mb-0 mt-2">
-                        {importResult.errors
-                          .slice(0, 10)
-                          .map((error, index) => (
-                            <li key={index} className="small">
-                              {error}
-                            </li>
-                          ))}
-                        {importResult.errors.length > 10 && (
-                          <li className="small text-muted">
-                            ... và {importResult.errors.length - 10} lỗi khác
-                          </li>
-                        )}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
     </>
   );
 }

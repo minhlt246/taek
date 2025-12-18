@@ -17,14 +17,21 @@ export class CreateUserDto {
   @MaxLength(100)
   ho_va_ten: string;
 
+  @IsOptional()
+  @ValidateIf((o) => o.email !== undefined && o.email !== null && o.email !== '')
   @IsEmail()
   @MaxLength(100)
-  email: string;
+  email?: string;
 
   @IsOptional()
   @IsString()
   @MaxLength(20)
   ma_hoi_vien?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  ma_hv?: string;
 
   @IsOptional()
   @IsString()
@@ -64,6 +71,16 @@ export class CreateUserDto {
   @IsOptional()
   @IsNumber()
   cap_dai_id?: number;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  emergency_contact_name?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(15)
+  emergency_contact_phone?: string;
 
   @IsString()
   @MinLength(6, { message: 'Password must be at least 6 characters long' })

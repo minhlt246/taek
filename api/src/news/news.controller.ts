@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { NewsService } from './news.service';
 import { CreateNewsDto, UpdateNewsDto } from './dto';
@@ -29,9 +30,11 @@ export class NewsController {
   }
 
   @Get()
-  async findAll() {
-    const news = await this.newsService.findAll();
-    return news; // Return array directly for frontend compatibility
+  async findAll(@Query('page') page?: string, @Query('limit') limit?: string) {
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = limit ? parseInt(limit, 10) : 25;
+    const result = await this.newsService.findAll(pageNum, limitNum);
+    return result;
   }
 
   @Get('published')

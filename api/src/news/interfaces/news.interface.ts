@@ -2,7 +2,16 @@ import { News } from '../entities/news.entity';
 
 export interface INewsService {
   create(createNewsDto: any): Promise<News>;
-  findAll(): Promise<News[]>;
+  findAll(
+    page?: number,
+    limit?: number,
+  ): Promise<{
+    docs: News[];
+    totalDocs: number;
+    limit: number;
+    page: number;
+    totalPages: number;
+  }>;
   findOne(id: number): Promise<News>;
   findBySlug(slug: string): Promise<News>;
   findByAuthor(author_id: number): Promise<News[]>;

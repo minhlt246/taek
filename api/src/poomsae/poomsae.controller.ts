@@ -36,7 +36,6 @@ export class PoomsaeController {
     return poomsaes.map((poomsae) => ({
       id: poomsae.id,
       tenBaiQuyenVietnamese: poomsae.tenBaiQuyenVietnamese || null,
-      tenBaiQuyenEnglish: poomsae.tenBaiQuyenEnglish || null,
       tenBaiQuyenKorean: poomsae.tenBaiQuyenKorean || null,
       capDo: poomsae.capDo || null,
       moTa: poomsae.moTa || null,
@@ -77,7 +76,6 @@ export class PoomsaeController {
             return {
               id: poomsae.id,
               tenBaiQuyenVietnamese: poomsae.tenBaiQuyenVietnamese || null,
-              tenBaiQuyenEnglish: poomsae.tenBaiQuyenEnglish || null,
               tenBaiQuyenKorean: poomsae.tenBaiQuyenKorean || null,
               capDo: poomsae.capDo || null,
               moTa: poomsae.moTa || null,
@@ -140,7 +138,6 @@ export class PoomsaeController {
     return poomsaes.map((poomsae) => ({
       id: poomsae.id,
       tenBaiQuyenVietnamese: poomsae.tenBaiQuyenVietnamese || null,
-      tenBaiQuyenEnglish: poomsae.tenBaiQuyenEnglish || null,
       tenBaiQuyenKorean: poomsae.tenBaiQuyenKorean || null,
       capDo: poomsae.capDo || null,
       moTa: poomsae.moTa || null,
@@ -166,7 +163,6 @@ export class PoomsaeController {
     return {
       id: poomsae.id,
       tenBaiQuyenVietnamese: poomsae.tenBaiQuyenVietnamese || null,
-      tenBaiQuyenEnglish: poomsae.tenBaiQuyenEnglish || null,
       tenBaiQuyenKorean: poomsae.tenBaiQuyenKorean || null,
       capDo: poomsae.capDo || null,
       moTa: poomsae.moTa || null,

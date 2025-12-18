@@ -30,11 +30,29 @@ export class NewsService implements INewsService {
     return await this.newsRepository.save(news);
   }
 
-  async findAll(): Promise<News[]> {
-    return await this.newsRepository
+  async findAll(
+    page: number = 1,
+    limit: number = 25,
+  ): Promise<{
+    docs: News[];
+    totalDocs: number;
+    limit: number;
+    page: number;
+    totalPages: number;
+  }> {
+    // Get total count
+    const totalDocs = await this.newsRepository.count();
+
+    // Calculate pagination
+    const skip = (page - 1) * limit;
+    const totalPages = Math.ceil(totalDocs / limit);
+
+    const docs = await this.newsRepository
       .createQueryBuilder('news')
       .leftJoin('news.author', 'author')
       .orderBy('news.created_at', 'DESC')
+      .skip(skip)
+      .take(limit)
       .addSelect([
         'author.id',
         'author.ho_va_ten',
@@ -57,6 +75,14 @@ export class NewsService implements INewsService {
         'author.updated_at',
       ])
       .getMany();
+
+    return {
+      docs,
+      totalDocs,
+      limit,
+      page,
+      totalPages,
+    };
   }
 
   async findOne(id: number): Promise<News> {

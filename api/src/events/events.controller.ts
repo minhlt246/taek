@@ -34,18 +34,25 @@ export class EventsController {
     @Query('type') type?: string,
     @Query('status') status?: string,
     @Query('club_id') club_id?: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
   ) {
     let events;
     if (type) {
       events = await this.eventsService.findByType(type);
+      return events; // Return array for filtered results
     } else if (status) {
       events = await this.eventsService.findByStatus(status);
+      return events; // Return array for filtered results
     } else if (club_id) {
       events = await this.eventsService.findByClub(parseInt(club_id));
+      return events; // Return array for filtered results
     } else {
-      events = await this.eventsService.findAll();
+      const pageNum = page ? parseInt(page, 10) : 1;
+      const limitNum = limit ? parseInt(limit, 10) : 25;
+      const result = await this.eventsService.findAll(pageNum, limitNum);
+      return result;
     }
-    return events; // Return array directly for frontend compatibility
   }
 
   @Get(':id')

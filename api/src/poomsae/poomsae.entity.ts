@@ -16,9 +16,6 @@ export class Poomsae {
   @Column({ name: 'ten_bai_quyen_vietnamese' })
   tenBaiQuyenVietnamese: string;
 
-  @Column({ name: 'ten_bai_quyen_english' })
-  tenBaiQuyenEnglish: string;
-
   @Column({ name: 'ten_bai_quyen_korean', nullable: true })
   tenBaiQuyenKorean?: string;
 

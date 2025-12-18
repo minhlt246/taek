@@ -23,10 +23,10 @@ export interface News {
  */
 export const getNewsTypeLabel = (slug?: string, title?: string): string => {
   if (!slug && !title) return "Tin tức";
-  
+
   const lowerSlug = slug?.toLowerCase() || "";
   const lowerTitle = title?.toLowerCase() || "";
-  
+
   if (lowerSlug.includes("su-kien") || lowerTitle.includes("sự kiện")) {
     return "Sự kiện";
   }
@@ -138,7 +138,9 @@ export const newsApi = {
    */
   getBySlug: async (slug: string): Promise<News | null> => {
     try {
-      const response = await http.get<News | { data: News }>(`/news/slug/${slug}`);
+      const response = await http.get<News | { data: News }>(
+        `/news/slug/${slug}`
+      );
       if (!response.data) {
         return null;
       }
@@ -159,12 +161,52 @@ export const newsApi = {
   },
 
   /**
-   * Get all news including unpublished (Admin only)
-   * @returns Promise<News[]>
+   * Get all news including unpublished (Admin only) with pagination
+   * @param page - Page number (default: 1)
+   * @param limit - Items per page (default: 25)
+   * @returns Promise with paginated news
    */
-  getAllAdmin: async (): Promise<News[]> => {
+  getAllAdmin: async (
+    page: number = 1,
+    limit: number = 25
+  ): Promise<
+    | News[]
+    | {
+        docs: News[];
+        totalDocs: number;
+        limit: number;
+        page: number;
+        totalPages: number;
+      }
+  > => {
     try {
-      const response = await http.get<NewsResponse | News[]>("/news");
+      const response = await http.get<
+        | NewsResponse
+        | News[]
+        | {
+            docs: News[];
+            totalDocs: number;
+            limit: number;
+            page: number;
+            totalPages: number;
+          }
+      >("/news", { params: { page, limit } });
+
+      // Handle paginated response
+      if (
+        response.data &&
+        typeof response.data === "object" &&
+        "docs" in response.data
+      ) {
+        return response.data as {
+          docs: News[];
+          totalDocs: number;
+          limit: number;
+          page: number;
+          totalPages: number;
+        };
+      }
+
       // Handle different response formats
       if (Array.isArray(response.data)) {
         return response.data;
@@ -172,7 +214,13 @@ export const newsApi = {
       return (response.data as NewsResponse)?.data || [];
     } catch (error: any) {
       console.error("Error fetching all news:", error);
-      return [];
+      return {
+        docs: [],
+        totalDocs: 0,
+        limit,
+        page,
+        totalPages: 0,
+      };
     }
   },
 
@@ -183,13 +231,19 @@ export const newsApi = {
    */
   create: async (data: any): Promise<News> => {
     try {
-      const response = await http.post<News | { success: boolean; message: string; data: News }>("/news", data);
+      const response = await http.post<
+        News | { success: boolean; message: string; data: News }
+      >("/news", data);
       console.log("[NewsApi] Create response:", response.data);
       // Handle response format: { success, message, data } or direct News
-      if (response.data && "id" in response.data && !("success" in response.data)) {
+      if (
+        response.data &&
+        "id" in response.data &&
+        !("success" in response.data)
+      ) {
         return response.data as News;
       }
-      return (response.data as { data: News })?.data || response.data as News;
+      return (response.data as { data: News })?.data || (response.data as News);
     } catch (error: any) {
       console.error("Error creating news:", error);
       throw error;
@@ -204,13 +258,19 @@ export const newsApi = {
    */
   update: async (id: number, data: any): Promise<News> => {
     try {
-      const response = await http.patch<News | { success: boolean; message: string; data: News }>(`/news/${id}`, data);
+      const response = await http.patch<
+        News | { success: boolean; message: string; data: News }
+      >(`/news/${id}`, data);
       console.log("[NewsApi] Update response:", response.data);
       // Handle response format: { success, message, data } or direct News
-      if (response.data && "id" in response.data && !("success" in response.data)) {
+      if (
+        response.data &&
+        "id" in response.data &&
+        !("success" in response.data)
+      ) {
         return response.data as News;
       }
-      return (response.data as { data: News })?.data || response.data as News;
+      return (response.data as { data: News })?.data || (response.data as News);
     } catch (error: any) {
       console.error(`Error updating news ${id}:`, error);
       throw error;
@@ -234,4 +294,3 @@ export const newsApi = {
 };
 
 export default newsApi;
-

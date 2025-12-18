@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useAccountStore } from "@/stores/account";
 import { usersApi } from "@/services/api/users";
 import { beltLevelsApi } from "@/services/api/belt-levels";
+import { poomsaeApi } from "@/services/api/poomsae";
 import http from "@/services/http";
 
 interface VoSinh {
@@ -19,6 +20,13 @@ interface VoSinh {
     id: number;
     name: string;
     color?: string;
+    order_sequence?: number;
+  };
+  bai_quyen?: {
+    id: number;
+    tenBaiQuyenVietnamese?: string;
+    tenBaiQuyenEnglish?: string;
+    tenBaiQuyenKorean?: string;
   };
   gioi_tinh: "Nam" | "Nữ";
   email?: string;
@@ -35,10 +43,25 @@ interface VoSinh {
 export default function UsersPage() {
   const { account } = useAccountStore();
   const [voSinh, setVoSinh] = useState<VoSinh[]>([]);
+  const [beltLevels, setBeltLevels] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 25,
+    totalDocs: 0,
+    totalPages: 0,
+  });
   const [showModal, setShowModal] = useState(false);
   const [editingVoSinh, setEditingVoSinh] = useState<VoSinh | null>(null);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState<{
+    imported: number;
+    failed: number;
+    errors: string[];
+  } | null>(null);
   const [formData, setFormData] = useState({
     ho_va_ten: "",
     ngay_thang_nam_sinh: "",
@@ -57,19 +80,43 @@ export default function UsersPage() {
   });
 
   /**
-   * Fetch võ sinh data from API
+   * Fetch võ sinh data from API with pagination
    * Lấy raw data từ backend để có đầy đủ thông tin
    */
-  const fetchVoSinh = async () => {
+  const fetchVoSinh = async (page: number = pagination.page) => {
     setLoading(true);
     try {
-      // Fetch users và belt_levels để map cấp đai
+      // Fetch users với pagination và belt_levels để map cấp đai
       const [usersResponse, beltLevelsData] = await Promise.all([
-        http.get<VoSinh[]>("/users"),
+        usersApi.getAll(page, pagination.limit),
         beltLevelsApi.getAll(),
       ]);
 
-      const data: VoSinh[] = Array.isArray(usersResponse.data) ? usersResponse.data : [];
+      // Handle paginated response
+      const paginatedData = usersResponse as {
+        docs: VoSinh[];
+        totalDocs: number;
+        limit: number;
+        page: number;
+        totalPages: number;
+      };
+
+      const data: VoSinh[] = Array.isArray(paginatedData.docs)
+        ? paginatedData.docs
+        : [];
+
+      // Update pagination state
+      setPagination({
+        page: paginatedData.page || page,
+        limit: paginatedData.limit || pagination.limit,
+        totalDocs: paginatedData.totalDocs || 0,
+        totalPages: paginatedData.totalPages || 0,
+      });
+
+      // Store belt levels for form selection
+      if (Array.isArray(beltLevelsData)) {
+        setBeltLevels(beltLevelsData);
+      }
 
       // Tạo map belt_levels để map vào users
       const beltLevelMap = new Map();
@@ -81,8 +128,21 @@ export default function UsersPage() {
 
       // Backend đã trả về belt_level, nhưng vẫn có fallback nếu không có
       const usersWithBeltLevel = data.map((user) => {
-        // Nếu backend đã trả về belt_level, sử dụng nó
+        // Nếu backend đã trả về belt_level, bổ sung order_sequence nếu thiếu
         if (user.belt_level) {
+          // Nếu thiếu order_sequence, lấy từ beltLevelMap
+          if (!user.belt_level.order_sequence && user.cap_dai_id) {
+            const beltLevel = beltLevelMap.get(user.cap_dai_id);
+            if (beltLevel && beltLevel.order_sequence) {
+              return {
+                ...user,
+                belt_level: {
+                  ...user.belt_level,
+                  order_sequence: beltLevel.order_sequence,
+                },
+              };
+            }
+          }
           return user;
         }
         // Fallback: Map belt_level từ beltLevelMap nếu có cap_dai_id nhưng chưa có belt_level
@@ -95,6 +155,7 @@ export default function UsersPage() {
                 id: beltLevel.id,
                 name: beltLevel.name,
                 color: beltLevel.color,
+                order_sequence: beltLevel.order_sequence,
               },
             };
           }
@@ -103,7 +164,15 @@ export default function UsersPage() {
       });
 
       setVoSinh(usersWithBeltLevel);
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Error fetching users:", error);
+      setVoSinh([]);
+      setPagination({
+        page: 1,
+        limit: 25,
+        totalDocs: 0,
+        totalPages: 0,
+      });
       console.error("Lỗi khi tải danh sách võ sinh:", error);
       setVoSinh([]);
     } finally {
@@ -117,26 +186,26 @@ export default function UsersPage() {
 
   // Helper function to get belt level color with proper contrast
   const getBeltLevelColor = (colorName?: string): string => {
-    if (!colorName) return '#000';
-    
+    if (!colorName) return "#000";
+
     const colorMap: Record<string, string> = {
-      'White': '#000', // Black text on white background
-      'Orange': '#ff8c00',
-      'Violet': '#8b00ff',
-      'Purple': '#8b00ff',
-      'Yellow': '#ff8c00', // Dark orange for better contrast
-      'Green': '#198754',
-      'Blue': '#0d6efd',
-      'Red': '#dc3545',
-      'Red-Black': '#000',
-      'Black': '#000',
+      White: "#000", // Black text on white background
+      Orange: "#ff8c00",
+      Violet: "#8b00ff",
+      Purple: "#8b00ff",
+      Yellow: "#ff8c00", // Dark orange for better contrast
+      Green: "#198754",
+      Blue: "#0d6efd",
+      Red: "#dc3545",
+      "Red-Black": "#fff", // Changed to white text for lighter background
+      Black: "#fff", // Changed to white text for lighter background
     };
-    
+
     // Try exact match first
     if (colorMap[colorName]) {
       return colorMap[colorName];
     }
-    
+
     // Try case-insensitive match
     const lowerColor = colorName.toLowerCase();
     for (const [key, value] of Object.entries(colorMap)) {
@@ -144,33 +213,46 @@ export default function UsersPage() {
         return value;
       }
     }
-    
+
+    // If color is a hex code and is dark, use white text
+    if (colorName.startsWith("#")) {
+      const hex = colorName.replace("#", "");
+      const r = parseInt(hex.substr(0, 2), 16);
+      const g = parseInt(hex.substr(2, 2), 16);
+      const b = parseInt(hex.substr(4, 2), 16);
+      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+      // If color is dark (brightness < 128), use white text
+      if (brightness < 128) {
+        return "#fff";
+      }
+    }
+
     // Default to black for unknown colors
-    return '#000';
+    return "#000";
   };
 
   // Helper function to get belt level background color
   const getBeltLevelBgColor = (colorName?: string): string => {
-    if (!colorName) return 'transparent';
-    
+    if (!colorName) return "transparent";
+
     const bgColorMap: Record<string, string> = {
-      'White': '#f8f9fa', // Light gray background
-      'Orange': '#fff3cd',
-      'Violet': '#e7d5ff',
-      'Purple': '#e7d5ff',
-      'Yellow': '#fff3cd',
-      'Green': '#d1e7dd',
-      'Blue': '#cfe2ff',
-      'Red': '#f8d7da',
-      'Red-Black': '#212529',
-      'Black': '#212529',
+      White: "#f8f9fa", // Light gray background
+      Orange: "#fff3cd",
+      Violet: "#e7d5ff",
+      Purple: "#e7d5ff",
+      Yellow: "#fff3cd",
+      Green: "#d1e7dd",
+      Blue: "#cfe2ff",
+      Red: "#f8d7da",
+      "Red-Black": "#6c757d", // Changed from dark to lighter gray for better visibility
+      Black: "#6c757d", // Changed from dark to lighter gray for better visibility
     };
-    
+
     // Try exact match first
     if (bgColorMap[colorName]) {
       return bgColorMap[colorName];
     }
-    
+
     // Try case-insensitive match
     const lowerColor = colorName.toLowerCase();
     for (const [key, value] of Object.entries(bgColorMap)) {
@@ -178,19 +260,46 @@ export default function UsersPage() {
         return value;
       }
     }
-    
-    return 'transparent';
+
+    // If color is a hex code and is dark, use lighter background
+    if (colorName.startsWith("#")) {
+      const hex = colorName.replace("#", "");
+      const r = parseInt(hex.substr(0, 2), 16);
+      const g = parseInt(hex.substr(2, 2), 16);
+      const b = parseInt(hex.substr(4, 2), 16);
+      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+      // If color is dark (brightness < 128), use lighter background
+      if (brightness < 128) {
+        return "#6c757d"; // Light gray instead of dark
+      }
+    }
+
+    return "transparent";
   };
 
-  const filteredVoSinh = voSinh.filter((voSinh) => {
-    const matchesSearch =
-      voSinh.ho_va_ten.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      voSinh.ma_hoi_vien.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      voSinh.ma_clb.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (voSinh.email &&
-        voSinh.email.toLowerCase().includes(searchTerm.toLowerCase()));
-    return matchesSearch;
-  });
+  const filteredVoSinh = voSinh
+    .filter((voSinh) => {
+      const matchesSearch =
+        voSinh.ho_va_ten.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        voSinh.ma_hoi_vien.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        voSinh.ma_clb.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (voSinh.email &&
+          voSinh.email.toLowerCase().includes(searchTerm.toLowerCase()));
+      return matchesSearch;
+    })
+    .sort((a, b) => {
+      // Sắp xếp theo cấp đai (order_sequence), từ cao xuống thấp (cấp 10 -> cấp 1 -> đẳng 1 -> đẳng 10)
+      // Lấy order_sequence từ belt_level, nếu không có thì dùng cap_dai_id làm fallback
+      const orderA = a.belt_level?.order_sequence ?? a.cap_dai_id ?? 999;
+      const orderB = b.belt_level?.order_sequence ?? b.cap_dai_id ?? 999;
+
+      // Sắp xếp tăng dần (cấp 10 = order_sequence nhỏ nhất sẽ lên đầu)
+      // Nếu order_sequence bằng nhau, sắp xếp theo ID
+      if (orderA !== orderB) {
+        return orderA - orderB;
+      }
+      return a.id - b.id;
+    });
 
   const handleEdit = (voSinh: VoSinh) => {
     setEditingVoSinh(voSinh);
@@ -359,16 +468,29 @@ export default function UsersPage() {
               </h6>
             </div>
             <div className="col-auto">
-              <button
-                className="btn btn-primary"
-                onClick={() => {
-                  resetForm();
-                  setShowModal(true);
-                }}
-              >
-                <i className="fas fa-plus mr-2"></i>
-                Thêm võ sinh mới
-              </button>
+              <div className="btn-group">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => {
+                    resetForm();
+                    setShowModal(true);
+                  }}
+                >
+                  <i className="fas fa-plus mr-2"></i>
+                  Thêm võ sinh mới
+                </button>
+                <button
+                  className="btn btn-success"
+                  onClick={() => {
+                    setShowImportModal(true);
+                    setImportFile(null);
+                    setImportResult(null);
+                  }}
+                >
+                  <i className="fas fa-file-excel mr-2"></i>
+                  Import Excel
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -464,10 +586,12 @@ export default function UsersPage() {
                         <span
                           style={{
                             color: getBeltLevelColor(user.belt_level.color),
-                            backgroundColor: getBeltLevelBgColor(user.belt_level.color),
-                            padding: '2px 8px',
-                            borderRadius: '4px',
-                            fontWeight: '500',
+                            backgroundColor: getBeltLevelBgColor(
+                              user.belt_level.color
+                            ),
+                            padding: "2px 8px",
+                            borderRadius: "4px",
+                            fontWeight: "500",
                           }}
                         >
                           {user.belt_level.name}
@@ -523,8 +647,229 @@ export default function UsersPage() {
               </p>
             </div>
           )}
+
+          {/* Pagination */}
+          {pagination.totalDocs > pagination.limit && (
+            <div className="pagination-section mt-4">
+              <nav aria-label="Users pagination">
+                <div className="d-flex justify-content-between align-items-center">
+                  <div className="pagination-info">
+                    Hiển thị {(pagination.page - 1) * pagination.limit + 1} đến{" "}
+                    {Math.min(
+                      pagination.page * pagination.limit,
+                      pagination.totalDocs
+                    )}{" "}
+                    trong tổng số {pagination.totalDocs} võ sinh
+                  </div>
+                  <div className="pagination-controls">
+                    <button
+                      onClick={() => fetchVoSinh(pagination.page - 1)}
+                      disabled={pagination.page <= 1}
+                      className="btn btn-sm btn-outline-primary me-2"
+                    >
+                      <i className="fas fa-chevron-left me-1"></i>
+                      Trước
+                    </button>
+                    <span className="pagination-current">
+                      Trang {pagination.page} / {pagination.totalPages}
+                    </span>
+                    <button
+                      onClick={() => fetchVoSinh(pagination.page + 1)}
+                      disabled={pagination.page >= pagination.totalPages}
+                      className="btn btn-sm btn-outline-primary ms-2"
+                    >
+                      Sau
+                      <i className="fas fa-chevron-right ms-1"></i>
+                    </button>
+                  </div>
+                </div>
+              </nav>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Modal for Import Excel */}
+      {showImportModal && (
+        <div
+          className="modal show d-block"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Import võ sinh từ Excel</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => {
+                    setShowImportModal(false);
+                    setImportFile(null);
+                    setImportResult(null);
+                  }}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <div className="mb-3">
+                  <label className="form-label">Chọn file Excel</label>
+                  <input
+                    type="file"
+                    className="form-control"
+                    accept=".xlsx,.xls,.xlsm"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setImportFile(file);
+                        setImportResult(null);
+                      }
+                    }}
+                    disabled={importing}
+                  />
+                  <small className="form-text text-muted">
+                    Hỗ trợ định dạng: .xlsx, .xls, .xlsm
+                  </small>
+                </div>
+
+                <div className="alert alert-info">
+                  <strong>Định dạng file Excel:</strong>
+                  <br />
+                  Dòng đầu tiên là tiêu đề với các cột:
+                  <ul className="mb-0 mt-2">
+                    <li>
+                      <strong>Bắt buộc:</strong> Mã hội viên
+                    </li>
+                    <li>
+                      <strong>Khuyến nghị:</strong> Mã CLB, Cấp đai dự thi, Số
+                      điện thoại
+                    </li>
+                    <li>
+                      <strong>Tùy chọn:</strong> Họ và tên, Email, Ngày sinh,
+                      Giới tính, Mã đơn vị, Quyền số, Địa chỉ, Tên người liên hệ
+                      khẩn cấp, SĐT liên hệ khẩn cấp
+                    </li>
+                  </ul>
+                  <small className="text-muted">
+                    <strong>Lưu ý:</strong> Email sẽ được tự động tạo từ mã hội
+                    viên nếu không được cung cấp.
+                  </small>
+                </div>
+
+                {importResult && (
+                  <div
+                    className={`alert ${
+                      importResult.failed === 0
+                        ? "alert-success"
+                        : "alert-warning"
+                    }`}
+                  >
+                    <strong>Kết quả import:</strong>
+                    <ul className="mb-0 mt-2">
+                      <li>Thành công: {importResult.imported}</li>
+                      <li>Thất bại: {importResult.failed}</li>
+                    </ul>
+                    {importResult.errors.length > 0 && (
+                      <div className="mt-3">
+                        <strong>Chi tiết lỗi:</strong>
+                        <ul
+                          className="mb-0 mt-2"
+                          style={{ maxHeight: "200px", overflowY: "auto" }}
+                        >
+                          {importResult.errors.map((error, index) => (
+                            <li key={index} className="text-danger small">
+                              {error}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {importing && (
+                  <div className="text-center py-3">
+                    <div className="spinner-border text-primary" role="status">
+                      <span className="visually-hidden">Đang import...</span>
+                    </div>
+                    <p className="mt-2">Đang xử lý file Excel...</p>
+                  </div>
+                )}
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    setShowImportModal(false);
+                    setImportFile(null);
+                    setImportResult(null);
+                  }}
+                  disabled={importing}
+                >
+                  Đóng
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-success"
+                  onClick={async () => {
+                    if (!importFile) {
+                      alert("Vui lòng chọn file Excel");
+                      return;
+                    }
+
+                    setImporting(true);
+                    setImportResult(null);
+
+                    try {
+                      const result = await usersApi.importExcel(importFile);
+                      setImportResult({
+                        imported: result.data.imported,
+                        failed: result.data.failed,
+                        errors: result.data.errors,
+                      });
+
+                      // Refresh data if import successful
+                      if (result.data.imported > 0) {
+                        await fetchVoSinh();
+                      }
+                    } catch (error: any) {
+                      console.error("Error importing Excel:", error);
+                      const errorMessage =
+                        error?.response?.data?.message ||
+                        error?.message ||
+                        "Lỗi khi import file Excel";
+                      alert(errorMessage);
+                      setImportResult({
+                        imported: 0,
+                        failed: 1,
+                        errors: [errorMessage],
+                      });
+                    } finally {
+                      setImporting(false);
+                    }
+                  }}
+                  disabled={importing || !importFile}
+                >
+                  {importing ? (
+                    <>
+                      <span
+                        className="spinner-border spinner-border-sm mr-2"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                      Đang import...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-upload mr-2"></i>
+                      Import
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal for Edit User */}
       {showModal && (
@@ -694,19 +1039,104 @@ export default function UsersPage() {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">Cấp đai ID</label>
-                        <input
-                          type="number"
-                          className="form-control"
-                          value={formData.cap_dai_id}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              cap_dai_id: parseInt(e.target.value) || 1,
-                            })
-                          }
-                          min="1"
-                        />
+                        <label className="form-label">Cấp đai</label>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "8px",
+                            maxHeight: "300px",
+                            overflowY: "auto",
+                            padding: "8px",
+                            border: "1px solid #ddd",
+                            borderRadius: "4px",
+                            backgroundColor: "#f8f9fa",
+                          }}
+                        >
+                          {beltLevels
+                            .sort(
+                              (a, b) =>
+                                (a.order_sequence || 0) -
+                                (b.order_sequence || 0)
+                            )
+                            .map((beltLevel) => {
+                              // Determine if color is dark
+                              const isDarkColor = (color: string): boolean => {
+                                if (!color || !color.startsWith("#"))
+                                  return false;
+                                try {
+                                  const hex = color.replace("#", "");
+                                  const r = parseInt(hex.substr(0, 2), 16);
+                                  const g = parseInt(hex.substr(2, 2), 16);
+                                  const b = parseInt(hex.substr(4, 2), 16);
+                                  const brightness =
+                                    (r * 299 + g * 587 + b * 114) / 1000;
+                                  return brightness < 128;
+                                } catch {
+                                  return false;
+                                }
+                              };
+
+                              const isDark = isDarkColor(beltLevel.color || "");
+                              const isSelected =
+                                formData.cap_dai_id === beltLevel.id;
+
+                              // For dark colors (like Black, Red-Black), use lighter background
+                              const bgColor = isDark
+                                ? "#6c757d" // Light gray for dark belt colors (sáng hơn màu đen)
+                                : beltLevel.color || "#f8f9fa";
+
+                              const textColor = isDark ? "#fff" : "#000";
+
+                              return (
+                                <button
+                                  key={beltLevel.id}
+                                  type="button"
+                                  onClick={() =>
+                                    setFormData({
+                                      ...formData,
+                                      cap_dai_id: beltLevel.id,
+                                    })
+                                  }
+                                  style={{
+                                    padding: "12px 16px",
+                                    borderRadius: "8px",
+                                    border: isSelected
+                                      ? "2px solid #007bff"
+                                      : "1px solid #ddd",
+                                    backgroundColor: bgColor,
+                                    color: textColor,
+                                    fontWeight: isSelected ? "600" : "500",
+                                    cursor: "pointer",
+                                    textAlign: "left",
+                                    transition: "all 0.2s",
+                                    boxShadow: isSelected
+                                      ? "0 2px 4px rgba(0,0,0,0.2)"
+                                      : "none",
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    if (!isSelected) {
+                                      e.currentTarget.style.backgroundColor =
+                                        isDark ? "#868e96" : "#e9ecef";
+                                    }
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    if (!isSelected) {
+                                      e.currentTarget.style.backgroundColor =
+                                        bgColor;
+                                    }
+                                  }}
+                                >
+                                  {beltLevel.name}
+                                </button>
+                              );
+                            })}
+                        </div>
+                        {beltLevels.length === 0 && (
+                          <small className="text-muted">
+                            Đang tải danh sách cấp đai...
+                          </small>
+                        )}
                       </div>
                     </div>
                     <div className="col-md-6">

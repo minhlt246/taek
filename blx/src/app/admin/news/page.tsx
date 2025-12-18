@@ -24,6 +24,12 @@ export default function NewsPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingNews, setEditingNews] = useState<News | null>(null);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 25,
+    totalDocs: 0,
+    totalPages: 0,
+  });
   const [formData, setFormData] = useState({
     title: "",
     content: "",
@@ -41,23 +47,40 @@ export default function NewsPage() {
     tags: "",
   });
 
-  useEffect(() => {
-    // Lấy danh sách tin tức từ API
-    const fetchNews = async () => {
-      setLoading(true);
-      try {
-        // TODO: Thay thế bằng API call thực tế
-        // const response = await api.get('/news');
-        // setNews(response.data);
-        setNews([]);
-      } catch (error) {
-        console.error("Lỗi khi tải danh sách tin tức:", error);
-        setNews([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Fetch tin tức với pagination
+  const fetchNews = async (page: number = pagination.page) => {
+    setLoading(true);
+    try {
+      const response = await newsApi.getAllAdmin(page, pagination.limit);
 
+      // Handle paginated response
+      if (response && typeof response === "object" && "docs" in response) {
+        setNews(response.docs);
+        setPagination({
+          page: response.page || page,
+          limit: response.limit || pagination.limit,
+          totalDocs: response.totalDocs || 0,
+          totalPages: response.totalPages || 0,
+        });
+      } else {
+        // Fallback for array response
+        setNews(Array.isArray(response) ? response : []);
+      }
+    } catch (error) {
+      console.error("Lỗi khi tải danh sách tin tức:", error);
+      setNews([]);
+      setPagination({
+        page: 1,
+        limit: 25,
+        totalDocs: 0,
+        totalPages: 0,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchNews();
   }, []);
 
@@ -365,6 +388,45 @@ export default function NewsPage() {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination */}
+          {pagination.totalDocs > pagination.limit && (
+            <div className="pagination-section mt-4">
+              <nav aria-label="News pagination">
+                <div className="d-flex justify-content-between align-items-center">
+                  <div className="pagination-info">
+                    Hiển thị {(pagination.page - 1) * pagination.limit + 1} đến{" "}
+                    {Math.min(
+                      pagination.page * pagination.limit,
+                      pagination.totalDocs
+                    )}{" "}
+                    trong tổng số {pagination.totalDocs} tin tức
+                  </div>
+                  <div className="pagination-controls">
+                    <button
+                      onClick={() => fetchNews(pagination.page - 1)}
+                      disabled={pagination.page <= 1}
+                      className="btn btn-sm btn-outline-primary me-2"
+                    >
+                      <i className="fas fa-chevron-left me-1"></i>
+                      Trước
+                    </button>
+                    <span className="pagination-current">
+                      Trang {pagination.page} / {pagination.totalPages}
+                    </span>
+                    <button
+                      onClick={() => fetchNews(pagination.page + 1)}
+                      disabled={pagination.page >= pagination.totalPages}
+                      className="btn btn-sm btn-outline-primary ms-2"
+                    >
+                      Sau
+                      <i className="fas fa-chevron-right ms-1"></i>
+                    </button>
+                  </div>
+                </div>
+              </nav>
+            </div>
+          )}
         </div>
       </div>
 

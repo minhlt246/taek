@@ -33,16 +33,52 @@ const handleResponse = <T>(response: any): T => {
  */
 export const eventsApi = {
   /**
-   * Get all events
-   * @returns Promise<Event[]>
+   * Get all events with pagination
+   * @param page - Page number (default: 1)
+   * @param limit - Items per page (default: 25)
+   * @returns Promise with paginated events
    */
-  getAll: async (): Promise<Event[]> => {
+  getAll: async (
+    page: number = 1,
+    limit: number = 25
+  ): Promise<
+    | Event[]
+    | {
+        docs: Event[];
+        totalDocs: number;
+        limit: number;
+        page: number;
+        totalPages: number;
+      }
+  > => {
     try {
-      const response = await http.get("/events");
+      const response = await http.get("/events", { params: { page, limit } });
+
+      // Handle paginated response
+      if (
+        response.data &&
+        typeof response.data === "object" &&
+        "docs" in response.data
+      ) {
+        return response.data as {
+          docs: Event[];
+          totalDocs: number;
+          limit: number;
+          page: number;
+          totalPages: number;
+        };
+      }
+
       return handleResponse<Event[]>(response.data);
     } catch (error: any) {
       console.error("Error fetching events:", error);
-      return [];
+      return {
+        docs: [],
+        totalDocs: 0,
+        limit,
+        page,
+        totalPages: 0,
+      };
     }
   },
 
@@ -68,12 +104,20 @@ export const eventsApi = {
    */
   create: async (data: any): Promise<Event> => {
     try {
-      const response = await http.post<Event | { success: boolean; message: string; data: Event }>("/events", data);
+      const response = await http.post<
+        Event | { success: boolean; message: string; data: Event }
+      >("/events", data);
       console.log("[EventsApi] Create response:", response.data);
-      if (response.data && "id" in response.data && !("success" in response.data)) {
+      if (
+        response.data &&
+        "id" in response.data &&
+        !("success" in response.data)
+      ) {
         return response.data as Event;
       }
-      return (response.data as { data: Event })?.data || response.data as Event;
+      return (
+        (response.data as { data: Event })?.data || (response.data as Event)
+      );
     } catch (error: any) {
       console.error("Error creating event:", error);
       throw error;
@@ -88,12 +132,20 @@ export const eventsApi = {
    */
   update: async (id: number, data: any): Promise<Event> => {
     try {
-      const response = await http.patch<Event | { success: boolean; message: string; data: Event }>(`/events/${id}`, data);
+      const response = await http.patch<
+        Event | { success: boolean; message: string; data: Event }
+      >(`/events/${id}`, data);
       console.log("[EventsApi] Update response:", response.data);
-      if (response.data && "id" in response.data && !("success" in response.data)) {
+      if (
+        response.data &&
+        "id" in response.data &&
+        !("success" in response.data)
+      ) {
         return response.data as Event;
       }
-      return (response.data as { data: Event })?.data || response.data as Event;
+      return (
+        (response.data as { data: Event })?.data || (response.data as Event)
+      );
     } catch (error: any) {
       console.error(`Error updating event ${id}:`, error);
       throw error;
@@ -117,4 +169,3 @@ export const eventsApi = {
 };
 
 export default eventsApi;
-

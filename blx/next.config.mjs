@@ -11,7 +11,7 @@ const nextConfig = {
   compress: true,
 
   // Security headers
-  async headers() {
+  async headers () {
     return [
       {
         source: "/(.*)",

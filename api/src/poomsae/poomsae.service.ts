@@ -64,12 +64,16 @@ export class PoomsaeService {
       const poomsaes = beltLevelPoomsaes
         .map((bp) => {
           if (!bp || !bp.poomsae) {
-            console.warn(`[PoomsaeService] Null poomsae in relation id ${bp?.id}`);
+            console.warn(
+              `[PoomsaeService] Null poomsae in relation id ${bp?.id}`,
+            );
             return null;
           }
           return bp.poomsae;
         })
-        .filter((poomsae) => poomsae !== null && poomsae !== undefined) as Poomsae[];
+        .filter(
+          (poomsae) => poomsae !== null && poomsae !== undefined,
+        ) as Poomsae[];
 
       console.log(
         `[PoomsaeService] Found ${poomsaes.length} valid poomsae(s) for belt level ${beltLevelId}`,
@@ -82,7 +86,10 @@ export class PoomsaeService {
 
       return poomsaes;
     } catch (error) {
-      console.error(`[PoomsaeService] Error finding poomsae for belt level ${beltLevelId}:`, error);
+      console.error(
+        `[PoomsaeService] Error finding poomsae for belt level ${beltLevelId}:`,
+        error,
+      );
       // Return empty array instead of throwing error
       return [];
     }
@@ -162,7 +169,7 @@ export class PoomsaeService {
       // Cấp 9 và Cấp 10 dùng bài quyền "Kĩ thuật", không phải Taegeuk
       const poomsaePatternMap: Record<string, string[]> = {
         // Kĩ thuật cho Cấp 9 và Cấp 10
-        '기술': ['Cấp 9', 'Cấp 10'], // Kĩ thuật
+        기술: ['Cấp 9', 'Cấp 10'], // Kĩ thuật
         '기술 1': ['Cấp 10'], // Kĩ thuật 1
         '기술 2': ['Cấp 9'], // Kĩ thuật 2
         // Taegeuk cho Cấp 8 đến Cấp 1
@@ -196,8 +203,8 @@ export class PoomsaeService {
         'Kĩ thuật 1 Jang': ['Cấp 10'],
         'kĩ Thuật 1 Jang': ['Cấp 10'],
         'Kĩ thuật 2': ['Cấp 9'],
-        'KT1': ['Cấp 10'],
-        'KT2': ['Cấp 9'],
+        KT1: ['Cấp 10'],
+        KT2: ['Cấp 9'],
         // Taegeuk cho Cấp 8 đến Cấp 1
         'Taegeuk Il-jang': ['Cấp 8'],
         'Taegeuk Ee-jang': ['Cấp 7'],
@@ -224,12 +231,8 @@ export class PoomsaeService {
 
       // Process each poomsae
       for (const poomsae of allPoomsaes) {
-        const koreanName =
-          poomsae.tenBaiQuyenKorean?.trim() || '';
-        const englishName =
-          poomsae.tenBaiQuyenEnglish?.trim() || '';
-        const vietnameseName =
-          poomsae.tenBaiQuyenVietnamese?.trim() || '';
+        const koreanName = poomsae.tenBaiQuyenKorean?.trim() || '';
+        const vietnameseName = poomsae.tenBaiQuyenVietnamese?.trim() || '';
 
         // Find matching belt level names
         let matchingBeltNames: string[] = [];
@@ -265,23 +268,6 @@ export class PoomsaeService {
             poomsaePatternMap,
           )) {
             if (koreanName.includes(pattern) || pattern.includes(koreanName)) {
-              matchingBeltNames = beltNames;
-              break;
-            }
-          }
-        }
-
-        // Try English name if no match
-        if (matchingBeltNames.length === 0 && englishName) {
-          const englishLower = englishName.toLowerCase();
-          for (const [pattern, beltNames] of Object.entries(
-            poomsaeEnglishMap,
-          )) {
-            const patternLower = pattern.toLowerCase();
-            if (
-              englishLower.includes(patternLower) ||
-              patternLower.includes(englishLower)
-            ) {
               matchingBeltNames = beltNames;
               break;
             }
@@ -352,7 +338,6 @@ export class PoomsaeService {
         where: [
           { tenBaiQuyenVietnamese: 'Kĩ thuật 1' },
           { tenBaiQuyenVietnamese: 'kĩ Thuật 1 Jang' },
-          { tenBaiQuyenEnglish: 'Technique 1' },
         ],
       });
 
@@ -360,7 +345,6 @@ export class PoomsaeService {
       if (!kt1) {
         kt1 = this.poomsaeRepository.create({
           tenBaiQuyenVietnamese: 'Kĩ thuật 1',
-          tenBaiQuyenEnglish: 'Technique 1',
           tenBaiQuyenKorean: '기술 1',
           capDo: 'Cơ bản',
           moTa: 'Bài quyền kĩ thuật cơ bản đầu tiên cho cấp đai trắng',
@@ -375,17 +359,13 @@ export class PoomsaeService {
 
       // Check if Kĩ thuật 2 already exists
       let kt2 = await this.poomsaeRepository.findOne({
-        where: [
-          { tenBaiQuyenVietnamese: 'Kĩ thuật 2' },
-          { tenBaiQuyenEnglish: 'Technique 2' },
-        ],
+        where: [{ tenBaiQuyenVietnamese: 'Kĩ thuật 2' }],
       });
 
       // Create Kĩ thuật 2 if not exists
       if (!kt2) {
         kt2 = this.poomsaeRepository.create({
           tenBaiQuyenVietnamese: 'Kĩ thuật 2',
-          tenBaiQuyenEnglish: 'Technique 2',
           tenBaiQuyenKorean: '기술 2',
           capDo: 'Cơ bản',
           moTa: 'Bài quyền kĩ thuật cơ bản thứ hai cho cấp đai cam',
@@ -532,7 +512,6 @@ export class PoomsaeService {
         const correctPoomsae = await this.poomsaeRepository.findOne({
           where: [
             { tenBaiQuyenVietnamese: correctPoomsaeName },
-            { tenBaiQuyenEnglish: correctPoomsaeName },
             { tenBaiQuyenKorean: correctPoomsaeName },
           ],
         });

@@ -361,41 +361,81 @@ export default function Profile() {
       // Fetch user data để lấy created_at và ma_hoi_vien
       const { usersApi } = await import("@/services/api/users");
       const user = await usersApi.getProfile();
+
+      // Debug: Log để kiểm tra giá trị ma_hoi_vien từ API
+      console.log("[Profile] User data from API:", {
+        id: user?.id,
+        ma_hoi_vien: user?.ma_hoi_vien,
+        ma_hoi_vien_type: typeof user?.ma_hoi_vien,
+        ma_hoi_vien_value: user?.ma_hoi_vien,
+        fullUser: user,
+      });
+
       if (user) {
-        // Xử lý ma_hoi_vien: chỉ loại bỏ NaN và giá trị không hợp lệ, giữ lại tất cả giá trị hợp lệ
+        // Debug: Log giá trị từ API
+        console.log("[Profile] User from API:", {
+          id: user.id,
+          ma_hoi_vien: user.ma_hoi_vien,
+          ma_hoi_vien_type: typeof user.ma_hoi_vien,
+          fullUser: user,
+        });
+
+        // Đơn giản hóa: giữ nguyên giá trị từ API, chỉ loại bỏ các trường hợp rõ ràng không hợp lệ
         let validatedMaHoiVien: string | null = user.ma_hoi_vien ?? null;
-        if (user.ma_hoi_vien !== null && user.ma_hoi_vien !== undefined) {
-          // Kiểm tra nếu là NaN (number) - loại bỏ
+
+        console.log("[Profile] Before validation:", {
+          original: user.ma_hoi_vien,
+          validated: validatedMaHoiVien,
+        });
+
+        // Chỉ validate nếu có giá trị
+        if (validatedMaHoiVien != null) {
+          // Kiểm tra nếu là NaN (number)
           if (
-            typeof user.ma_hoi_vien === "number" &&
-            Number.isNaN(user.ma_hoi_vien)
+            typeof validatedMaHoiVien === "number" &&
+            Number.isNaN(validatedMaHoiVien)
           ) {
             validatedMaHoiVien = null;
+            console.log("[Profile] ma_hoi_vien is NaN, set to null");
           } else {
             // Convert sang string và kiểm tra chuỗi không hợp lệ
-            const maHoiVienStr = String(user.ma_hoi_vien).trim();
-            // Chỉ loại bỏ nếu là chuỗi "NaN", "null", "undefined" hoặc rỗng
+            const str = String(validatedMaHoiVien).trim();
+            console.log("[Profile] Checking string:", str);
             if (
-              maHoiVienStr === "" ||
-              maHoiVienStr === "NaN" ||
-              maHoiVienStr === "null" ||
-              maHoiVienStr === "undefined"
+              str === "" ||
+              str === "NaN" ||
+              str === "null" ||
+              str === "undefined" ||
+              str === "N/A"
             ) {
               validatedMaHoiVien = null;
+              console.log("[Profile] ma_hoi_vien is invalid string, set to null");
             } else {
-              // Giữ lại giá trị gốc (có thể là số hoặc chuỗi)
-              validatedMaHoiVien = user.ma_hoi_vien;
+              console.log("[Profile] ma_hoi_vien is valid:", validatedMaHoiVien);
             }
           }
+        } else {
+          console.log("[Profile] ma_hoi_vien is null/undefined");
         }
+
+        // Set userData ngay lập tức với giá trị đã validate
         const validatedUser = {
           ...user,
           ma_hoi_vien: validatedMaHoiVien,
         };
+
+        console.log("[Profile] Setting userData:", {
+          ma_hoi_vien: validatedUser.ma_hoi_vien,
+          type: typeof validatedUser.ma_hoi_vien,
+        });
+
         setUserData(validatedUser);
+
         if (user.created_at) {
           setUserCreatedAt(user.created_at);
         }
+      } else {
+        console.log("[Profile] No user data from API");
       }
 
       const data = await profileApi.getProfileData();
@@ -1158,14 +1198,45 @@ export default function Profile() {
                         </strong>
                         <span>
                           {(() => {
-                            const maHoiVien = userData?.ma_hoi_vien;
-                            if (maHoiVien === null || maHoiVien === undefined) {
+                            // Ưu tiên lấy từ userData.ma_hoi_vien (trực tiếp từ API)
+                            // Fallback về profileData.memberId nếu userData chưa có
+                            const maHoiVien =
+                              userData?.ma_hoi_vien ??
+                              profileData?.memberId ??
+                              null;
+
+                            // Debug log
+                            console.log("[Profile Display] Rendering ma_hoi_vien:", {
+                              userData_ma_hoi_vien: userData?.ma_hoi_vien,
+                              profileData_memberId: profileData?.memberId,
+                              final_maHoiVien: maHoiVien,
+                              userData: userData,
+                              profileData: profileData,
+                            });
+
+                            // Nếu không có dữ liệu, hiển thị "Chưa có mã" ngay
+                            if (!maHoiVien) {
+                              console.log("[Profile Display] No ma_hoi_vien, showing 'Chưa có mã'");
                               return "Chưa có mã";
                             }
+
+                            // Convert sang string và trim
                             const str = String(maHoiVien).trim();
-                            if (str === "" || str === "NaN" || str === "null" || str === "undefined") {
+
+                            // Chỉ kiểm tra các giá trị rõ ràng không hợp lệ
+                            if (
+                              str === "" ||
+                              str === "NaN" ||
+                              str === "null" ||
+                              str === "undefined" ||
+                              str === "N/A"
+                            ) {
+                              console.log("[Profile Display] Invalid ma_hoi_vien:", str);
                               return "Chưa có mã";
                             }
+
+                            // Trả về giá trị hợp lệ
+                            console.log("[Profile Display] Valid ma_hoi_vien:", str);
                             return str;
                           })()}
                         </span>

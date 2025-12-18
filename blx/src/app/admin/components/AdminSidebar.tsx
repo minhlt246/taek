@@ -69,6 +69,12 @@ const AdminSidebar = () => {
       href: "/admin/news",
       active: pathname.startsWith("/admin/news"),
     },
+    {
+      title: "Kết quả thi",
+      icon: "ti ti-clipboard-list",
+      href: "/admin/ket-qua-thi",
+      active: pathname.startsWith("/admin/ket-qua-thi"),
+    },
   ];
 
   return (

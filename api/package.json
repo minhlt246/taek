@@ -27,7 +27,9 @@
     "check-db": "ts-node -r tsconfig-paths/register scripts/check-database-connection.ts",
     "setup-db": "ts-node -r tsconfig-paths/register scripts/setup-database.ts",
     "fix-orphan": "ts-node -r tsconfig-paths/register scripts/fix-orphan-assistants.ts",
-    "import-test-results": "ts-node -r tsconfig-paths/register scripts/import-test-results.ts"
+    "import-test-results": "ts-node -r tsconfig-paths/register scripts/import-test-results.ts",
+    "update-all-passwords": "ts-node -r tsconfig-paths/register scripts/update-all-passwords.ts",
+    "check-ma-don-vi": "ts-node -r tsconfig-paths/register scripts/check-ma-don-vi.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

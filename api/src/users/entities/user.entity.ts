@@ -42,6 +42,14 @@ export class User {
   })
   ma_hoi_vien: string | null;
 
+  @Column({
+    type: 'varchar',
+    length: 50,
+    nullable: true,
+    comment: 'Mã HV',
+  })
+  ma_hv: string | null;
+
   @Column({ length: 20, comment: 'Mã câu lạc bộ' })
   ma_clb: string;
 
@@ -134,4 +142,11 @@ export class User {
 
   @OneToMany(() => StudentParent, (studentParent) => studentParent.student)
   student_parents: StudentParent[];
+
+  // Relation to Poomsae (bài quyền) - quyen_so references bai_quyen.id
+  @ManyToOne(() => require('../../poomsae/poomsae.entity').Poomsae, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'quyen_so' })
+  bai_quyen: any; // Poomsae entity
 }

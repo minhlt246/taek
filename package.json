@@ -10,10 +10,13 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "^14.0.0",
     "@heroicons/react": "^2.0.12",
+    "@nestjs/common": "^11.1.9",
+    "@nestjs/core": "^11.1.9",
+    "@nestjs/platform-express": "^11.1.9",
     "@next/swc-darwin-x64": "^12.3.2",
     "framer-motion": "^7.6.2",
+    "next": "^14.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.38.0",

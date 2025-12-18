@@ -29,6 +29,7 @@ import { TuitionPackagesModule } from './tuition-packages/tuition-packages.modul
 import { PoomsaeModule } from './poomsae/poomsae.module';
 import { MediaModule } from './media/media.module';
 import { TestRegistrationsModule } from './test-registrations/test-registrations.module';
+import { KetQuaThiModule } from './ket-qua-thi/ket-qua-thi.module';
 
 const createDatabaseConfig = (
   configService: ConfigService,
@@ -109,6 +110,7 @@ const createDatabaseConfig = (
     PoomsaeModule,
     MediaModule,
     TestRegistrationsModule,
+    KetQuaThiModule,
   ],
   controllers: [],
   providers: [],

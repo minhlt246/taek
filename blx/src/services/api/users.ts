@@ -72,16 +72,41 @@ const handleResponse = <T>(response: any): T => {
  */
 export const usersApi = {
   /**
-   * Get all users
-   * @returns Promise<User[]>
+   * Get all users with pagination
+   * @param page - Page number (default: 1)
+   * @param limit - Items per page (default: 25)
+   * @returns Promise with paginated users
    */
-  getAll: async (): Promise<User[]> => {
+  getAll: async (
+    page: number = 1,
+    limit: number = 25
+  ): Promise<{
+    docs: User[];
+    totalDocs: number;
+    limit: number;
+    page: number;
+    totalPages: number;
+  }> => {
     try {
-      const response = await http.get("/users");
-      return handleResponse<User[]>(response.data);
+      const response = await http.get("/users", {
+        params: { page, limit },
+      });
+      return handleResponse<{
+        docs: User[];
+        totalDocs: number;
+        limit: number;
+        page: number;
+        totalPages: number;
+      }>(response.data);
     } catch (error: any) {
       console.error("Error fetching users:", error);
-      return [];
+      return {
+        docs: [],
+        totalDocs: 0,
+        limit,
+        page,
+        totalPages: 0,
+      };
     }
   },
 
@@ -165,14 +190,53 @@ export const usersApi = {
   },
   /**
    * Get user profile
-   * @param userId - User ID (optional, can be passed via query param)
+   * @param userId - User ID (optional, can be passed via query param or auto-fetched from account store)
    * @returns Promise<User | null>
    */
   getProfile: async (userId?: number): Promise<User | null> => {
     try {
-      const params = userId ? { userId: userId.toString() } : {};
+      // Lấy userId từ account store nếu không được truyền vào
+      let finalUserId = userId;
+      if (!finalUserId) {
+        try {
+          const { useAccountStore } = await import("@/stores/account");
+          const { account } = useAccountStore.getState();
+          if (account?.id) {
+            finalUserId = Number(account.id);
+          }
+        } catch (e) {
+          console.warn("Could not get userId from account store:", e);
+        }
+      }
+
+      // Backend yêu cầu userId, nếu không có thì throw error
+      if (!finalUserId) {
+        console.error(
+          "User ID is required for getProfile. Please login again."
+        );
+        return null;
+      }
+
+      const params = { userId: finalUserId.toString() };
       const response = await http.get("/users/profile", { params });
-      return handleResponse<User>(response.data);
+
+      // Debug: Log raw response từ backend
+      console.log("[Users API] Raw response from /users/profile:", {
+        responseData: response.data,
+        ma_hoi_vien: response.data?.ma_hoi_vien,
+        ma_hoi_vien_type: typeof response.data?.ma_hoi_vien,
+      });
+
+      const user = handleResponse<User>(response.data);
+
+      // Debug: Log sau khi handle response
+      console.log("[Users API] User after handleResponse:", {
+        user,
+        ma_hoi_vien: user?.ma_hoi_vien,
+        ma_hoi_vien_type: typeof user?.ma_hoi_vien,
+      });
+
+      return user;
     } catch (error: any) {
       console.error("Error fetching user profile:", error);
       return null;
@@ -248,8 +312,6 @@ export const usersApi = {
         );
       }
 
-      // Backend expect field name là "image" không phải "avatar"
-      // Kiểm tra xem có field "image" không, nếu không thì rename từ "avatar" sang "image"
       const entries = Array.from(formData.entries());
       const hasImageField = entries.some(([key]) => key === "image");
       if (!hasImageField) {
@@ -297,9 +359,6 @@ export const usersApi = {
         config.headers.Authorization = `Bearer ${token}`;
       }
 
-      // Đảm bảo không set Content-Type để axios tự động set multipart/form-data với boundary
-      // Axios sẽ tự động detect FormData và set header đúng
-
       const response = await http.post<{
         success: boolean;
         message: string;
@@ -344,6 +403,50 @@ export const usersApi = {
       return true;
     } catch (error: any) {
       console.error("Error changing password:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Import users from Excel file
+   * @param file - Excel file to import
+   * @param clubId - Optional club ID
+   * @returns Promise with import result
+   */
+  importExcel: async (
+    file: File,
+    clubId?: number
+  ): Promise<{
+    success: boolean;
+    message: string;
+    data: {
+      imported: number;
+      failed: number;
+      errors: string[];
+    };
+  }> => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      if (clubId) {
+        formData.append("club_id", clubId.toString());
+      }
+
+      const response = await http.post<{
+        success: boolean;
+        message: string;
+        data: {
+          imported: number;
+          failed: number;
+          errors: string[];
+        };
+      }>("/users/import-excel", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      return response.data;
+    } catch (error: any) {
+      console.error("Error importing users from Excel:", error);
       throw error;
     }
   },

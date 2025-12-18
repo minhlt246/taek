@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
  */
 export default function ClientAssets() {
   const [jQueryReady, setJQueryReady] = useState(false);
+  const [slickReady, setSlickReady] = useState(false);
 
   useEffect(() => {
     // Load CSS từ client vào head
@@ -20,11 +21,13 @@ export default function ClientAssets() {
       "/client/css/jquery.fancybox.min.css",
       "/client/css/daterangepicker.css",
       "/client/css/flag-icons.min.css",
+      "/client/slick/slick.css",
+      "/client/slick/slick-theme.css",
     ];
 
     cssFiles.forEach((href) => {
       const linkId = `client-css-${href.split("/").pop()?.replace(".css", "")}`;
-      
+
       // Kiểm tra xem đã load chưa
       if (!document.getElementById(linkId)) {
         const link = document.createElement("link");
@@ -49,7 +52,7 @@ export default function ClientAssets() {
           }
         }}
       />
-      
+
       {/* Load Bootstrap sau jQuery */}
       {jQueryReady && (
         <Script
@@ -57,13 +60,37 @@ export default function ClientAssets() {
           strategy="afterInteractive"
         />
       )}
-      
+
       {/* Load các script khác */}
       <Script src="/client/js/all.min.js" strategy="afterInteractive" />
       <Script src="/client/js/moment.min.js" strategy="afterInteractive" />
-      
-      {/* Chỉ load main.js sau khi jQuery đã sẵn sàng */}
+
+      {/* Load Slick carousel - cần jQuery và phải load trước main.js */}
       {jQueryReady && (
+        <Script
+          src="/client/slick/slick.js"
+          strategy="afterInteractive"
+          onLoad={() => {
+            // Đảm bảo Slick đã sẵn sàng
+            if (
+              typeof window !== "undefined" &&
+              (window as any).jQuery &&
+              (window as any).jQuery.fn.slick
+            ) {
+              console.log("Slick carousel loaded successfully");
+              setSlickReady(true);
+            }
+          }}
+          onError={(e) => {
+            console.error("Error loading slick.js:", e);
+            // Vẫn set ready để không block main.js nếu Slick fail
+            setSlickReady(true);
+          }}
+        />
+      )}
+
+      {/* Chỉ load main.js sau khi jQuery và Slick đã sẵn sàng */}
+      {jQueryReady && slickReady && (
         <Script
           src="/client/js/main.js"
           strategy="afterInteractive"
@@ -75,4 +102,3 @@ export default function ClientAssets() {
     </>
   );
 }
-

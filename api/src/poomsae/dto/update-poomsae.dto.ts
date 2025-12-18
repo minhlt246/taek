@@ -1,6 +1,5 @@
 export class UpdatePoomsaeDto {
   tenBaiQuyenVietnamese?: string;
-  tenBaiQuyenEnglish?: string;
   tenBaiQuyenKorean?: string;
   capDo?: string;
   moTa?: string;

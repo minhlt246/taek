@@ -32,11 +32,37 @@ export class EventsService implements IEventService {
     return await this.eventRepository.save(event);
   }
 
-  async findAll(): Promise<Event[]> {
-    return await this.eventRepository.find({
+  async findAll(
+    page: number = 1,
+    limit: number = 25,
+  ): Promise<{
+    docs: Event[];
+    totalDocs: number;
+    limit: number;
+    page: number;
+    totalPages: number;
+  }> {
+    // Get total count
+    const totalDocs = await this.eventRepository.count();
+
+    // Calculate pagination
+    const skip = (page - 1) * limit;
+    const totalPages = Math.ceil(totalDocs / limit);
+
+    const docs = await this.eventRepository.find({
+      skip,
+      take: limit,
       relations: ['club'],
       order: { start_date: 'ASC' },
     });
+
+    return {
+      docs,
+      totalDocs,
+      limit,
+      page,
+      totalPages,
+    };
   }
 
   async findOne(id: number): Promise<Event> {

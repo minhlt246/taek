@@ -9,6 +9,7 @@ import Script from "next/script";
  */
 export const AdminAssets = () => {
   const [jQueryReady, setJQueryReady] = useState(false);
+  const [slickReady, setSlickReady] = useState(false);
 
   useEffect(() => {
     // Load CSS files từ /client/assets
@@ -20,6 +21,8 @@ export const AdminAssets = () => {
       "/client/assets/plugins/datatables/css/dataTables.bootstrap5.min.css",
       "/client/assets/plugins/daterangepicker/daterangepicker.css",
       "/client/assets/plugins/fontawesome/css/all.min.css",
+      "/client/slick/slick.css",
+      "/client/slick/slick-theme.css",
     ];
 
     links.forEach((href) => {
@@ -86,10 +89,7 @@ export const AdminAssets = () => {
       )}
 
       {/* Load DateRangePicker */}
-      <Script
-        src="/client/js/moment.min.js"
-        strategy="lazyOnload"
-      />
+      <Script src="/client/js/moment.min.js" strategy="lazyOnload" />
       {jQueryReady && (
         <Script
           src="/client/assets/plugins/daterangepicker/daterangepicker.js"
@@ -97,8 +97,32 @@ export const AdminAssets = () => {
         />
       )}
 
-      {/* Load main admin script - cần jQuery */}
+      {/* Load Slick carousel - cần jQuery và phải load trước main.js */}
       {jQueryReady && (
+        <Script
+          src="/client/slick/slick.js"
+          strategy="lazyOnload"
+          onLoad={() => {
+            // Đảm bảo Slick đã sẵn sàng
+            if (
+              typeof window !== "undefined" &&
+              (window as any).jQuery &&
+              (window as any).jQuery.fn.slick
+            ) {
+              console.log("Slick carousel loaded successfully");
+              setSlickReady(true);
+            }
+          }}
+          onError={(e) => {
+            console.error("Error loading slick.js:", e);
+            // Vẫn set ready để không block main.js nếu Slick fail
+            setSlickReady(true);
+          }}
+        />
+      )}
+
+      {/* Load main admin script - cần jQuery và Slick */}
+      {jQueryReady && slickReady && (
         <Script
           src="/client/js/main.js"
           strategy="lazyOnload"

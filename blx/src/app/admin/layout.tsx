@@ -38,8 +38,8 @@ export default function AdminLayout({
 
   useEffect(() => {
     // Kiểm tra nếu đang ở trang admin (pathname bắt đầu bằng /admin)
-    const isAdminPath = pathname?.startsWith('/admin');
-    
+    const isAdminPath = pathname?.startsWith("/admin");
+
     if (!isAdminPath) {
       // Reset flags khi rời khỏi trang admin
       hasCheckedAuth.current = false;
@@ -57,11 +57,13 @@ export default function AdminLayout({
     // Kiểm tra xem có phải là reload hay navigation mới
     // Sử dụng performance API để detect reload
     let isReload = false;
-    if (typeof window !== 'undefined' && window.performance) {
-      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+    if (typeof window !== "undefined" && window.performance) {
+      const navigation = performance.getEntriesByType(
+        "navigation"
+      )[0] as PerformanceNavigationTiming;
       if (navigation) {
         // type === 'reload' nghĩa là reload trang
-        isReload = navigation.type === 'reload';
+        isReload = navigation.type === "reload";
       }
     }
 
@@ -72,6 +74,7 @@ export default function AdminLayout({
     // Chỉ redirect khi thực sự navigate đến trang admin từ bên ngoài
     if (isReload) {
       // Đã reload, không redirect - giữ nguyên trang bất kể user có quyền hay không
+      // Cho phép user truy cập trang admin ngay cả khi reload với account khác
       return;
     }
 
@@ -86,11 +89,12 @@ export default function AdminLayout({
     }
 
     // Cho phép truy cập admin nếu role là 'admin', 'owner', hoặc từ bảng admin (super_admin)
-    const allowedRoles = ['admin', 'owner', 'super_admin'];
+    const allowedRoles = ["admin", "owner", "super_admin"];
     const userRole = account?.role?.toLowerCase();
-    
+
     // CHỈ redirect nếu user có role nhưng KHÔNG phải admin/owner
     // Và đây là navigation MỚI (không phải reload)
+    // Lưu ý: Nếu user không có role (null/undefined), vẫn cho phép truy cập để tránh block
     if (userRole && !allowedRoles.includes(userRole)) {
       // Navigate mới đến trang admin nhưng không có quyền, redirect về home
       if (!hasRedirected.current) {
@@ -99,16 +103,17 @@ export default function AdminLayout({
       }
       return;
     }
-    
-    // User có quyền admin, không redirect
+
+    // User có quyền admin hoặc chưa có role (có thể là student đang test), không redirect
+    // Cho phép truy cập để hệ thống có thể chạy độc lập
   }, [isAuthenticated, account, router, pathname]);
 
   // Show loading while checking authentication
   const userRole = account?.role?.toLowerCase();
-  const allowedRoles = ['admin', 'owner', 'super_admin'];
+  const allowedRoles = ["admin", "owner", "super_admin"];
   const hasAdminRole = userRole && allowedRoles.includes(userRole);
-  const isAdminPath = pathname?.startsWith('/admin');
-  
+  const isAdminPath = pathname?.startsWith("/admin");
+
   // Chỉ show loading nếu:
   // 1. Đang initial loading
   // 2. Hoặc chưa authenticated và đang ở trang admin (sẽ redirect về login)
@@ -150,16 +155,28 @@ export default function AdminLayout({
 
       <div className="main-wrapper">
         <AdminSidebar />
-        
+
         {/* Search Modal */}
         <div className="modal fade" id="searchModal">
           <div className="modal-dialog modal-lg">
             <div className="modal-content bg-transparent">
               <div className="card shadow-none mb-0">
-                <div className="px-3 py-2 d-flex flex-row align-items-center" id="search-top">
+                <div
+                  className="px-3 py-2 d-flex flex-row align-items-center"
+                  id="search-top"
+                >
                   <i className="ti ti-search fs-22"></i>
-                  <input type="search" className="form-control border-0" placeholder="Search" />
-                  <button type="button" className="btn p-0" data-bs-dismiss="modal" aria-label="Close">
+                  <input
+                    type="search"
+                    className="form-control border-0"
+                    placeholder="Search"
+                  />
+                  <button
+                    type="button"
+                    className="btn p-0"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  >
                     <i className="ti ti-x fs-22"></i>
                   </button>
                 </div>
@@ -170,15 +187,18 @@ export default function AdminLayout({
 
         <div className="page-wrapper">
           <AdminHeader />
-          <div className="content pb-0">
-            {children}
-          </div>
+          <div className="content pb-0">{children}</div>
 
           {/* Footer */}
           <footer className="footer d-block d-md-flex justify-content-between text-md-start text-center">
             <p className="mb-md-0 mb-1">
               Copyright &copy; {new Date().getFullYear()}{" "}
-              <a href="javascript:void(0);" className="link-primary text-decoration-underline ms-1">Minh-Dev Team</a>
+              <a
+                href="javascript:void(0);"
+                className="link-primary text-decoration-underline ms-1"
+              >
+                Minh-Dev Team
+              </a>
             </p>
             <div className="d-flex align-items-center gap-2 footer-links justify-content-center justify-content-md-end">
               <a href="javascript:void(0);">About</a>
